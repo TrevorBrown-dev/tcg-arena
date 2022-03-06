@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+    db:
+        build:
+            context: ./db
+            dockerfile: Dockerfile
+        environment:
+            POSTGRES_USER: postgres
+        env_file:
+            - globals.env
+        volumes:
+            - ./db/data/postgres:/var/lib/postgresql/data
+    api:
+        build:
+            context: ./api
+            dockerfile: Dockerfile.dev
+        restart: always
+        command: npm run dev
+        volumes:
+            - ./api/src:/usr/app/src
+            - /usr/app/node_modules
+        env_file:
+            - ./globals.env
+            - ./api/.env
+        depends_on:
+            - db
+    web:
+        build:
+            context: ./web
+            dockerfile: Dockerfile.dev
+        restart: always
+        volumes:
+            - ./web:/usr/app
+            - ./web/components:/usr/app/components
+            - ./web/pages:/usr/app/pages
+            - ./web/styles:/usr/app/styles
+            - /usr/app/node_modules
+            - /.next
+        expose:
+            - '3000'
+        depends_on:
+            - api
+    nginx:
+        build:
+            context: ./nginx
+            dockerfile: Dockerfile
+        ports:
+            - '80:80'
+        depends_on:
+            - web
