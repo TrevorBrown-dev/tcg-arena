@@ -11,18 +11,18 @@ services:
             - globals.env
         volumes:
             - ./db/data/postgres:/var/lib/postgresql/data
-    api:
+    server:
         build:
-            context: ./api
+            context: ./server
             dockerfile: Dockerfile.dev
         restart: always
         command: npm run dev
         volumes:
-            - ./api/src:/usr/app/src
+            - ./server/src:/usr/app/src
             - /usr/app/node_modules
         env_file:
             - ./globals.env
-            - ./api/.env
+            - ./server/.env
         depends_on:
             - db
     web:

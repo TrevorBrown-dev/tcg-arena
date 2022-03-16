@@ -1,7 +1,7 @@
 {
-    "name": "api",
+    "name": "server",
     "version": "1.0.0",
-    "description": "The api for the application",
+    "description": "The backend for the application",
     "main": "index.js",
     "scripts": {
         "build": "tsc -b",
