@@ -3,6 +3,9 @@
  */
 module.exports = {
     reactStrictMode: true,
+    webpack: (config, { dev, isServer }) => {
+        return config;
+    },
     webpackDevMiddleware: (config) => {
         config.watchOptions = {
             poll: 1000,

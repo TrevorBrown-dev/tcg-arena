@@ -30,6 +30,13 @@ https://github.com/oxalorg/sakura
         cursor: pointer;
         user-select: none;
     }
+
+    button {
+        cursor: pointer;
+        outline: none;
+        border: none;
+    }
+
     a,
     a:link,
     a:visited {

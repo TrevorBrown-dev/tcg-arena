@@ -1,4 +1,4 @@
-FROM node:12 as builder
+FROM node:latest as builder
 WORKDIR /usr/app
 COPY ./package.json ./
 RUN npm install
@@ -7,7 +7,7 @@ RUN npm run build
 
 
 
-FROM node:12
+FROM node:latest
 WORKDIR /usr/app
 COPY --from=builder /usr/app/package.json ./
 RUN npm install

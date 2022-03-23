@@ -1,19 +1,20 @@
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import React from 'react';
+import { Provider } from 'urql';
 import { GlobalStyle } from '../styles/sc/GlobalStyle';
 // import '../styles/globals.css';
-// import { ssrCache, urqlClient } from '../utils/createURQLClient';
+import { ssrCache, urqlClient } from '../utils/createURQLClient';
 //create a function that will turn a cookie string into a json object
 export const findCookie = (name: string, cookie: string) => {
     return cookie?.split(';').find((c) => c.trim().startsWith(`${name}=`));
 };
 
 function MyApp({ Component, pageProps, ...rest }: AppProps) {
-    // if (pageProps.urqlState) {
-    //     ssrCache.restoreData(pageProps.urqlState);
-    //     pageProps.urqlState;
-    // }
+    if (pageProps.urqlState) {
+        ssrCache.restoreData(pageProps.urqlState);
+        pageProps.urqlState;
+    }
 
     return (
         <>
@@ -24,10 +25,10 @@ function MyApp({ Component, pageProps, ...rest }: AppProps) {
                 />
                 <title>TCG Arena</title>
             </Head>
-            {/* <Provider value={urqlClient}> */}
-            <GlobalStyle />
-            <Component {...pageProps} />
-            {/* </Provider> */}
+            <Provider value={urqlClient}>
+                <GlobalStyle />
+                <Component {...pageProps} />
+            </Provider>
         </>
     );
 }

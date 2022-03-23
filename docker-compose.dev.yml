@@ -10,7 +10,7 @@ services:
         env_file:
             - globals.env
         volumes:
-            - ./db/data/postgres:/var/lib/postgresql/data
+            - db_data:/var/lib/postgresql/data
     server:
         build:
             context: ./server
@@ -25,6 +25,18 @@ services:
             - ./server/.env
         depends_on:
             - db
+
+    redis:
+        build:
+            context: ./redis
+            dockerfile: Dockerfile
+        restart: always
+        volumes:
+            - redis_data:/data
+        env_file:
+            - ./globals.env
+        depends_on:
+            - server
     web:
         build:
             context: ./web
@@ -32,11 +44,8 @@ services:
         restart: always
         volumes:
             - ./web:/usr/app
-            - ./web/components:/usr/app/components
-            - ./web/pages:/usr/app/pages
-            - ./web/styles:/usr/app/styles
             - /usr/app/node_modules
-            - /.next
+            - /usr/app/.next
         expose:
             - '3000'
         depends_on:
@@ -49,3 +58,6 @@ services:
             - '80:80'
         depends_on:
             - web
+volumes:
+    db_data:
+    redis_data:

@@ -9,7 +9,7 @@ export default {
     database: process.env.DB_NAME || 'postgres',
     synchronize: true, //? probably should comment out in production
     // logging: true, //? turn on if you wanna look at sql
-    entities: ['src/entities/**/*.ts'],
+    entities: [__dirname + '/**/*/entities/*{.ts,.js}'],
     // cache: {
     //     type: 'redis',
     //     host: process.env.REDIS_HOST || 'localhost',

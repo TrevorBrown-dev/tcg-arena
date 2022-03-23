@@ -1,10 +1,10 @@
 import { css } from 'styled-components';
 
 export const Palette = {
-    primary: '#5f75de',
+    primary: '#ff005a',
     primaryLight: '#7e90e4',
-    offPrimary: '#5569c7',
-    secondary: '#04afa6',
+    offPrimary: '#ae2a5f',
+    secondary: '#1b0a65',
     offSecondary: '#039c9c',
     warning: '#dc3545',
     warningText: '#721c2a',
@@ -12,7 +12,7 @@ export const Palette = {
     light: '#fff',
     offLight: '#f9f9f9',
     medium: '#d1d1d1',
-    dark: '#2a2a2a',
+    dark: '#1d013a',
     offDark: 'lighten($color-dark, 10%)',
 };
 
