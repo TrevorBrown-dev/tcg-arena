@@ -24,7 +24,7 @@ export const pubsub = new RedisPubSub({
     },
 });
 const main = async () => {
-    await createConnection(ormconfig);
+    const res = await createConnection(ormconfig);
     const resolvers = (await Promise.all(
         glob
             .sync(path.join(__dirname, '/resolvers/*.js'))
@@ -37,7 +37,8 @@ const main = async () => {
 
     app.use(
         cors({
-            origin: '*',
+            origin: 'http://localhost',
+            credentials: true,
         })
     );
 
@@ -51,7 +52,6 @@ const main = async () => {
     const httpServer = createServer(app);
     const schema = await buildSchema({
         resolvers,
-        emitSchemaFile: true,
         pubSub: pubsub,
     });
 
@@ -67,7 +67,6 @@ const main = async () => {
         context: (req): MyContext => ({ req }),
 
         plugins: [
-            // ApolloServerPluginLandingPageGraphQLPlayground,
             ApolloServerPluginDrainHttpServer({ httpServer }),
             {
                 async serverWillStart() {
@@ -83,10 +82,10 @@ const main = async () => {
     await apolloServer.start();
     apolloServer.applyMiddleware({
         app,
-        // cors: {
-        //     origin: '*',
-        //     // credentials: true,
-        // },
+        cors: {
+            origin: 'http://localhost',
+            credentials: true,
+        },
     });
     // app.get('/', (_, res) => {
     //     res.redirect(apolloServer.graphqlPath);

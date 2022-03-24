@@ -1,0 +1,5 @@
+fragment AccountParts on Account {
+    id
+    email
+    userName
+}

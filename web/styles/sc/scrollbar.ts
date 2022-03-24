@@ -2,7 +2,7 @@ import { css } from 'styled-components';
 
 export const Scrollbar = css`
     :root {
-        ::-webkit-scrollbar {
+        /* ::-webkit-scrollbar {
             width: 0.8em;
             background-color: $color-off-dark;
         }
@@ -13,6 +13,6 @@ export const Scrollbar = css`
             &:hover {
                 background-color: darken($color_light, 20%);
             }
-        }
+        } */
     }
 `;

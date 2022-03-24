@@ -4,3 +4,5 @@ db/data/*
 */dist
 out.txt
 out.json
+.credentials
+.ssl

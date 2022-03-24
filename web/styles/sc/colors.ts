@@ -5,7 +5,7 @@ export const Palette = {
     primaryLight: '#7e90e4',
     offPrimary: '#ae2a5f',
     secondary: '#1b0a65',
-    offSecondary: '#039c9c',
+    offSecondary: '#BE97FF',
     warning: '#dc3545',
     warningText: '#721c2a',
     offWarning: '#f8d7da',

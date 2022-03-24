@@ -13,5 +13,5 @@ COPY --from=builder /usr/app/package.json ./
 RUN npm install
 COPY --from=builder /usr/app/.next ./.next
 COPY --from=builder /usr/app/public ./public
-
+EXPOSE 3000
 CMD ["npm", "start"]

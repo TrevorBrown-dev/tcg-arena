@@ -1,65 +1,83 @@
 import type { NextPage } from 'next';
 import styled from 'styled-components';
+import { Button } from '../components/library/Button';
+import { Form } from '../components/library/Form';
+import { Input } from '../components/library/Input';
+import { RegisterForm } from '../components/RegisterForm';
+import {
+    Crystal,
+    genCrystal,
+    generateRandomCrystals,
+} from '../components/svg/Crystal';
+import { JaggedFrame } from '../components/svg/JaggedFrame';
 const StyledHome = styled.div`
     color: var(--color-light);
     background-color: var(--color-secondary);
-    height: 100vh;
-    padding: 5em;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3em;
 
     h1 {
-        font-size: 5em;
+        font-size: 9vw;
     }
-
-    .button {
-        border-radius: 20rem;
-        background-color: var(--color-primary);
-        color: var(--color-light);
-        padding: 1em;
-        font-size: 1.6rem;
-        font-weight: bold;
+    h2 {
+        font-size: 3vw;
     }
-`;
-
-const Input = styled.input`
-    border-radius: 100px;
-    outline: none;
-    border: none;
-    padding: 0.8em 0.8em;
-    font-size: 1.6rem;
-
-    &:focus {
-        outline-offset: 2px;
-        outline: 2px solid var(--color-light);
-    }
-`;
-
-const Form = styled.form`
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
-
-    .row {
+    .hero {
+        width: 100%;
+        position: relative;
+        padding: 5em;
+        height: 90vh;
         display: flex;
-        flex-direction: row;
-        gap: 0.5em;
+        flex-direction: column;
+        align-items: center;
+        background-color: transparent;
+        justify-content: center;
+        overflow: hidden;
+        gap: 2em;
+        *:not(.crystal) {
+            z-index: 2;
+        }
+        .crystal {
+            position: absolute;
+            /* z-index: ; */
+        }
     }
 `;
 
 const Home: NextPage = () => {
     return (
         <StyledHome>
-            <h1>TCG Arena</h1>
-            <Form>
-                <div className="row">
-                    <Input type="text" placeholder="email" />
-                    <Input type="text" placeholder="password" />
-                </div>
-                <button className="button">Sign up now</button>
-            </Form>
+            <div className="hero">
+                {genCrystal(0, 20, 20, 30)}
+                {genCrystal(2, 80, 20, -30)}
+                {genCrystal(4, 20, 50, -30)}
+                {genCrystal(5, 80, 50, 30)}
+
+                <h1>TCG ARENA</h1>
+                <h2>Sign up for some free goodies at launch!</h2>
+                <RegisterForm />
+                <JaggedFrame
+                    style={{
+                        position: 'absolute',
+                        bottom: '-1',
+                        left: 0,
+                        width: '100vw',
+                        height: 'auto',
+                        zIndex: 1,
+                    }}
+                />
+            </div>
+            <div
+                className="test"
+                style={{
+                    background: 'var(--color-off-secondary)',
+                    width: '100%',
+                    color: 'var(--color-dark)',
+                }}
+            >
+                <h1>Hi there</h1>
+            </div>
         </StyledHome>
     );
 };

@@ -1,5 +1,0 @@
-subscription AccountAdded($testing: String!) {
-    accountAdded(testing: $testing) {
-        message
-    }
-}

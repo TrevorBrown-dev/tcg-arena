@@ -1,0 +1,97 @@
+version: '3'
+
+services:
+    db:
+        image: 934932360625.dkr.ecr.us-east-1.amazonaws.com/tcgarena:db
+        build:
+            context: ./db
+            dockerfile: Dockerfile
+        environment:
+            POSTGRES_USER: postgres
+        env_file:
+            - globals.env
+        volumes:
+            - db_data:/var/lib/postgresql/data
+        logging:
+            driver: awslogs
+            options:
+                awslogs-region: us-east-1
+                awslogs-group: tcgarena-logs
+                awslogs-stream-prefix: db
+    redis:
+        image: 934932360625.dkr.ecr.us-east-1.amazonaws.com/tcgarena:redis
+        build:
+            context: ./redis
+            dockerfile: Dockerfile
+        restart: always
+        env_file:
+            - ./globals.env
+        logging:
+            driver: awslogs
+            options:
+                awslogs-region: us-east-1
+                awslogs-group: tcgarena-logs
+                awslogs-stream-prefix: redis
+    server:
+        image: 934932360625.dkr.ecr.us-east-1.amazonaws.com/tcgarena:server
+        build:
+            context: ./server
+            dockerfile: Dockerfile
+        restart: always
+        env_file:
+            - ./globals.env
+            - ./server/.env
+        depends_on:
+            - db
+            - redis
+        links:
+            - db
+            - redis
+        logging:
+            driver: awslogs
+            options:
+                awslogs-region: us-east-1
+                awslogs-group: tcgarena-logs
+                awslogs-stream-prefix: server
+
+    web:
+        image: 934932360625.dkr.ecr.us-east-1.amazonaws.com/tcgarena:web
+        build:
+            context: ./web
+            dockerfile: Dockerfile
+        restart: always
+        expose:
+            - '3000'
+        depends_on:
+            - server
+        links:
+            - server
+        logging:
+            driver: awslogs
+            options:
+                awslogs-region: us-east-1
+                awslogs-group: tcgarena-logs
+                awslogs-stream-prefix: web
+    nginx:
+        restart: always
+        image: 934932360625.dkr.ecr.us-east-1.amazonaws.com/tcgarena:nginx
+        build:
+            context: ./nginx
+            dockerfile: Dockerfile
+        ports:
+            - '80:80'
+            - '443:443'
+        depends_on:
+            - web
+            - server
+        links:
+            - web
+            - server
+        logging:
+            driver: awslogs
+            options:
+                awslogs-region: us-east-1
+                awslogs-group: tcgarena-logs
+                awslogs-stream-prefix: nginx
+volumes:
+    db_data:

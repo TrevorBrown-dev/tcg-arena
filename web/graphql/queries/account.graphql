@@ -1,0 +1,5 @@
+query Account($id: Float!) {
+    account(id: $id) {
+        ...AccountParts
+    }
+}

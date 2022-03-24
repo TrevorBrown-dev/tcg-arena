@@ -15,58 +15,101 @@ export type Scalars = {
   Float: number;
 };
 
+export type Account = {
+  __typename?: 'Account';
+  email: Scalars['String'];
+  id: Scalars['Float'];
+  userName: Scalars['String'];
+};
+
+export type AccountResponse = {
+  __typename?: 'AccountResponse';
+  account?: Maybe<Account>;
+  errors?: Maybe<Array<FieldError>>;
+};
+
+export type FieldError = {
+  __typename?: 'FieldError';
+  field: Scalars['String'];
+  message: Scalars['String'];
+};
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  register: AccountResponse;
+};
+
+
+export type MutationRegisterArgs = {
+  input: RegisterInput;
+};
+
 export type Query = {
   __typename?: 'Query';
-  accounts: Test;
-};
-
-export type Subscription = {
-  __typename?: 'Subscription';
-  accountAdded: Test;
+  account: Account;
 };
 
 
-export type SubscriptionAccountAddedArgs = {
-  testing: Scalars['String'];
+export type QueryAccountArgs = {
+  id: Scalars['Float'];
 };
 
-export type Test = {
-  __typename?: 'Test';
-  message?: Maybe<Scalars['String']>;
+export type RegisterInput = {
+  email: Scalars['String'];
+  password: Scalars['String'];
+  userName: Scalars['String'];
 };
 
-export type AccountAddedSubscriptionVariables = Exact<{
-  testing: Scalars['String'];
+export type AccountPartsFragment = { __typename?: 'Account', id: number, email: string, userName: string };
+
+export type RegisterMutationVariables = Exact<{
+  email: Scalars['String'];
+  password: Scalars['String'];
+  userName: Scalars['String'];
 }>;
 
 
-export type AccountAddedSubscription = { __typename?: 'Subscription', accountAdded: { __typename?: 'Test', message?: string | null } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'AccountResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, account?: { __typename?: 'Account', id: number, email: string, userName: string } | null } };
 
-export type AccountsQueryVariables = Exact<{ [key: string]: never; }>;
+export type AccountQueryVariables = Exact<{
+  id: Scalars['Float'];
+}>;
 
 
-export type AccountsQuery = { __typename?: 'Query', accounts: { __typename?: 'Test', message?: string | null } };
+export type AccountQuery = { __typename?: 'Query', account: { __typename?: 'Account', id: number, email: string, userName: string } };
 
-
-export const AccountAddedDocument = gql`
-    subscription AccountAdded($testing: String!) {
-  accountAdded(testing: $testing) {
-    message
-  }
+export const AccountPartsFragmentDoc = gql`
+    fragment AccountParts on Account {
+  id
+  email
+  userName
 }
     `;
+export const RegisterDocument = gql`
+    mutation Register($email: String!, $password: String!, $userName: String!) {
+  register(input: {email: $email, password: $password, userName: $userName}) {
+    errors {
+      field
+      message
+    }
+    account {
+      ...AccountParts
+    }
+  }
+}
+    ${AccountPartsFragmentDoc}`;
 
-export function useAccountAddedSubscription<TData = AccountAddedSubscription>(options: Omit<Urql.UseSubscriptionArgs<AccountAddedSubscriptionVariables>, 'query'> = {}, handler?: Urql.SubscriptionHandler<AccountAddedSubscription, TData>) {
-  return Urql.useSubscription<AccountAddedSubscription, TData, AccountAddedSubscriptionVariables>({ query: AccountAddedDocument, ...options }, handler);
+export function useRegisterMutation() {
+  return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
 };
-export const AccountsDocument = gql`
-    query Accounts {
-  accounts {
-    message
+export const AccountDocument = gql`
+    query Account($id: Float!) {
+  account(id: $id) {
+    ...AccountParts
   }
 }
-    `;
+    ${AccountPartsFragmentDoc}`;
 
-export function useAccountsQuery(options?: Omit<Urql.UseQueryArgs<AccountsQueryVariables>, 'query'>) {
-  return Urql.useQuery<AccountsQuery>({ query: AccountsDocument, ...options });
+export function useAccountQuery(options: Omit<Urql.UseQueryArgs<AccountQueryVariables>, 'query'>) {
+  return Urql.useQuery<AccountQuery>({ query: AccountDocument, ...options });
 };

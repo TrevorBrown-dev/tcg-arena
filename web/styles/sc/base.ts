@@ -20,7 +20,7 @@ https://github.com/oxalorg/sakura
     html {
         scroll-behavior: smooth;
         font-size: 62.5%;
-        font-family: 'Proxima Nova', sans-serif;
+        font-family: 'Roboto', sans-serif;
         font-weight: 200;
         overflow: scroll;
         overflow-x: hidden;

@@ -1,15 +1,22 @@
-import { Field, ID, ObjectType } from 'type-graphql';
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import argon2 from 'argon2';
+import { Field, ObjectType } from 'type-graphql';
+import {
+    BaseEntity,
+    BeforeInsert,
+    Column,
+    Entity,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 @ObjectType()
 export class Account extends BaseEntity {
-    @Field(() => ID)
+    @Field(() => Number)
     @PrimaryGeneratedColumn()
-    id: string;
+    id: number;
 
     @Field()
-    @Column()
+    @Column({ unique: true })
     email: string;
 
     @Column()
