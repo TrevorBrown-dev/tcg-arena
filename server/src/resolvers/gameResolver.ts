@@ -24,25 +24,6 @@ class GameResolver {
     }
 
     @Mutation(() => Game)
-    async createGame(
-        @Arg('player1') player1Id: number,
-        @Arg('player2') player2Id: number
-    ): Promise<Game> {
-        const player1 = await Account.findOne(player1Id);
-        const player2 = await Account.findOne(player2Id);
-
-        const game = await Game.create({
-            player1,
-            player2,
-            player1Health: 100,
-            player2Health: 100,
-        }).save();
-
-        pubsub.publish(`updateGame_${game.id}`, game);
-        return game;
-    }
-
-    @Mutation(() => Game)
     async updateGame(@Arg('id') id: number, @Arg('data') data: GameInput) {
         const game = await Game.findOne(id);
 

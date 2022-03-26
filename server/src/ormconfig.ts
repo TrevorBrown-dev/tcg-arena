@@ -6,6 +6,7 @@ import { CardLibrary } from './entities/CardLibrary';
 import { Deck } from './entities/Deck';
 import { DeckTemplate } from './entities/DeckTemplate';
 import { Game } from './entities/Game';
+import { Player } from './entities/Player';
 
 export default {
     type: 'postgres',
@@ -16,7 +17,7 @@ export default {
     database: 'tcgarena',
     synchronize: true, //? probably should comment out in production
     // logging: true, //? turn on if you wanna look at sql
-    entities: [Account, Game, Card, Deck, DeckTemplate, CardLibrary],
+    entities: [Account, Game, Card, Deck, DeckTemplate, CardLibrary, Player],
     // cache: {
     //     type: 'redis',
     //     host: process.env.REDIS_HOST || 'localhost',
