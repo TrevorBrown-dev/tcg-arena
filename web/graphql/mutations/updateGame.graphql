@@ -1,0 +1,12 @@
+mutation UpdateGame($id: Float!, $data: GameInput!) {
+    updateGame(id: $id, data: $data) {
+        player1 {
+            ...AccountParts
+        }
+        player2 {
+            ...AccountParts
+        }
+        player1Health
+        player2Health
+    }
+}

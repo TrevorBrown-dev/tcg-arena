@@ -10,6 +10,7 @@ RUN npm run build
 FROM node:latest
 WORKDIR /usr/app
 COPY --from=builder /usr/app/package.json ./
+ENV NODE_ENV production
 RUN npm install
 COPY --from=builder /usr/app/.next ./.next
 COPY --from=builder /usr/app/public ./public

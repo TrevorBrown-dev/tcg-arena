@@ -30,11 +30,7 @@ export const ssrCache = ssrExchange({
     isClient: !isServer,
     initialState: !isServer ? (window as any).__URQL_DATA__ : undefined,
 });
-const cache = cacheExchange({
-    updates: {
-        Mutation: {},
-    },
-});
+// const cache = cacheExchange();
 
 export const urqlConfig: ClientOptions = {
     url: `/graphql`,
@@ -48,7 +44,7 @@ export const urqlConfig: ClientOptions = {
     },
     exchanges: [
         dedupExchange,
-        cache,
+        cacheExchange({}),
         ssrCache,
         fetchExchange,
         subscriptionExchange({
@@ -56,7 +52,10 @@ export const urqlConfig: ClientOptions = {
                 return {
                     subscribe: (sink) => {
                         const wsClient = createWSClient({
-                            url: `ws://localhost/graphql`,
+                            url:
+                                process.env.NODE_ENV === 'production'
+                                    ? `wss://tcgarena.xyz/graphql`
+                                    : `ws://localhost/graphql`,
                         });
                         const dispose = wsClient.subscribe(operation, sink);
                         return {

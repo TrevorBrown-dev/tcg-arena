@@ -1,15 +1,11 @@
 import { createConnection } from 'typeorm';
-import { glob } from 'glob';
-import path from 'path';
-import { Account } from './entities/Account';
 
-// const entities = (async () => {
-//     return await Promise.all(
-//         glob
-//             .sync(path.join(__dirname, '/resolvers/*.js'))
-//             .map(async (f) => (await import(f)).default)
-//     );
-// })();
+import { Account } from './entities/Account';
+import { Card } from './entities/Card';
+import { CardLibrary } from './entities/CardLibrary';
+import { Deck } from './entities/Deck';
+import { DeckTemplate } from './entities/DeckTemplate';
+import { Game } from './entities/Game';
 
 export default {
     type: 'postgres',
@@ -20,7 +16,7 @@ export default {
     database: 'tcgarena',
     synchronize: true, //? probably should comment out in production
     // logging: true, //? turn on if you wanna look at sql
-    entities: [Account],
+    entities: [Account, Game, Card, Deck, DeckTemplate, CardLibrary],
     // cache: {
     //     type: 'redis',
     //     host: process.env.REDIS_HOST || 'localhost',

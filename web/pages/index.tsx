@@ -12,7 +12,7 @@ import {
 import { JaggedFrame } from '../components/svg/JaggedFrame';
 const StyledHome = styled.div`
     color: var(--color-light);
-    background-color: var(--color-secondary);
+    background-color: var(--color-dark);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -60,7 +60,7 @@ const Home: NextPage = () => {
                 <JaggedFrame
                     style={{
                         position: 'absolute',
-                        bottom: '-1',
+                        bottom: '0',
                         left: 0,
                         width: '100vw',
                         height: 'auto',
@@ -71,12 +71,13 @@ const Home: NextPage = () => {
             <div
                 className="test"
                 style={{
+                    minHeight: '10vh',
                     background: 'var(--color-off-secondary)',
                     width: '100%',
                     color: 'var(--color-dark)',
                 }}
             >
-                <h1>Hi there</h1>
+                {/* <h1>Hi there</h1> */}
             </div>
         </StyledHome>
     );

@@ -1,0 +1,7 @@
+mutation CreateGame($player1: Float!, $player2: Float!) {
+    createGame(player1: $player1, player2: $player2) {
+        id
+        player1Health
+        player2Health
+    }
+}

@@ -8,4 +8,4 @@ docker compose push
 echo "Waiting for services to drain"
 sleep 20
 ./ecs-compose-up.sh
-# ./cloudflare-dns-update.sh
+./cloudflare-dns-update.sh

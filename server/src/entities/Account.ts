@@ -5,8 +5,12 @@ import {
     BeforeInsert,
     Column,
     Entity,
+    OneToMany,
+    OneToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm';
+import { CardLibrary } from './CardLibrary';
+import { Game } from './Game';
 
 @Entity()
 @ObjectType()
@@ -25,4 +29,11 @@ export class Account extends BaseEntity {
     @Field()
     @Column()
     userName: string;
+
+    @OneToMany(() => Game, (game) => game.player1)
+    @OneToMany(() => Game, (game) => game.player2)
+    games: Game[];
+
+    @OneToOne(() => CardLibrary, (library) => library)
+    cardLibrary: CardLibrary;
 }

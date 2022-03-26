@@ -1,0 +1,12 @@
+subscription WatchGame($gameId: Float!) {
+    watchGame(gameId: $gameId) {
+        player1 {
+            ...AccountParts
+        }
+        player2 {
+            ...AccountParts
+        }
+        player1Health
+        player2Health
+    }
+}

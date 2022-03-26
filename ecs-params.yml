@@ -1,5 +1,8 @@
 version: 1
 task_definition:
     ecs_network_mode: bridge
-    
+    efs_volumes:
+    - name: db_data
+      filesystem_id: fs-0c56f6ad80653b973
+      transit_encryption: ENABLED
       

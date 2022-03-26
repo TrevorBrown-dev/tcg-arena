@@ -18,6 +18,8 @@ services:
         restart: always
         env_file:
             - ./globals.env
+        ports:
+            - '6379:6379'
     server:
         build:
             context: ./server

@@ -17,14 +17,41 @@ import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 import { RedisPubSub } from 'graphql-redis-subscriptions';
-export const pubsub = new RedisPubSub({
-    connection: {
-        host: 'redis',
-        port: 6379,
+import Redis from 'ioredis';
+import { exit } from 'process';
+// const connection: RedisOptions = {
+//     host: 'redis://redis',
+//     port: 6379,
+// };
+
+const options = {
+    host: 'redis',
+    port: 6379,
+    retryStrategy: (times: number) => {
+        // reconnect after
+        return Math.min(times * 50, 2000);
     },
+};
+
+export const pubsub = new RedisPubSub({
+    connection: options,
+    publisher: new Redis(options),
+    subscriber: new Redis(options),
 });
+
+// export const pubsub = new RedisPubSub({
+//     connection: {
+//         host: 'redis',
+//         port: 6379,
+//     },
+// });
 const main = async () => {
-    const res = await createConnection(ormconfig);
+    try {
+        await createConnection(ormconfig);
+    } catch (e) {
+        console.log(e);
+        exit(1);
+    }
     const resolvers = (await Promise.all(
         glob
             .sync(path.join(__dirname, '/resolvers/*.js'))
