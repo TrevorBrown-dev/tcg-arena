@@ -5,10 +5,14 @@ import {
     Entity,
     Column,
     OneToMany,
+    ManyToMany,
+    OneToOne,
 } from 'typeorm';
+import { shuffleArray } from '../utils/shuffleArray';
 import { Card } from './Card';
 import { CardLibrary } from './CardLibrary';
 import { Deck } from './Deck';
+import { Player } from './Player';
 
 @ObjectType()
 @Entity()
@@ -21,9 +25,15 @@ export class DeckTemplate extends BaseEntity {
     @Column()
     name!: string;
 
-    @Column(() => Card, { array: true })
+    @Field(() => Card)
+    @ManyToMany(() => Card)
     cards!: Card[];
 
-    @OneToMany(() => Deck, (deck) => deck.template)
-    decks!: Deck[];
+    @OneToOne(() => Player, (player) => player.deckTemplate)
+    player!: Player;
+
+    public loadCardsFromTemplate() {
+        const cards = [...this.cards];
+        return cards;
+    }
 }

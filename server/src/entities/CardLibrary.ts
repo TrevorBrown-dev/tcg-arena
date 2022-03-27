@@ -7,6 +7,7 @@ import {
     Column,
     OneToOne,
     ManyToMany,
+    JoinTable,
 } from 'typeorm';
 import { Account } from './Account';
 import { Card } from './Card';
@@ -22,6 +23,9 @@ export class CardLibrary extends BaseEntity {
     account!: Account;
 
     @Field(() => [Card])
-    @Column(() => Card, { array: true })
+    @ManyToMany(() => Card, {
+        onDelete: 'CASCADE',
+    })
+    @JoinTable({ name: 'card_ownership' })
     cards!: Card[];
 }

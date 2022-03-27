@@ -1,28 +1,21 @@
-import {
-    ApolloServerPluginDrainHttpServer,
-    ApolloServerPluginLandingPageGraphQLPlayground,
-    gql,
-} from 'apollo-server-core';
+import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import cors from 'cors';
 import express from 'express';
 import jwt from 'express-jwt';
+import { glob } from 'glob';
+import { RedisPubSub } from 'graphql-redis-subscriptions';
+import { useServer } from 'graphql-ws/lib/use/ws';
+import { createServer } from 'http';
+import Redis from 'ioredis';
+import path from 'path';
+import { exit } from 'process';
 import { buildSchema, NonEmptyArray } from 'type-graphql';
 import { createConnection } from 'typeorm';
+import { WebSocketServer } from 'ws';
+import { testGame } from './game/tester';
 import ormconfig from './ormconfig';
 import { MyContext } from './types';
-import { glob } from 'glob';
-import path from 'path';
-import { createServer } from 'http';
-import { WebSocketServer } from 'ws';
-import { useServer } from 'graphql-ws/lib/use/ws';
-import { RedisPubSub } from 'graphql-redis-subscriptions';
-import Redis from 'ioredis';
-import { exit } from 'process';
-// const connection: RedisOptions = {
-//     host: 'redis://redis',
-//     port: 6379,
-// };
 
 const options = {
     host: 'redis',
@@ -39,28 +32,26 @@ export const pubsub = new RedisPubSub({
     subscriber: new Redis(options),
 });
 
-// export const pubsub = new RedisPubSub({
-//     connection: {
-//         host: 'redis',
-//         port: 6379,
-//     },
-// });
 const main = async () => {
+    //Attempt to create typeORM connection to db
     try {
         await createConnection(ormconfig);
     } catch (e) {
         console.log(e);
         exit(1);
     }
+
+    //Grabs all resolvers and fits them into an array with some typescript trickery
     const resolvers = (await Promise.all(
         glob
             .sync(path.join(__dirname, '/resolvers/*.js'))
             .map(async (f) => (await import(f)).default)
-    )) as unknown as NonEmptyArray<Function>;
+    )) as NonEmptyArray<Function>;
 
+    //Basic express setup
     const app = express();
 
-    app.use(express.json({ limit: '50mb' }));
+    app.use(express.json());
 
     app.use(
         cors({
@@ -76,6 +67,8 @@ const main = async () => {
             algorithms: ['HS256'],
         })
     );
+
+    //Setting httpServer to enable subscriptions/websockets with teh schema also being setup here
     const httpServer = createServer(app);
     const schema = await buildSchema({
         resolvers,
@@ -89,6 +82,7 @@ const main = async () => {
 
     const serverCleanup = useServer({ schema }, wsServer);
 
+    //Setup for apolloServer with grahpql schema and websockets
     const apolloServer = new ApolloServer({
         schema,
         context: (req): MyContext => ({ req }),
@@ -107,6 +101,8 @@ const main = async () => {
         ],
     });
     await apolloServer.start();
+
+    //Applies the express server to apolloServer with the cors fix
     apolloServer.applyMiddleware({
         app,
         cors: {
@@ -114,12 +110,6 @@ const main = async () => {
             credentials: true,
         },
     });
-    // app.get('/', (_, res) => {
-    //     res.redirect(apolloServer.graphqlPath);
-    // });
-    // app.listen(4000, () => {
-    //     console.log('server started at http://localhost:4000/graphql');
-    // });
 
     httpServer.listen(4000, () => {
         console.log('server started at http://localhost:4000/graphql');
@@ -128,6 +118,7 @@ const main = async () => {
 
 try {
     main();
+    testGame();
 } catch (e) {
     console.log(e);
 }

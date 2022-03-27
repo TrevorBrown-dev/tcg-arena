@@ -2,6 +2,7 @@ import { Field, ObjectType } from 'type-graphql';
 import {
     BaseEntity,
     Column,
+    createConnection,
     Entity,
     ManyToOne,
     OneToOne,
@@ -26,9 +27,6 @@ export class Deck extends BaseEntity {
     @Field(() => [Card])
     @Column(() => Card)
     cards!: Card[];
-
-    @OneToOne(() => Player, (player) => player.deck)
-    player: Player;
 
     loadCardsFromTemplate() {
         this.cards = shuffleArray([...this.template.cards]);

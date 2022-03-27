@@ -18,9 +18,12 @@ export default {
     synchronize: true, //? probably should comment out in production
     // logging: true, //? turn on if you wanna look at sql
     entities: [Account, Game, Card, Deck, DeckTemplate, CardLibrary, Player],
-    // cache: {
-    //     type: 'redis',
-    //     host: process.env.REDIS_HOST || 'localhost',
-    //     port: process.env.REDIS_PORT || 6379,
-    // },
+    cache: {
+        type: 'ioredis',
+        duration: 60000,
+        options: {
+            host: 'redis',
+            port: 6379,
+        },
+    },
 } as Parameters<typeof createConnection>[0];
