@@ -5,10 +5,14 @@ import {
     PrimaryGeneratedColumn,
     OneToOne,
     Column,
+    OneToMany,
+    ManyToMany,
+    JoinColumn,
 } from 'typeorm';
 import { Account } from './Account';
 import { Card } from './Card';
 import { Deck } from './Deck';
+import { DeckTemplate } from './DeckTemplate';
 import { Game } from './Game';
 
 @Entity()
@@ -18,26 +22,15 @@ export class Player extends BaseEntity {
     @PrimaryGeneratedColumn()
     id!: number;
 
+    @OneToOne(() => Account)
+    account!: Account;
+
     @Field(() => Account, { nullable: true })
     @OneToOne(() => Game, (game) => game.player1)
     @OneToOne(() => Game, (game) => game.player2)
     game!: Game;
 
-    @Field(() => Number)
-    @Column()
-    health!: number;
-
     @Field(() => Deck, { nullable: true })
-    @OneToOne(() => Deck, (deck) => deck.player)
-    deck!: Deck;
-
-    @Field(() => [Card])
-    @Column(() => Card, { array: true })
-    hand!: Card[];
-
-    async draw(n: number) {
-        const cards = await this.deck.draw(n);
-        this.hand = [...this.hand, ...cards];
-        await this.save();
-    }
+    @OneToOne(() => DeckTemplate, (deckTemplate) => deckTemplate.player)
+    deckTemplate!: DeckTemplate;
 }

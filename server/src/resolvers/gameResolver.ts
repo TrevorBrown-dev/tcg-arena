@@ -9,6 +9,7 @@ import {
 import { pubsub } from '..';
 import { Account } from '../entities/Account';
 import { Game } from '../entities/Game';
+import { gameMaster } from '../game/GameMaster';
 import { SubscriptionIterator } from '../types';
 import { GameInput } from './inputs/GameInput';
 type GameSubArgs = {
@@ -20,6 +21,20 @@ class GameResolver {
     async game(@Arg('id') id: number): Promise<Game> {
         const game = await Game.findOne(id);
         if (!game) throw new Error(`Game not found with id: ${id}`);
+        return game;
+    }
+
+    @Mutation(() => Game)
+    async createGame(@Arg('data') data: GameInput): Promise<Game> {
+        const player1 = await Account.findOne(data.player1Id);
+        const player2 = await Account.findOne(data.player2Id);
+        const game = Game.create({
+            player1,
+            player2,
+        });
+        await game.createGame();
+        await game.save();
+        game.roomId;
         return game;
     }
 
