@@ -17,9 +17,11 @@ export class CardRecord extends BaseEntity {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(() => Card)
+    @Field(() => Card)
+    @ManyToOne(() => Card, { eager: true })
     card: Card;
 
+    @Field(() => Number)
     @Column()
     amount: number;
 
@@ -34,14 +36,47 @@ export class CardRecord extends BaseEntity {
         return cardRecord;
     }
 
-    async removeCount(amount: number = 1): Promise<CardRecord> {
-        this.amount -= amount;
-        if (this.amount < 0) {
-            return await this.remove();
+    static async addCount(
+        owner: WithCardRecords & BaseEntity,
+        card: Card,
+        amount: number = 1
+    ) {
+        const existingRecord = owner.cards.find(
+            (cardRecord) => cardRecord.card.id === card.id
+        );
+        if (existingRecord) {
+            existingRecord.amount += amount;
+            existingRecord.save();
+        } else {
+            const record = await CardRecord.create({
+                card,
+                amount,
+            }).save();
+            owner.cards.push(record);
         }
+        await owner.save();
+    }
 
-        await this.save();
-        return this;
+    static async removeCount(
+        owner: WithCardRecords & BaseEntity,
+        card: Card,
+        amount: number = 1
+    ): Promise<boolean> {
+        const record = owner.cards.find(
+            (cardRecord) => cardRecord.card.id === card.id
+        );
+        if (!record) return false;
+        if (record.amount <= amount) {
+            owner.cards = owner.cards.filter(
+                (cardRecord) => cardRecord.card.id !== card.id
+            );
+            await record.remove();
+        } else {
+            record.amount -= amount;
+            await record.save();
+        }
+        await owner.save();
+        return true;
     }
 
     static mapRecordsToCards(records: CardRecord[]): Card[] {
@@ -53,4 +88,8 @@ export class CardRecord extends BaseEntity {
         });
         return allCards;
     }
+}
+
+export interface WithCardRecords {
+    cards: CardRecord[];
 }

@@ -8,12 +8,13 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Card } from './Card';
 import { CardLibrary } from './CardLibrary';
-import { CardRecord } from './CardRecord';
+import { CardRecord, WithCardRecords } from './CardRecord';
 
 @ObjectType()
 @Entity()
-export class DeckTemplate extends BaseEntity {
+export class DeckTemplate extends BaseEntity implements WithCardRecords {
     @Field(() => Number)
     @PrimaryGeneratedColumn()
     id!: number;
@@ -26,7 +27,6 @@ export class DeckTemplate extends BaseEntity {
     @ManyToMany(() => CardRecord, {
         onDelete: 'CASCADE',
         eager: true,
-        cascade: true,
     })
     @JoinTable({ name: 'card_in_deck_template' })
     cards!: CardRecord[];

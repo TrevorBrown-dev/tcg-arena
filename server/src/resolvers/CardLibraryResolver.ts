@@ -5,12 +5,11 @@ import { CardRecord } from '../entities/CardRecord';
 
 @Resolver()
 class CardLibraryResolver {
-    @Query(() => [Card])
-    async cardsInLibrary(@Arg('id') id: number): Promise<Card[]> {
+    @Query(() => [CardRecord])
+    async cardsInLibrary(@Arg('id') id: number): Promise<CardRecord[]> {
         const library = await CardLibrary.findOne(id);
         if (!library) throw new Error(`CardLibrary not found with id: ${id}`);
-        const cards = CardRecord.mapRecordsToCards(library.cards);
-        return cards || [];
+        return library.cards || [];
     }
 
     @Query(() => [CardLibrary])
@@ -19,37 +18,23 @@ class CardLibraryResolver {
             relations: ['cards', 'cards.card'],
         });
     }
-
-    @Mutation(() => [Card])
+    @Mutation(() => [CardRecord])
     async addCardToLibrary(
         @Arg('id') id: number,
         @Arg('cardId') cardId: number
-    ): Promise<Card[]> {
+    ): Promise<CardRecord[]> {
         const library = await CardLibrary.findOne({
             where: { id },
-            relations: ['account'],
+            relations: ['account', 'cards'],
         });
         if (!library) throw new Error(`CardLibrary not found with id: ${id}`);
 
         const card = await Card.findOne(cardId);
         if (!card) throw new Error(`Card not found with id: ${cardId}`);
+        console.log('CARDS IN LIB', library, card);
 
-        const existingRecord = library.cards.find(
-            (cardRecord) => cardRecord.card.id === cardId
-        );
-        if (existingRecord) {
-            existingRecord.amount++;
-            existingRecord.save();
-        } else {
-            const record = await CardRecord.create({
-                card,
-                amount: 1,
-            }).save();
-            library.cards.push(record);
-        }
-        await library.save();
-
-        return CardRecord.mapRecordsToCards(library.cards);
+        await CardRecord.addCount(library, card);
+        return library.cards;
     }
 
     @Mutation(() => Boolean)
@@ -66,19 +51,7 @@ class CardLibraryResolver {
         const card = await Card.findOne(cardId);
         if (!card) throw new Error(`Card not found with id: ${cardId}`);
 
-        const record = library.cards.find(
-            (cardRecord) => cardRecord.card.id === cardId
-        );
-        if (!record) return false;
-        if (record.amount <= 1) {
-            await record.remove();
-        } else {
-            record.amount--;
-            await record.save();
-        }
-        await library.save();
-
-        return true;
+        return await CardRecord.removeCount(library, card);
     }
 }
 

@@ -12,12 +12,12 @@ import {
 } from 'typeorm';
 import { Account } from './Account';
 import { Card } from './Card';
-import { CardRecord } from './CardRecord';
+import { CardRecord, WithCardRecords } from './CardRecord';
 import { DeckTemplate } from './DeckTemplate';
 
 @ObjectType()
 @Entity()
-export class CardLibrary extends BaseEntity {
+export class CardLibrary extends BaseEntity implements WithCardRecords {
     @Field(() => Number)
     @PrimaryGeneratedColumn()
     id!: number;
