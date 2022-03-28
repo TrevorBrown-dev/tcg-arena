@@ -1,4 +1,7 @@
-import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
+import {
+    ApolloServerPluginDrainHttpServer,
+    ApolloServerPluginLandingPageGraphQLPlayground,
+} from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import cors from 'cors';
 import express from 'express';
@@ -38,7 +41,6 @@ const main = async () => {
         await createConnection(ormconfig);
     } catch (e) {
         console.log(e);
-        exit(1);
     }
 
     //Grabs all resolvers and fits them into an array with some typescript trickery
@@ -55,7 +57,10 @@ const main = async () => {
 
     app.use(
         cors({
-            origin: 'http://localhost',
+            origin:
+                process.env.NODE_ENV !== 'production'
+                    ? '*'
+                    : 'http://localhost',
             credentials: true,
         })
     );
@@ -106,7 +111,10 @@ const main = async () => {
     apolloServer.applyMiddleware({
         app,
         cors: {
-            origin: 'http://localhost',
+            origin:
+                process.env.NODE_ENV !== 'production'
+                    ? '*'
+                    : 'http://localhost',
             credentials: true,
         },
     });

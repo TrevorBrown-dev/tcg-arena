@@ -5,8 +5,10 @@ import {
     Entity,
     Column,
     ManyToMany,
+    OneToMany,
 } from 'typeorm';
 import { CardLibrary } from './CardLibrary';
+import { CardRecord } from './CardRecord';
 
 @ObjectType()
 @Entity()

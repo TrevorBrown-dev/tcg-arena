@@ -1,5 +1,5 @@
 import { Field, InputType } from 'type-graphql';
-import { Game } from '../../entities/Game';
+import { GameEntity } from '../../entities/GameEntity';
 
 @InputType()
 export class GameInput {

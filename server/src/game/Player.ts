@@ -1,15 +1,29 @@
+import { Field, ObjectType } from 'type-graphql';
 import { Account } from '../entities/Account';
 import { Card } from '../entities/Card';
 import { DeckTemplate } from '../entities/DeckTemplate';
 import { Deck } from './Deck';
 
+@ObjectType()
 export class Player {
+    @Field(() => Deck)
     private deck: Deck;
+
+    @Field(() => Number)
+    get health() {
+        return this._health;
+    }
+
+    @Field(() => [Card])
+    get hand() {
+        return this._hand;
+    }
+
     constructor(
         private account: Account,
         private deckTemplate: DeckTemplate,
-        private health: number = 20,
-        private hand: Card[] = []
+        private _health: number = 20,
+        private _hand: Card[] = []
     ) {
         this.deck = new Deck(this.deckTemplate);
     }
@@ -27,11 +41,11 @@ export class Player {
     }
 
     incrementHealth(amount: number) {
-        this.health += amount;
+        this._health += amount;
     }
 
     decrementHealth(amount: number) {
-        this.health -= amount;
+        this._health -= amount;
     }
 
     getHand() {
@@ -40,7 +54,7 @@ export class Player {
 
     draw(numCards: number) {
         const drawnCards = this.deck.draw(numCards);
-        this.hand = [...this.hand, ...drawnCards];
+        this._hand = [...this._hand, ...drawnCards];
     }
 
     replace(cards: Card[]) {

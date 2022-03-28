@@ -1,18 +1,15 @@
 import { Field, ObjectType } from 'type-graphql';
 import {
     BaseEntity,
-    PrimaryGeneratedColumn,
-    Entity,
     Column,
-    OneToMany,
+    Entity,
+    JoinTable,
     ManyToMany,
-    OneToOne,
+    ManyToOne,
+    PrimaryGeneratedColumn,
 } from 'typeorm';
-import { shuffleArray } from '../utils/shuffleArray';
-import { Card } from './Card';
 import { CardLibrary } from './CardLibrary';
-import { Deck } from './Deck';
-import { Player } from './Player';
+import { CardRecord } from './CardRecord';
 
 @ObjectType()
 @Entity()
@@ -25,15 +22,20 @@ export class DeckTemplate extends BaseEntity {
     @Column()
     name!: string;
 
-    @Field(() => Card)
-    @ManyToMany(() => Card)
-    cards!: Card[];
+    @Field(() => [CardRecord])
+    @ManyToMany(() => CardRecord, {
+        onDelete: 'CASCADE',
+        eager: true,
+        cascade: true,
+    })
+    @JoinTable({ name: 'card_in_deck_template' })
+    cards!: CardRecord[];
 
-    @OneToOne(() => Player, (player) => player.deckTemplate)
-    player!: Player;
+    @ManyToOne(() => CardLibrary, (cardLibrary) => cardLibrary.deckTemplates)
+    cardLibrary!: CardLibrary;
 
     public loadCardsFromTemplate() {
-        const cards = [...this.cards];
+        const cards = CardRecord.mapRecordsToCards(this.cards);
         return cards;
     }
 }

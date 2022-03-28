@@ -8,9 +8,12 @@ import {
     OneToOne,
     ManyToMany,
     JoinTable,
+    OneToMany,
 } from 'typeorm';
 import { Account } from './Account';
 import { Card } from './Card';
+import { CardRecord } from './CardRecord';
+import { DeckTemplate } from './DeckTemplate';
 
 @ObjectType()
 @Entity()
@@ -22,10 +25,15 @@ export class CardLibrary extends BaseEntity {
     @OneToOne(() => Account, (account) => account.cardLibrary)
     account!: Account;
 
-    @Field(() => [Card])
-    @ManyToMany(() => Card, {
+    @Field(() => [CardRecord])
+    @ManyToMany(() => CardRecord, {
         onDelete: 'CASCADE',
+        eager: true,
     })
     @JoinTable({ name: 'card_ownership' })
-    cards!: Card[];
+    cards!: CardRecord[];
+
+    @Field(() => DeckTemplate)
+    @OneToMany(() => DeckTemplate, (deckTemplate) => deckTemplate.cardLibrary)
+    deckTemplates!: DeckTemplate[];
 }

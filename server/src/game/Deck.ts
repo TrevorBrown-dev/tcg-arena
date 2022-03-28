@@ -1,9 +1,13 @@
+import { Field, ObjectType } from 'type-graphql';
 import { Card } from '../entities/Card';
 import { DeckTemplate } from '../entities/DeckTemplate';
 import { shuffleArray } from '../utils/shuffleArray';
 
+@ObjectType()
 export class Deck {
+    @Field(() => [Card])
     private deck: Card[];
+
     constructor(private template: DeckTemplate) {
         this.deck = this.template.loadCardsFromTemplate();
         this.deck = shuffleArray(this.deck);

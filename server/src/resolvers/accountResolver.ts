@@ -5,10 +5,7 @@ import {
     ObjectType,
     Query,
     Resolver,
-    Root,
-    Subscription,
 } from 'type-graphql';
-import { pubsub } from '..';
 import { Account } from '../entities/Account';
 import { RegisterInput } from './inputs/registerInput';
 import argon2 from 'argon2';
@@ -35,7 +32,11 @@ type Iterator<T> = AsyncIterator<T> & T;
 class AccountResolver {
     @Query(() => Account)
     async account(@Arg('id') id: number): Promise<Account> {
-        const account = await Account.findOne(id);
+        const account = await Account.findOne({
+            relations: ['cardLibrary'],
+            where: { id },
+        });
+        console.log(account);
         if (!account) throw new Error(`Account not found with id: ${id}`);
 
         return account;
@@ -54,8 +55,11 @@ class AccountResolver {
                 userName,
             }).save();
 
+            Account.createDefaultCardLibrary(account);
+
             return { account };
         } catch (err: any) {
+            console.log(err);
             if (err.code === '23505') {
                 return {
                     errors: [
