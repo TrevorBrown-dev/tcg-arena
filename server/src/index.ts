@@ -84,38 +84,48 @@ const main = async () => {
     });
 
     wsServer.on('connection', (ws) => {
+        //This happens when a subscription is made
         ws.onmessage = (e) => {
+            //Grab the data from the subscription
             const data = JSON.parse(e.data.toString());
+
+            //This is the initial payload from the client, we dont care about this payload
             if (data.type === 'connection_init') return;
+
+            //If we got here this is an instance of a subscription happening
+
+            //The payload includes the graphql subscription info and variables
+            //Right now the only way I know of how to know exactly what the subscription is is
+            //by looking at the payload for specific keys
             if (
                 data.payload.variables.watchLobbyId &&
                 data.payload.variables.accountId
             ) {
-                if (!ws.onclose) {
-                    ws.onclose = (e) => {
-                        Lobby.findOne({
-                            where: {
-                                id: data.payload.variables.watchLobbyId,
-                            },
-                            relations: ['members'],
-                        }).then(async (lobby) => {
-                            if (lobby) {
-                                lobby.members = lobby.members.filter(
-                                    (account) => {
-                                        return (
-                                            account.id !==
-                                            data.payload.variables.accountId
-                                        );
-                                    }
+                //if we already set an onclose listener for this ws, dont do it again
+                if (ws.onclose) return;
+
+                ws.onclose = (e) => {
+                    //This happens when the subscription is closed
+                    Lobby.findOne({
+                        where: {
+                            id: data.payload.variables.watchLobbyId,
+                        },
+                        relations: ['members'],
+                    }).then(async (lobby) => {
+                        if (lobby) {
+                            lobby.members = lobby.members.filter((account) => {
+                                return (
+                                    account.id !==
+                                    data.payload.variables.accountId
                                 );
-                                lobby.save();
-                                pubsub.publish(`watchLobby_${lobby.id}`, {
-                                    lobby,
-                                });
-                            }
-                        });
-                    };
-                }
+                            });
+                            lobby.save();
+                            pubsub.publish(`watchLobby_${lobby.id}`, {
+                                lobby,
+                            });
+                        }
+                    });
+                };
             }
         };
     });
