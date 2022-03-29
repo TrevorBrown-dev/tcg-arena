@@ -1,0 +1,9 @@
+mutation JoinLobby($accountId: Float!, $joinLobbyId: String!) {
+    joinLobby(accountId: $accountId, id: $joinLobbyId) {
+        id
+        members {
+            id
+            userName
+        }
+    }
+}

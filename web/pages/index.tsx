@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Button } from '../components/library/Button';
 import { Form } from '../components/library/Form';
 import { Input } from '../components/library/Input';
-import { RegisterForm } from '../components/RegisterForm';
+import { RegisterForm } from '../components/auth/RegisterForm';
 import {
     Crystal,
     genCrystal,

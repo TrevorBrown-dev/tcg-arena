@@ -1,0 +1,9 @@
+mutation CreateLobby($creatorId: Float!) {
+    createLobby(creatorId: $creatorId) {
+        id
+        members {
+            id
+            userName
+        }
+    }
+}

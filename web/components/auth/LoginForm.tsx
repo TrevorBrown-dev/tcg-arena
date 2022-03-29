@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import {
+    LoginMutationVariables,
     RegisterMutationVariables,
+    useLoginMutation,
     useRegisterMutation,
-} from '../generated/graphql';
-import { Button } from './library/Button';
-import { Form } from './library/Form';
-import { Input } from './library/Input';
+} from '../../generated/graphql';
+import { Button } from '../library/Button';
+import { Form } from '../library/Form';
+import { Input } from '../library/Input';
 
 const Success = styled.div`
     font-size: 2rem;
@@ -14,26 +16,23 @@ const Success = styled.div`
     font-weight: 300;
 `;
 
-export const RegisterForm: React.FC = () => {
-    const [formState, setFormState] = useState<RegisterMutationVariables>({
-        userName: '',
+export const LoginForm: React.FC = () => {
+    const [formState, setFormState] = useState<LoginMutationVariables>({
         email: '',
         password: '',
     });
 
-    const [registerResult, register] = useRegisterMutation();
+    const [loginResult, login] = useLoginMutation();
     const [success, setSuccess] = useState(false);
-    const requiredFieldsNotFilled =
-        !formState.userName || !formState.email || !formState.password;
+    const requiredFieldsNotFilled = !formState.email || !formState.password;
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const res = await register({
+        const res = await login({
             ...formState,
         });
-        if (!res.data?.register.errors) {
+        if (!res.data?.login.errors) {
             setFormState({
-                userName: '',
                 email: '',
                 password: '',
             });
@@ -45,22 +44,10 @@ export const RegisterForm: React.FC = () => {
 
     return (
         <Form onSubmit={handleSubmit}>
-            {registerResult.data?.register.errors && (
-                <div>{registerResult.data?.register.errors[0].message}</div>
+            {loginResult.data?.login.errors && (
+                <div>{loginResult.data?.login.errors[0].message}</div>
             )}
-            {success && (
-                <Success>Thanks for registering! See you soon!</Success>
-            )}
-            <div className="row">
-                <Input
-                    placeholder="Username"
-                    required
-                    value={formState.userName}
-                    onChange={(e) =>
-                        setFormState({ ...formState, userName: e.target.value })
-                    }
-                />
-            </div>
+
             <div className="row">
                 <Input
                     type="email"
@@ -86,9 +73,7 @@ export const RegisterForm: React.FC = () => {
                 type="submit"
                 disabled={requiredFieldsNotFilled}
             >
-                {requiredFieldsNotFilled
-                    ? 'Fill in your info!'
-                    : 'Sign up now!'}
+                Login
             </Button>
         </Form>
     );

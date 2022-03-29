@@ -17,6 +17,7 @@ export type Scalars = {
 
 export type Account = {
   __typename?: 'Account';
+  cardLibrary?: Maybe<CardLibrary>;
   email: Scalars['String'];
   id: Scalars['Float'];
   userName: Scalars['String'];
@@ -28,6 +29,54 @@ export type AccountResponse = {
   errors?: Maybe<Array<FieldError>>;
 };
 
+export type Card = {
+  __typename?: 'Card';
+  code: Scalars['String'];
+  description: Scalars['String'];
+  id: Scalars['Float'];
+  imageUrl?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
+};
+
+export type CardInput = {
+  code: Scalars['String'];
+  description: Scalars['String'];
+  imageUrl?: InputMaybe<Scalars['String']>;
+  name: Scalars['String'];
+};
+
+export type CardLibrary = {
+  __typename?: 'CardLibrary';
+  cards: Array<CardRecord>;
+  deckTemplates: DeckTemplate;
+  id: Scalars['Float'];
+};
+
+export type CardRecord = {
+  __typename?: 'CardRecord';
+  amount: Scalars['Float'];
+  card: Card;
+  id: Scalars['Float'];
+};
+
+export type Deck = {
+  __typename?: 'Deck';
+  deck?: Maybe<Array<Card>>;
+  template?: Maybe<DeckTemplate>;
+};
+
+export type DeckTemplate = {
+  __typename?: 'DeckTemplate';
+  cards: Array<CardRecord>;
+  id: Scalars['Float'];
+  name: Scalars['String'];
+};
+
+export type DeckTemplateInput = {
+  cardLibraryId: Scalars['Float'];
+  name: Scalars['String'];
+};
+
 export type FieldError = {
   __typename?: 'FieldError';
   field: Scalars['String'];
@@ -36,29 +85,98 @@ export type FieldError = {
 
 export type Game = {
   __typename?: 'Game';
+  id: Scalars['String'];
+  noticeMe: Scalars['String'];
+  player1: Player;
+  player2: Player;
+};
+
+export type GameEntity = {
+  __typename?: 'GameEntity';
   id: Scalars['Float'];
-  player1?: Maybe<Account>;
-  player1Health: Scalars['Float'];
-  player2?: Maybe<Account>;
-  player2Health: Scalars['Float'];
+  player1?: Maybe<PlayerEntity>;
+  player2?: Maybe<PlayerEntity>;
+  roomId?: Maybe<Scalars['String']>;
 };
 
 export type GameInput = {
-  player1Health: Scalars['Float'];
-  player2Health: Scalars['Float'];
+  p1DeckTemplateId: Scalars['Float'];
+  p2DeckTemplateId: Scalars['Float'];
+  player1Id: Scalars['Float'];
+  player2Id: Scalars['Float'];
+};
+
+export type Lobby = {
+  __typename?: 'Lobby';
+  id: Scalars['String'];
+  members: Array<Account>;
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createGame: Game;
+  addCardToDeckTemplate: DeckTemplate;
+  addCardToLibrary: Array<CardRecord>;
+  createCard: Card;
+  createDeckTemplate: DeckTemplate;
+  createGame: GameEntity;
+  createLobby: Lobby;
+  joinLobby: Lobby;
+  leaveLobby: Lobby;
+  login: AccountResponse;
+  logout: Scalars['Boolean'];
   register: AccountResponse;
-  updateGame: Game;
+  removeCardFromLibrary: Scalars['Boolean'];
+  updateGame: GameEntity;
+};
+
+
+export type MutationAddCardToDeckTemplateArgs = {
+  cardId: Scalars['Float'];
+  id: Scalars['Float'];
+};
+
+
+export type MutationAddCardToLibraryArgs = {
+  cardId: Scalars['Float'];
+  id: Scalars['Float'];
+};
+
+
+export type MutationCreateCardArgs = {
+  data: CardInput;
+};
+
+
+export type MutationCreateDeckTemplateArgs = {
+  data: DeckTemplateInput;
 };
 
 
 export type MutationCreateGameArgs = {
-  player1: Scalars['Float'];
-  player2: Scalars['Float'];
+  data: GameInput;
+};
+
+
+export type MutationCreateLobbyArgs = {
+  creatorId: Scalars['Float'];
+};
+
+
+export type MutationJoinLobbyArgs = {
+  accountId: Scalars['Float'];
+  id: Scalars['String'];
+};
+
+
+export type MutationLeaveLobbyArgs = {
+  accountId: Scalars['Float'];
+  id: Scalars['String'];
+};
+
+
+export type MutationLoginArgs = {
+  email: Scalars['String'];
+  password: Scalars['String'];
 };
 
 
@@ -67,19 +185,57 @@ export type MutationRegisterArgs = {
 };
 
 
+export type MutationRemoveCardFromLibraryArgs = {
+  cardId: Scalars['Float'];
+  id: Scalars['Float'];
+};
+
+
 export type MutationUpdateGameArgs = {
   data: GameInput;
+  id: Scalars['Float'];
+};
+
+export type Player = {
+  __typename?: 'Player';
+  deck: Deck;
+  hand: Array<Card>;
+  health: Scalars['Float'];
+};
+
+export type PlayerEntity = {
+  __typename?: 'PlayerEntity';
+  deckTemplate?: Maybe<DeckTemplate>;
+  game?: Maybe<Account>;
   id: Scalars['Float'];
 };
 
 export type Query = {
   __typename?: 'Query';
   account: Account;
-  game: Game;
+  card: Card;
+  cardLibraries: Array<CardLibrary>;
+  cards: Array<Card>;
+  cardsInLibrary: Array<CardRecord>;
+  deckTemplates: Array<DeckTemplate>;
+  game: GameEntity;
+  games: Array<Game>;
+  lobbies: Array<Lobby>;
+  me?: Maybe<Account>;
 };
 
 
 export type QueryAccountArgs = {
+  id: Scalars['Float'];
+};
+
+
+export type QueryCardArgs = {
+  id: Scalars['Float'];
+};
+
+
+export type QueryCardsInLibraryArgs = {
   id: Scalars['Float'];
 };
 
@@ -96,7 +252,14 @@ export type RegisterInput = {
 
 export type Subscription = {
   __typename?: 'Subscription';
-  watchGame: Game;
+  deckTemplateUpdated: DeckTemplate;
+  watchGame: GameEntity;
+  watchLobby: Lobby;
+};
+
+
+export type SubscriptionDeckTemplateUpdatedArgs = {
+  id: Scalars['Float'];
 };
 
 
@@ -104,15 +267,21 @@ export type SubscriptionWatchGameArgs = {
   gameId: Scalars['Float'];
 };
 
+
+export type SubscriptionWatchLobbyArgs = {
+  accountId: Scalars['Float'];
+  id: Scalars['String'];
+};
+
 export type AccountPartsFragment = { __typename?: 'Account', id: number, email: string, userName: string };
 
-export type CreateGameMutationVariables = Exact<{
-  player1: Scalars['Float'];
-  player2: Scalars['Float'];
+export type LoginMutationVariables = Exact<{
+  password: Scalars['String'];
+  email: Scalars['String'];
 }>;
 
 
-export type CreateGameMutation = { __typename?: 'Mutation', createGame: { __typename?: 'Game', id: number, player1Health: number, player2Health: number } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'AccountResponse', account?: { __typename?: 'Account', id: number, userName: string } | null, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null } };
 
 export type RegisterMutationVariables = Exact<{
   email: Scalars['String'];
@@ -123,14 +292,6 @@ export type RegisterMutationVariables = Exact<{
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'AccountResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, account?: { __typename?: 'Account', id: number, email: string, userName: string } | null } };
 
-export type UpdateGameMutationVariables = Exact<{
-  id: Scalars['Float'];
-  data: GameInput;
-}>;
-
-
-export type UpdateGameMutation = { __typename?: 'Mutation', updateGame: { __typename?: 'Game', player1Health: number, player2Health: number, player1?: { __typename?: 'Account', id: number, email: string, userName: string } | null, player2?: { __typename?: 'Account', id: number, email: string, userName: string } | null } };
-
 export type AccountQueryVariables = Exact<{
   id: Scalars['Float'];
 }>;
@@ -138,19 +299,41 @@ export type AccountQueryVariables = Exact<{
 
 export type AccountQuery = { __typename?: 'Query', account: { __typename?: 'Account', id: number, email: string, userName: string } };
 
-export type GameQueryVariables = Exact<{
-  id: Scalars['Float'];
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'Account', userName: string, email: string, id: number, cardLibrary?: { __typename?: 'CardLibrary', id: number } | null } | null };
+
+export type CreateLobbyMutationVariables = Exact<{
+  creatorId: Scalars['Float'];
 }>;
 
 
-export type GameQuery = { __typename?: 'Query', game: { __typename?: 'Game', id: number, player1Health: number, player2Health: number } };
+export type CreateLobbyMutation = { __typename?: 'Mutation', createLobby: { __typename?: 'Lobby', id: string, members: Array<{ __typename?: 'Account', id: number, userName: string }> } };
 
-export type WatchGameSubscriptionVariables = Exact<{
-  gameId: Scalars['Float'];
+export type JoinLobbyMutationVariables = Exact<{
+  accountId: Scalars['Float'];
+  joinLobbyId: Scalars['String'];
 }>;
 
 
-export type WatchGameSubscription = { __typename?: 'Subscription', watchGame: { __typename?: 'Game', player1Health: number, player2Health: number, player1?: { __typename?: 'Account', id: number, email: string, userName: string } | null, player2?: { __typename?: 'Account', id: number, email: string, userName: string } | null } };
+export type JoinLobbyMutation = { __typename?: 'Mutation', joinLobby: { __typename?: 'Lobby', id: string, members: Array<{ __typename?: 'Account', id: number, userName: string }> } };
+
+export type LeaveLobbyMutationVariables = Exact<{
+  accountId: Scalars['Float'];
+  leaveLobbyId: Scalars['String'];
+}>;
+
+
+export type LeaveLobbyMutation = { __typename?: 'Mutation', leaveLobby: { __typename?: 'Lobby', id: string, members: Array<{ __typename?: 'Account', userName: string }> } };
+
+export type WatchLobbySubscriptionVariables = Exact<{
+  watchLobbyId: Scalars['String'];
+  accountId: Scalars['Float'];
+}>;
+
+
+export type WatchLobbySubscription = { __typename?: 'Subscription', watchLobby: { __typename?: 'Lobby', id: string, members: Array<{ __typename?: 'Account', id: number, userName: string }> } };
 
 export const AccountPartsFragmentDoc = gql`
     fragment AccountParts on Account {
@@ -159,18 +342,23 @@ export const AccountPartsFragmentDoc = gql`
   userName
 }
     `;
-export const CreateGameDocument = gql`
-    mutation CreateGame($player1: Float!, $player2: Float!) {
-  createGame(player1: $player1, player2: $player2) {
-    id
-    player1Health
-    player2Health
+export const LoginDocument = gql`
+    mutation Login($password: String!, $email: String!) {
+  login(password: $password, email: $email) {
+    account {
+      id
+      userName
+    }
+    errors {
+      field
+      message
+    }
   }
 }
     `;
 
-export function useCreateGameMutation() {
-  return Urql.useMutation<CreateGameMutation, CreateGameMutationVariables>(CreateGameDocument);
+export function useLoginMutation() {
+  return Urql.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument);
 };
 export const RegisterDocument = gql`
     mutation Register($email: String!, $password: String!, $userName: String!) {
@@ -189,24 +377,6 @@ export const RegisterDocument = gql`
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
 };
-export const UpdateGameDocument = gql`
-    mutation UpdateGame($id: Float!, $data: GameInput!) {
-  updateGame(id: $id, data: $data) {
-    player1 {
-      ...AccountParts
-    }
-    player2 {
-      ...AccountParts
-    }
-    player1Health
-    player2Health
-  }
-}
-    ${AccountPartsFragmentDoc}`;
-
-export function useUpdateGameMutation() {
-  return Urql.useMutation<UpdateGameMutation, UpdateGameMutationVariables>(UpdateGameDocument);
-};
 export const AccountDocument = gql`
     query Account($id: Float!) {
   account(id: $id) {
@@ -218,34 +388,78 @@ export const AccountDocument = gql`
 export function useAccountQuery(options: Omit<Urql.UseQueryArgs<AccountQueryVariables>, 'query'>) {
   return Urql.useQuery<AccountQuery>({ query: AccountDocument, ...options });
 };
-export const GameDocument = gql`
-    query Game($id: Float!) {
-  game(id: $id) {
+export const MeDocument = gql`
+    query Me {
+  me {
+    userName
+    email
     id
-    player1Health
-    player2Health
+    cardLibrary {
+      id
+    }
   }
 }
     `;
 
-export function useGameQuery(options: Omit<Urql.UseQueryArgs<GameQueryVariables>, 'query'>) {
-  return Urql.useQuery<GameQuery>({ query: GameDocument, ...options });
+export function useMeQuery(options?: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'>) {
+  return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
 };
-export const WatchGameDocument = gql`
-    subscription WatchGame($gameId: Float!) {
-  watchGame(gameId: $gameId) {
-    player1 {
-      ...AccountParts
+export const CreateLobbyDocument = gql`
+    mutation CreateLobby($creatorId: Float!) {
+  createLobby(creatorId: $creatorId) {
+    id
+    members {
+      id
+      userName
     }
-    player2 {
-      ...AccountParts
-    }
-    player1Health
-    player2Health
   }
 }
-    ${AccountPartsFragmentDoc}`;
+    `;
 
-export function useWatchGameSubscription<TData = WatchGameSubscription>(options: Omit<Urql.UseSubscriptionArgs<WatchGameSubscriptionVariables>, 'query'> = {}, handler?: Urql.SubscriptionHandler<WatchGameSubscription, TData>) {
-  return Urql.useSubscription<WatchGameSubscription, TData, WatchGameSubscriptionVariables>({ query: WatchGameDocument, ...options }, handler);
+export function useCreateLobbyMutation() {
+  return Urql.useMutation<CreateLobbyMutation, CreateLobbyMutationVariables>(CreateLobbyDocument);
+};
+export const JoinLobbyDocument = gql`
+    mutation JoinLobby($accountId: Float!, $joinLobbyId: String!) {
+  joinLobby(accountId: $accountId, id: $joinLobbyId) {
+    id
+    members {
+      id
+      userName
+    }
+  }
+}
+    `;
+
+export function useJoinLobbyMutation() {
+  return Urql.useMutation<JoinLobbyMutation, JoinLobbyMutationVariables>(JoinLobbyDocument);
+};
+export const LeaveLobbyDocument = gql`
+    mutation LeaveLobby($accountId: Float!, $leaveLobbyId: String!) {
+  leaveLobby(accountId: $accountId, id: $leaveLobbyId) {
+    id
+    members {
+      userName
+    }
+  }
+}
+    `;
+
+export function useLeaveLobbyMutation() {
+  return Urql.useMutation<LeaveLobbyMutation, LeaveLobbyMutationVariables>(LeaveLobbyDocument);
+};
+export const WatchLobbyDocument = gql`
+    subscription WatchLobby($watchLobbyId: String!, $accountId: Float!) {
+  watchLobby(id: $watchLobbyId, accountId: $accountId) {
+    id
+    members {
+      id
+      userName
+    }
+  }
+}
+    `;
+
+export function useWatchLobbySubscription<TData = WatchLobbySubscription>(options: Omit<Urql.UseSubscriptionArgs<WatchLobbySubscriptionVariables>, 'query'> = {}, handler?: Urql.SubscriptionHandler<WatchLobbySubscription, TData>) {
+  return Urql.useSubscription<WatchLobbySubscription, TData, WatchLobbySubscriptionVariables>({ query: WatchLobbyDocument, ...options }, handler);
 };

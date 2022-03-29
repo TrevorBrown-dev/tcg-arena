@@ -1,7 +1,4 @@
-import {
-    ApolloServerPluginDrainHttpServer,
-    ApolloServerPluginLandingPageGraphQLPlayground,
-} from 'apollo-server-core';
+import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import cors from 'cors';
 import express from 'express';
@@ -12,10 +9,11 @@ import { useServer } from 'graphql-ws/lib/use/ws';
 import { createServer } from 'http';
 import Redis from 'ioredis';
 import path from 'path';
-import { exit } from 'process';
 import { buildSchema, NonEmptyArray } from 'type-graphql';
 import { createConnection } from 'typeorm';
 import { WebSocketServer } from 'ws';
+import { Account } from './entities/Account';
+import { Lobby } from './entities/Lobby';
 import { testGame } from './game/tester';
 import ormconfig from './ormconfig';
 import { MyContext } from './types';
@@ -83,6 +81,43 @@ const main = async () => {
     const wsServer = new WebSocketServer({
         server: httpServer,
         path: '/graphql',
+    });
+
+    wsServer.on('connection', (ws) => {
+        ws.onmessage = (e) => {
+            const data = JSON.parse(e.data.toString());
+            if (data.type === 'connection_init') return;
+            if (
+                data.payload.variables.watchLobbyId &&
+                data.payload.variables.accountId
+            ) {
+                if (!ws.onclose) {
+                    ws.onclose = (e) => {
+                        Lobby.findOne({
+                            where: {
+                                id: data.payload.variables.watchLobbyId,
+                            },
+                            relations: ['members'],
+                        }).then(async (lobby) => {
+                            if (lobby) {
+                                lobby.members = lobby.members.filter(
+                                    (account) => {
+                                        return (
+                                            account.id !==
+                                            data.payload.variables.accountId
+                                        );
+                                    }
+                                );
+                                lobby.save();
+                                pubsub.publish(`watchLobby_${lobby.id}`, {
+                                    lobby,
+                                });
+                            }
+                        });
+                    };
+                }
+            }
+        };
     });
 
     const serverCleanup = useServer({ schema }, wsServer);

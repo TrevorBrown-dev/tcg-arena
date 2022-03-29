@@ -7,11 +7,13 @@ import {
     Column,
     Entity,
     JoinColumn,
+    ManyToOne,
     OneToMany,
     OneToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import { CardLibrary } from './CardLibrary';
+import { Lobby } from './Lobby';
 
 @Entity()
 @ObjectType()
@@ -46,4 +48,9 @@ export class Account extends BaseEntity {
     @OneToOne(() => CardLibrary, (library) => library.account)
     @JoinColumn()
     cardLibrary: CardLibrary;
+
+    @ManyToOne(() => Lobby, (lobby) => lobby.members, {
+        nullable: true,
+    })
+    lobby?: Lobby | null;
 }

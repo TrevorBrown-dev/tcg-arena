@@ -1,0 +1,25 @@
+{
+    "id": "fc03637a-e8ef-4c3e-b61b-f00043fb4d49",
+    "type": "subscribe",
+    "payload": {
+        "key": "1xa4ctd",
+        "query": "subscription WatchLobby($watchLobbyId: String!, $accountId: Float!) {\n  watchLobby(id: $watchLobbyId, accountId: $accountId) {\n    id\n    members {\n      id\n      userName\n      __typename\n    }\n    __typename\n  }\n}",
+        "variables": {
+            "watchLobbyId": "ev-MxQdslij3wTwjz82AO",
+            "accountId": 3
+        },
+        "context": {
+            "url": "/graphql",
+            "fetchOptions": {
+                "credentials": "include",
+                "headers": {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Credentials": "true"
+                }
+            },
+            "preferGetMethod": false,
+            "suspense": false,
+            "requestPolicy": "cache-first"
+        }
+    }
+}

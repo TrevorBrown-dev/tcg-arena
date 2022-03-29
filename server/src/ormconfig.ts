@@ -6,6 +6,7 @@ import { CardLibrary } from './entities/CardLibrary';
 import { CardRecord } from './entities/CardRecord';
 import { DeckTemplate } from './entities/DeckTemplate';
 import { GameEntity } from './entities/GameEntity';
+import { Lobby } from './entities/Lobby';
 import { PlayerEntity } from './entities/PlayerEntity';
 
 export default {
@@ -25,5 +26,6 @@ export default {
         CardLibrary,
         PlayerEntity,
         CardRecord,
+        Lobby,
     ],
 } as Parameters<typeof createConnection>[0];

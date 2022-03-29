@@ -1,0 +1,9 @@
+subscription WatchLobby($watchLobbyId: String!, $accountId: Float!) {
+    watchLobby(id: $watchLobbyId, accountId: $accountId) {
+        id
+        members {
+            id
+            userName
+        }
+    }
+}

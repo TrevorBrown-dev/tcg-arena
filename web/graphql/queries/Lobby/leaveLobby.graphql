@@ -1,0 +1,8 @@
+mutation LeaveLobby($accountId: Float!, $leaveLobbyId: String!) {
+    leaveLobby(accountId: $accountId, id: $leaveLobbyId) {
+        id
+        members {
+            userName
+        }
+    }
+}

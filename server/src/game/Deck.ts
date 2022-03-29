@@ -5,11 +5,16 @@ import { shuffleArray } from '../utils/shuffleArray';
 
 @ObjectType()
 export class Deck {
-    @Field(() => [Card])
+    @Field(() => [Card], { nullable: true })
     private deck: Card[];
 
-    constructor(private template: DeckTemplate) {
-        this.deck = this.template.loadCardsFromTemplate();
+    @Field(() => DeckTemplate, { nullable: true })
+    get template() {
+        return this._template;
+    }
+
+    constructor(private _template: DeckTemplate) {
+        this.deck = this._template.loadCardsFromTemplate();
         this.deck = shuffleArray(this.deck);
     }
 

@@ -1,7 +1,0 @@
-query Game($id: Float!) {
-    game(id: $id) {
-        id
-        player1Health
-        player2Health
-    }
-}

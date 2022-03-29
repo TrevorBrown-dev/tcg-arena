@@ -1,5 +1,6 @@
 import {
     Arg,
+    Ctx,
     Field,
     Mutation,
     ObjectType,
@@ -9,7 +10,10 @@ import {
 import { Account } from '../entities/Account';
 import { RegisterInput } from './inputs/registerInput';
 import argon2 from 'argon2';
-
+import { MyContext } from '../types';
+import { ILike } from 'typeorm';
+import jwt from 'jsonwebtoken';
+import { parseJWT } from '../utils/parseJWT';
 @ObjectType()
 class FieldError {
     @Field()
@@ -81,6 +85,81 @@ class AccountResolver {
                 };
             }
         }
+    }
+    @Mutation(() => AccountResponse)
+    async login(
+        @Ctx() { req: { res } }: MyContext,
+        @Arg('email') email: string,
+        @Arg('password') password: string
+    ): Promise<AccountResponse> {
+        const account = await Account.findOne({
+            where: { email: ILike(email) },
+        });
+
+        if (!account) {
+            return {
+                errors: [
+                    {
+                        field: 'usernameOrEmail',
+                        message: 'That username does not exist.',
+                    },
+                ],
+            };
+        }
+
+        const valid = await argon2.verify(account.password, password);
+        if (!valid) {
+            return {
+                errors: [
+                    {
+                        field: 'password',
+                        message: 'Incorrect password.',
+                    },
+                ],
+            };
+        }
+
+        //Place for jwt
+        // send jwt back as cookie
+        const token = jwt.sign(
+            { id: account.id },
+            process.env.JWT_SECRET as string,
+            { expiresIn: '7d' }
+        );
+        res.cookie('token', token, {
+            httpOnly: true,
+            maxAge: 1000 * 60 * 60 * 24 * 365,
+        });
+
+        return {
+            account,
+        };
+    }
+    @Mutation(() => Boolean)
+    logout(@Ctx() { req: { res } }: MyContext): boolean {
+        try {
+            res.clearCookie('token');
+            return true;
+        } catch (err) {
+            console.log('ERROR CLEARING COOKIE', err);
+            return false;
+        }
+    }
+    @Query(() => Account, { nullable: true })
+    async me(@Ctx() { req: { req } }: MyContext): Promise<Account> {
+        const authorization = req.headers.cookie;
+        if (!authorization) throw new Error(`Authorization Failed`);
+
+        const payload = await parseJWT(authorization);
+        const { id } = payload;
+        const account = await Account.findOne({
+            where: { id },
+            relations: ['cardLibrary'],
+        });
+
+        if (!account) throw new Error(`Account not found with id: ${id}`);
+
+        return account;
     }
 }
 
