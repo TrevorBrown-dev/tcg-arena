@@ -10,36 +10,6 @@ import { pubsub } from '..';
 import { Account } from '../entities/Account';
 import { Lobby } from '../entities/Lobby';
 
-const joinLobbyUtil = async (id: string, accountId: number) => {
-    const lobby = await Lobby.findOne({
-        where: { id },
-        relations: ['members'],
-    });
-
-    if (!lobby) throw new Error(`Lobby not found with id: ${id}`);
-
-    const account = await Account.findOne({
-        where: { id: accountId },
-    });
-    if (!account) throw new Error(`Account not found with id: ${accountId}`);
-    if (
-        lobby.members &&
-        lobby.members.find((account) => {
-            return account.id === accountId;
-        })
-    ) {
-        //Interesting case I need to figure out handling joining and leaving lobbies
-        return lobby;
-    }
-    lobby.members.push(account);
-    account.save();
-    console.log('RUNNING');
-    await account.save();
-    await lobby.save();
-
-    console.log(`Lobby ${id} joined`);
-    return lobby;
-};
 @Resolver()
 class LobbyResolver {
     @Query(() => [Lobby])
@@ -71,48 +41,13 @@ class LobbyResolver {
         @Arg('id') id: string,
         @Arg('accountId') accountId: number
     ): Promise<Boolean> {
-        console.log('LEAVING LOBBY');
-        const lobby = await Lobby.findOne({
-            where: { id },
-            relations: ['members'],
-        });
-        if (!lobby) throw new Error(`Lobby not found with id: ${id}`);
-        const account = await Account.findOne({
-            where: { id: accountId },
-            relations: ['lobby'],
-        });
-        if (!account)
-            throw new Error(`Account not found with id: ${accountId}`);
-        if (
-            lobby.members &&
-            lobby.members.find((account) => {
-                return account.id === accountId;
-            })
-        ) {
-            //Interesting case I need to figure out handling joining and leaving lobbies
-            console.log('ABOUT TO LEAVE', lobby.id);
-            lobby.members = lobby.members.filter(
-                (account) => account.id !== accountId
-            );
-            await account.save();
-            await lobby.save();
-            if (lobby.members.length === 0) {
-                await lobby.remove();
-            } else {
-                console.log(lobby);
-                pubsub.publish(`watchLobby_${lobby.id}`, { lobby });
-            }
-
-            return true;
-        }
-
-        return false;
+        return await Lobby.leaveLobby(id, accountId);
     }
 
     @Subscription(() => Lobby, {
         topics: ({ args }) => {
             setTimeout(async () => {
-                const lobby = await joinLobbyUtil(args.id, args.accountId);
+                const lobby = await Lobby.joinLobby(args.id, args.accountId);
                 pubsub.publish(`watchLobby_${args.id}`, { lobby });
             }, 1);
             return `watchLobby_${args.id}`;
