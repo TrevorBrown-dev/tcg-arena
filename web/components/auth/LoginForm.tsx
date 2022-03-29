@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import styled from 'styled-components';
 import {
@@ -21,6 +22,7 @@ export const LoginForm: React.FC = () => {
         email: '',
         password: '',
     });
+    const router = useRouter();
 
     const [loginResult, login] = useLoginMutation();
     const [success, setSuccess] = useState(false);
@@ -37,6 +39,7 @@ export const LoginForm: React.FC = () => {
                 password: '',
             });
             setSuccess(true);
+            router.push('/');
         } else {
             setSuccess(false);
         }

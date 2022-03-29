@@ -1,6 +1,7 @@
 import { NextPage } from 'next';
 import { Dashboard } from '../components/Home/Dashboard';
 import Home from '../components/Home/Home';
+import { Button } from '../components/library/Button';
 import { Loading } from '../components/Loading';
 import { useMeQuery } from '../generated/graphql';
 
