@@ -33,7 +33,9 @@ export class CardLibrary extends BaseEntity implements WithCardRecords {
     @JoinTable({ name: 'card_ownership' })
     cards!: CardRecord[];
 
-    @Field(() => DeckTemplate)
-    @OneToMany(() => DeckTemplate, (deckTemplate) => deckTemplate.cardLibrary)
+    @Field(() => [DeckTemplate])
+    @OneToMany(() => DeckTemplate, (deckTemplate) => deckTemplate.cardLibrary, {
+        onDelete: 'CASCADE',
+    })
     deckTemplates!: DeckTemplate[];
 }

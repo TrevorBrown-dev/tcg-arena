@@ -1,0 +1,7 @@
+fragment LobbyParts on Lobby {
+    id
+    members {
+        id
+        userName
+    }
+}

@@ -1,0 +1,7 @@
+fragment CardRecordParts on CardRecord {
+    id
+    card {
+        ...CardParts
+    }
+    amount
+}

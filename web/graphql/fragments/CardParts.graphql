@@ -1,0 +1,6 @@
+fragment CardParts on Card {
+    id
+    name
+    description
+    imageUrl
+}

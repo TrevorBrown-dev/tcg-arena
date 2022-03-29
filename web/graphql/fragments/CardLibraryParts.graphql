@@ -1,0 +1,6 @@
+fragment CardLibraryParts on CardLibrary {
+    id
+    cards {
+        ...CardRecordParts
+    }
+}
