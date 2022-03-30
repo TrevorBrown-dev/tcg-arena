@@ -22,11 +22,13 @@ type Props = {
 };
 
 const StyledCard = styled.div`
-    width: 30rem;
-    height: 40rem;
+    width: 15em;
+    height: 20em;
     border: 2px solid var(--color-dark);
     border-radius: 1rem;
     padding: 1em;
+    display: flex;
+    flex-direction: column;
     .header {
         font-size: 1.5em;
         font-weight: bold;
@@ -43,7 +45,28 @@ const StyledCard = styled.div`
 
     .description {
         padding: 1em;
-        font-size: 1.2em;
+        font-size: 1em;
+        overflow: auto;
+        ::-webkit-scrollbar {
+            width: 0.5rem;
+            background-color: var(--color-medium);
+        }
+        ::-webkit-scrollbar-thumb {
+            width: 0.5rem;
+            background: #fff;
+            border: 1px solid var(--color-dark);
+            border-radius: 0.5rem;
+        }
+    }
+    .amount {
+        display: flex;
+        height: 100%;
+        flex: 1;
+        justify-content: flex-end;
+        align-items: flex-end;
+        .amount-container {
+            font-weight: 400;
+        }
     }
 `;
 
@@ -68,7 +91,9 @@ export const CardLibraryCard: React.FC<Props> = ({ cardRecord }) => {
                 <img src={'http://via.placeholder.com/640x360'} />
             </div>
             <div className="description">{card.description}</div>
-            <div>x{cardRecord.amount}</div>
+            <div className="amount">
+                <div className="amount-container">x{cardRecord.amount}</div>
+            </div>
         </StyledCard>
     );
 };

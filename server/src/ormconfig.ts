@@ -4,6 +4,7 @@ import { Account } from './entities/Account';
 import { Card } from './entities/Card';
 import { CardLibrary } from './entities/CardLibrary';
 import { CardRecord } from './entities/CardRecord';
+import { ChatMessage } from './entities/ChatMessage';
 import { DeckTemplate } from './entities/DeckTemplate';
 import { GameEntity } from './entities/GameEntity';
 import { Lobby } from './entities/Lobby';
@@ -27,5 +28,6 @@ export default {
         PlayerEntity,
         CardRecord,
         Lobby,
+        ChatMessage,
     ],
 } as Parameters<typeof createConnection>[0];

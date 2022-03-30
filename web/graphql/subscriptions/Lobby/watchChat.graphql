@@ -1,0 +1,5 @@
+subscription WatchChat($lobbyId: String!) {
+    watchChat(lobbyId: $lobbyId) {
+        ...ChatMessageParts
+    }
+}

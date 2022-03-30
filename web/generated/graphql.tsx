@@ -59,6 +59,13 @@ export type CardRecord = {
   id: Scalars['Float'];
 };
 
+export type ChatMessage = {
+  __typename?: 'ChatMessage';
+  account: Account;
+  id: Scalars['Float'];
+  message: Scalars['String'];
+};
+
 export type Deck = {
   __typename?: 'Deck';
   deck?: Maybe<Array<Card>>;
@@ -117,6 +124,7 @@ export type Mutation = {
   addCardToDeckTemplate: DeckTemplate;
   addCardToLibrary: Array<CardRecord>;
   createCard: Card;
+  createChatMessage: ChatMessage;
   createDeckTemplate: DeckTemplate;
   createGame: GameEntity;
   createLobby: Lobby;
@@ -146,6 +154,12 @@ export type MutationAddCardToLibraryArgs = {
 
 export type MutationCreateCardArgs = {
   data: CardInput;
+};
+
+
+export type MutationCreateChatMessageArgs = {
+  lobbyId: Scalars['String'];
+  message: Scalars['String'];
 };
 
 
@@ -230,6 +244,7 @@ export type Query = {
   cardLibraries: Array<CardLibrary>;
   cards: Array<Card>;
   cardsInLibrary: Array<CardRecord>;
+  chatMessages: Array<ChatMessage>;
   deckTemplates: Array<DeckTemplate>;
   game: GameEntity;
   games: Array<Game>;
@@ -268,6 +283,7 @@ export type Subscription = {
   __typename?: 'Subscription';
   deckTemplateUpdated: DeckTemplate;
   myDeckTemplates: Array<DeckTemplate>;
+  watchChat: Array<ChatMessage>;
   watchGame: GameEntity;
   watchLobby: Lobby;
 };
@@ -275,6 +291,11 @@ export type Subscription = {
 
 export type SubscriptionDeckTemplateUpdatedArgs = {
   id: Scalars['Float'];
+};
+
+
+export type SubscriptionWatchChatArgs = {
+  lobbyId: Scalars['String'];
 };
 
 
@@ -294,6 +315,8 @@ export type CardLibraryPartsFragment = { __typename?: 'CardLibrary', id: number,
 export type CardPartsFragment = { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null };
 
 export type CardRecordPartsFragment = { __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } };
+
+export type ChatMessagePartsFragment = { __typename?: 'ChatMessage', id: number, message: string, account: { __typename?: 'Account', id: number, userName: string } };
 
 export type DeckTemplatePartsFragment = { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> };
 
@@ -351,6 +374,37 @@ export type AddCardToDeckTemplateMutationVariables = Exact<{
 
 export type AddCardToDeckTemplateMutation = { __typename?: 'Mutation', addCardToDeckTemplate: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> } };
 
+export type CreateLobbyMutationVariables = Exact<{
+  creatorId: Scalars['Float'];
+}>;
+
+
+export type CreateLobbyMutation = { __typename?: 'Mutation', createLobby: { __typename?: 'Lobby', id: string, members?: Array<{ __typename?: 'Account', id: number, userName: string }> | null } };
+
+export type JoinLobbyMutationVariables = Exact<{
+  accountId: Scalars['Float'];
+  joinLobbyId: Scalars['String'];
+}>;
+
+
+export type JoinLobbyMutation = { __typename?: 'Mutation', joinLobby: { __typename?: 'Lobby', id: string, members?: Array<{ __typename?: 'Account', id: number, userName: string }> | null } };
+
+export type LeaveLobbyMutationVariables = Exact<{
+  accountId: Scalars['Float'];
+  leaveLobbyId: Scalars['String'];
+}>;
+
+
+export type LeaveLobbyMutation = { __typename?: 'Mutation', leaveLobby: { __typename?: 'Lobby', id: string, members?: Array<{ __typename?: 'Account', id: number, userName: string }> | null } };
+
+export type SendMessageMutationVariables = Exact<{
+  lobbyId: Scalars['String'];
+  message: Scalars['String'];
+}>;
+
+
+export type SendMessageMutation = { __typename?: 'Mutation', createChatMessage: { __typename?: 'ChatMessage', id: number, message: string, account: { __typename?: 'Account', id: number, userName: string } } };
+
 export type AccountQueryVariables = Exact<{
   id: Scalars['Float'];
 }>;
@@ -375,29 +429,6 @@ export type MyCardLibraryQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MyCardLibraryQuery = { __typename?: 'Query', myCardLibrary: Array<{ __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> };
 
-export type CreateLobbyMutationVariables = Exact<{
-  creatorId: Scalars['Float'];
-}>;
-
-
-export type CreateLobbyMutation = { __typename?: 'Mutation', createLobby: { __typename?: 'Lobby', id: string, members?: Array<{ __typename?: 'Account', id: number, userName: string }> | null } };
-
-export type JoinLobbyMutationVariables = Exact<{
-  accountId: Scalars['Float'];
-  joinLobbyId: Scalars['String'];
-}>;
-
-
-export type JoinLobbyMutation = { __typename?: 'Mutation', joinLobby: { __typename?: 'Lobby', id: string, members?: Array<{ __typename?: 'Account', id: number, userName: string }> | null } };
-
-export type LeaveLobbyMutationVariables = Exact<{
-  accountId: Scalars['Float'];
-  leaveLobbyId: Scalars['String'];
-}>;
-
-
-export type LeaveLobbyMutation = { __typename?: 'Mutation', leaveLobby: { __typename?: 'Lobby', id: string, members?: Array<{ __typename?: 'Account', id: number, userName: string }> | null } };
-
 export type MyDeckTemplatesSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -416,6 +447,13 @@ export type WatchLobbySubscriptionVariables = Exact<{
 
 
 export type WatchLobbySubscription = { __typename?: 'Subscription', watchLobby: { __typename?: 'Lobby', id: string, members?: Array<{ __typename?: 'Account', id: number, userName: string }> | null } };
+
+export type WatchChatSubscriptionVariables = Exact<{
+  lobbyId: Scalars['String'];
+}>;
+
+
+export type WatchChatSubscription = { __typename?: 'Subscription', watchChat: Array<{ __typename?: 'ChatMessage', id: number, message: string, account: { __typename?: 'Account', id: number, userName: string } }> };
 
 export const AccountPartsFragmentDoc = gql`
     fragment AccountParts on Account {
@@ -449,6 +487,16 @@ export const CardLibraryPartsFragmentDoc = gql`
   }
 }
     ${CardRecordPartsFragmentDoc}`;
+export const ChatMessagePartsFragmentDoc = gql`
+    fragment ChatMessageParts on ChatMessage {
+  id
+  message
+  account {
+    id
+    userName
+  }
+}
+    `;
 export const DeckTemplatePartsFragmentDoc = gql`
     fragment DeckTemplateParts on DeckTemplate {
   id
@@ -557,6 +605,50 @@ export const AddCardToDeckTemplateDocument = gql`
 export function useAddCardToDeckTemplateMutation() {
   return Urql.useMutation<AddCardToDeckTemplateMutation, AddCardToDeckTemplateMutationVariables>(AddCardToDeckTemplateDocument);
 };
+export const CreateLobbyDocument = gql`
+    mutation CreateLobby($creatorId: Float!) {
+  createLobby(creatorId: $creatorId) {
+    ...LobbyParts
+  }
+}
+    ${LobbyPartsFragmentDoc}`;
+
+export function useCreateLobbyMutation() {
+  return Urql.useMutation<CreateLobbyMutation, CreateLobbyMutationVariables>(CreateLobbyDocument);
+};
+export const JoinLobbyDocument = gql`
+    mutation JoinLobby($accountId: Float!, $joinLobbyId: String!) {
+  joinLobby(accountId: $accountId, id: $joinLobbyId) {
+    ...LobbyParts
+  }
+}
+    ${LobbyPartsFragmentDoc}`;
+
+export function useJoinLobbyMutation() {
+  return Urql.useMutation<JoinLobbyMutation, JoinLobbyMutationVariables>(JoinLobbyDocument);
+};
+export const LeaveLobbyDocument = gql`
+    mutation LeaveLobby($accountId: Float!, $leaveLobbyId: String!) {
+  leaveLobby(accountId: $accountId, id: $leaveLobbyId) {
+    ...LobbyParts
+  }
+}
+    ${LobbyPartsFragmentDoc}`;
+
+export function useLeaveLobbyMutation() {
+  return Urql.useMutation<LeaveLobbyMutation, LeaveLobbyMutationVariables>(LeaveLobbyDocument);
+};
+export const SendMessageDocument = gql`
+    mutation SendMessage($lobbyId: String!, $message: String!) {
+  createChatMessage(lobbyId: $lobbyId, message: $message) {
+    ...ChatMessageParts
+  }
+}
+    ${ChatMessagePartsFragmentDoc}`;
+
+export function useSendMessageMutation() {
+  return Urql.useMutation<SendMessageMutation, SendMessageMutationVariables>(SendMessageDocument);
+};
 export const AccountDocument = gql`
     query Account($id: Float!) {
   account(id: $id) {
@@ -613,39 +705,6 @@ export const MyCardLibraryDocument = gql`
 export function useMyCardLibraryQuery(options?: Omit<Urql.UseQueryArgs<MyCardLibraryQueryVariables>, 'query'>) {
   return Urql.useQuery<MyCardLibraryQuery>({ query: MyCardLibraryDocument, ...options });
 };
-export const CreateLobbyDocument = gql`
-    mutation CreateLobby($creatorId: Float!) {
-  createLobby(creatorId: $creatorId) {
-    ...LobbyParts
-  }
-}
-    ${LobbyPartsFragmentDoc}`;
-
-export function useCreateLobbyMutation() {
-  return Urql.useMutation<CreateLobbyMutation, CreateLobbyMutationVariables>(CreateLobbyDocument);
-};
-export const JoinLobbyDocument = gql`
-    mutation JoinLobby($accountId: Float!, $joinLobbyId: String!) {
-  joinLobby(accountId: $accountId, id: $joinLobbyId) {
-    ...LobbyParts
-  }
-}
-    ${LobbyPartsFragmentDoc}`;
-
-export function useJoinLobbyMutation() {
-  return Urql.useMutation<JoinLobbyMutation, JoinLobbyMutationVariables>(JoinLobbyDocument);
-};
-export const LeaveLobbyDocument = gql`
-    mutation LeaveLobby($accountId: Float!, $leaveLobbyId: String!) {
-  leaveLobby(accountId: $accountId, id: $leaveLobbyId) {
-    ...LobbyParts
-  }
-}
-    ${LobbyPartsFragmentDoc}`;
-
-export function useLeaveLobbyMutation() {
-  return Urql.useMutation<LeaveLobbyMutation, LeaveLobbyMutationVariables>(LeaveLobbyDocument);
-};
 export const MyDeckTemplatesDocument = gql`
     subscription MyDeckTemplates {
   myDeckTemplates {
@@ -682,4 +741,15 @@ export const WatchLobbyDocument = gql`
 
 export function useWatchLobbySubscription<TData = WatchLobbySubscription>(options: Omit<Urql.UseSubscriptionArgs<WatchLobbySubscriptionVariables>, 'query'> = {}, handler?: Urql.SubscriptionHandler<WatchLobbySubscription, TData>) {
   return Urql.useSubscription<WatchLobbySubscription, TData, WatchLobbySubscriptionVariables>({ query: WatchLobbyDocument, ...options }, handler);
+};
+export const WatchChatDocument = gql`
+    subscription WatchChat($lobbyId: String!) {
+  watchChat(lobbyId: $lobbyId) {
+    ...ChatMessageParts
+  }
+}
+    ${ChatMessagePartsFragmentDoc}`;
+
+export function useWatchChatSubscription<TData = WatchChatSubscription>(options: Omit<Urql.UseSubscriptionArgs<WatchChatSubscriptionVariables>, 'query'> = {}, handler?: Urql.SubscriptionHandler<WatchChatSubscription, TData>) {
+  return Urql.useSubscription<WatchChatSubscription, TData, WatchChatSubscriptionVariables>({ query: WatchChatDocument, ...options }, handler);
 };

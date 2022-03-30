@@ -1,36 +1,20 @@
+import { useMeQuery, useWatchLobbySubscription } from '@graphql-gen';
+import { Layout } from 'components/layout/Layout';
+import { Lobby } from 'components/Lobby/Lobby';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import {
-    useLeaveLobbyMutation,
-    useMeQuery,
-    useWatchLobbySubscription,
-} from '../../generated/graphql';
 export const ActiveLobby: NextPage = () => {
     const router = useRouter();
-    const [me] = useMeQuery();
-    console.log(me);
-    const [lobby] = useWatchLobbySubscription({
-        pause: !me.data?.me,
-        variables: {
-            watchLobbyId: router!.query!.lobbyId! as string,
-            accountId: me.data?.me?.id!,
-        },
-    });
+    const { lobbyId } = router.query;
 
-    useEffect(() => {
-        console.log(lobby);
-    }, [lobby]);
-    const members = lobby.data?.watchLobby.members;
+    if (!lobbyId) {
+        return <div>No lobbyId</div>;
+    }
     return (
-        <div>
-            <h1>Active Lobby</h1>
-            <h2>{router.query.lobbyId}</h2>
-            {members &&
-                members.map((mem) => {
-                    return <h3 key={mem.id}>{mem.userName}</h3>;
-                })}
-        </div>
+        <Layout>
+            <Lobby lobbyId={lobbyId as string} />
+        </Layout>
     );
 };
 export default ActiveLobby;

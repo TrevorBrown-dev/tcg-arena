@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { pubsub } from '..';
 import { Account } from './Account';
+import { ChatMessage } from './ChatMessage';
 
 @ObjectType()
 @Entity()
@@ -25,6 +26,12 @@ export class Lobby extends BaseEntity {
         eager: true,
     })
     members!: Account[];
+
+    @OneToMany(() => ChatMessage, (chatMessage) => chatMessage.lobby, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+    })
+    chatMessages!: ChatMessage[];
 
     static async joinLobby(lobbyId: string, accountId: number) {
         try {

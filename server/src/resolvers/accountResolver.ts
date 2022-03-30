@@ -31,7 +31,6 @@ class AccountResponse {
     @Field(() => Account, { nullable: true })
     account?: Account;
 }
-type Iterator<T> = AsyncIterator<T> & T;
 @Resolver(Account)
 class AccountResolver {
     @Query(() => Account)

@@ -1,0 +1,8 @@
+fragment ChatMessageParts on ChatMessage {
+    id
+    message
+    account {
+        id
+        userName
+    }
+}

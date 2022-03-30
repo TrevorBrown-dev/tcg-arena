@@ -17,14 +17,12 @@ import { parseJWT } from '../utils/parseJWT';
 import { DeckTemplateInput } from './inputs/DeckTemplateInput';
 @Resolver()
 class DeckTemplateResolver {
+    //Returns all dexkTemplates
     @Query(() => [DeckTemplate])
     async deckTemplates(): Promise<DeckTemplate[]> {
-        const deckTemplates = await DeckTemplate.find({
+        return await DeckTemplate.find({
             relations: ['cardLibrary', 'cards'],
         });
-        console.log(deckTemplates);
-
-        return deckTemplates;
     }
 
     @Subscription(() => [DeckTemplate], {
@@ -65,15 +63,18 @@ class DeckTemplateResolver {
         return deckTemplates || [];
     }
 
+    //Creates and returns a deckTemplate
     @Mutation(() => DeckTemplate)
     async createDeckTemplate(
         @Arg('data') data: DeckTemplateInput,
         @Ctx() { req: { req } }: MyContext
     ): Promise<DeckTemplate | null> {
+        //Pulls cookie and checks for authorization and finds account
         const authorization = req.headers.cookie;
         if (!authorization && !data.cardLibraryId) return null;
         const account = parseJWT(authorization!);
 
+        //Finds cardLibrary based on account
         const cardLibrary = await CardLibrary.findOne({
             where: { account },
             relations: ['account', 'deckTemplates', 'deckTemplates.cards'],
@@ -82,14 +83,18 @@ class DeckTemplateResolver {
             throw new Error(
                 `CardLibrary not found with id: ${data.cardLibraryId}`
             );
+
+        //Creates a deckTemplate and stores in on the person's deckTemplate
         const deckTemplate = await DeckTemplate.create({
             name: data.name,
             cards: [],
         }).save();
         if (!deckTemplate)
             throw new Error('DeckTemplate not created something went wrong :(');
-        cardLibrary.deckTemplates.push(deckTemplate);
+        cardLibrary.deckTemplates.unshift(deckTemplate);
         await cardLibrary.save();
+
+        //Publishes this data to subscription
         pubsub.publish(`deckTemplateCreated_${account.id}`, {
             deckTemplates: cardLibrary.deckTemplates,
         });
@@ -97,15 +102,19 @@ class DeckTemplateResolver {
         return deckTemplate;
     }
 
+    //Deletes a deckTemplate from an account
     @Mutation(() => Boolean)
     async deleteDeckTemplate(
         @Arg('id') id: number,
         @Ctx() { req: { req } }: MyContext
     ) {
+        //Pulls cookie and checks for authorization and finds account
         const authorization = req.headers.cookie;
         if (!authorization) return false;
         const account = parseJWT(authorization!);
         if (!account) return false;
+        
+        //Finds cardLibrary based on account
         const cardLibrary = await CardLibrary.findOne({
             where: {
                 account,
@@ -113,16 +122,21 @@ class DeckTemplateResolver {
             relations: ['account', 'deckTemplates', 'deckTemplates.cards'],
         });
         if (!cardLibrary) return false;
+
+        //Sets deckTemplates to deckTemplates besides the one passed to this function
         cardLibrary.deckTemplates = cardLibrary.deckTemplates.filter(
             (deckTemplate) => deckTemplate.id !== id
         );
         await cardLibrary.save();
+
+        //Publishes this data to subscription
         pubsub.publish(`deckTemplateCreated_${account.id}`, {
             deckTemplates: cardLibrary.deckTemplates,
         });
         return true;
     }
 
+    //Adds a card to a deckTemplate
     @Mutation(() => DeckTemplate)
     async addCardToDeckTemplate(
         @Arg('id') id: number,

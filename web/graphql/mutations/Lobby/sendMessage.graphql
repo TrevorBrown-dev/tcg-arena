@@ -1,0 +1,5 @@
+mutation SendMessage($lobbyId: String!, $message: String!) {
+    createChatMessage(lobbyId: $lobbyId, message: $message) {
+        ...ChatMessageParts
+    }
+}

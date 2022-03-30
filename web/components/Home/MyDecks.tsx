@@ -18,6 +18,16 @@ export const DeckSidebar = styled.div`
     .controls {
         font-size: 0.5em;
         display: flex;
+        justify-content: center;
+        gap: 6px;
+    }
+    .decks {
+        display: flex;
+        flex-direction: column;
+        padding: 1em;
+        font-size: 1.3em;
+        font-weight: 400;
+        /* gap: 1em; */
     }
 `;
 
@@ -47,7 +57,7 @@ const DeckTemplateControls: React.FC = () => {
 };
 
 const DeckListItem: React.FC<{ name: string; id: number }> = ({ name, id }) => {
-    const { mode, setMode } = useModeContext();
+    const { setMode } = useModeContext();
     return (
         <div
             onClick={() => {
@@ -66,7 +76,7 @@ export const MyDecks: React.FC = () => {
     return (
         <DeckSidebar>
             <DeckTemplateControls />
-            <div>
+            <div className="decks">
                 {deckTemplates.data?.myDeckTemplates.map((deckTemplate, i) => {
                     return (
                         <DeckListItem
