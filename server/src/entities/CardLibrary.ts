@@ -1,17 +1,14 @@
 import { Field, ObjectType } from 'type-graphql';
 import {
     BaseEntity,
-    PrimaryGeneratedColumn,
     Entity,
-    ManyToOne,
-    Column,
-    OneToOne,
-    ManyToMany,
     JoinTable,
+    ManyToMany,
     OneToMany,
+    OneToOne,
+    PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Account } from './Account';
-import { Card } from './Card';
 import { CardRecord, WithCardRecords } from './CardRecord';
 import { DeckTemplate } from './DeckTemplate';
 
@@ -33,9 +30,10 @@ export class CardLibrary extends BaseEntity implements WithCardRecords {
     @JoinTable({ name: 'card_ownership' })
     cards!: CardRecord[];
 
-    @Field(() => [DeckTemplate])
+    @Field(() => [DeckTemplate], { nullable: true })
     @OneToMany(() => DeckTemplate, (deckTemplate) => deckTemplate.cardLibrary, {
         onDelete: 'CASCADE',
+        nullable: true,
     })
     deckTemplates!: DeckTemplate[];
 }
