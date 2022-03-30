@@ -2,13 +2,13 @@ import { getConnection } from 'typeorm';
 import { Lobby } from '../../entities/Lobby';
 
 export const cleanDb = async () => {
-    const changes = [];
-    changes.push(
-        await getConnection()
-            .createQueryBuilder()
-            .delete()
-            .from(Lobby, 'lobby')
-            .execute()
-    );
+    // const changes = [];
+    const lobbies = await Lobby.find();
+    const changes: any[] = [];
+    lobbies.forEach(async (lobby) => {
+        if (lobby.members.length === 0) {
+            changes.push(await lobby.remove());
+        }
+    });
     return changes;
 };
