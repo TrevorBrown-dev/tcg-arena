@@ -1,7 +1,9 @@
-query CardsInLibrary($cardLibraryId: Float!) {
-    cardsInLibrary(id: $cardLibraryId) {
+query MyCardLibrary {
+    myCardLibrary {
+        id
         amount
         card {
+            id
             name
             description
             imageUrl

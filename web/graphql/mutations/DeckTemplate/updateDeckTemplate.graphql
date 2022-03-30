@@ -1,0 +1,5 @@
+mutation AddCardToDeckTemplate($cardId: Float!, $deckTemplateId: Float!) {
+    addCardToDeckTemplate(cardId: $cardId, id: $deckTemplateId) {
+        ...DeckTemplateParts
+    }
+}

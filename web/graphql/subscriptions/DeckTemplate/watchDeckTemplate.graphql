@@ -1,0 +1,5 @@
+subscription WatchDeckTemplate($deckTemplateId: Float!) {
+    deckTemplateUpdated(id: $deckTemplateId) {
+        ...DeckTemplateParts
+    }
+}

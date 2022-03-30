@@ -1,0 +1,5 @@
+mutation RemoveCardFromDeckTemplate($id: Float!, $cardId: Float!) {
+    removeCardFromDeckTemplate(id: $id, cardId: $cardId) {
+        ...DeckTemplateParts
+    }
+}

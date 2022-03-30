@@ -5,7 +5,7 @@ export const Input = styled.input`
     outline: none;
     border: none;
     padding: 0.8em 0.8em;
-    font-size: 1.6rem;
+    font-size: 1.6em;
     display: block;
     max-width: 100vw;
     &:focus {

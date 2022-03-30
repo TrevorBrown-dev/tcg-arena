@@ -6,7 +6,7 @@ export const Button = styled.button`
     color: var(--color-dark);
     border: 2px solid var(--color-primary);
     padding: 1em;
-    font-size: 1.6rem;
+    font-size: 1.6em;
     font-weight: bold;
 
     transition: all 0.2s ease-in-out;

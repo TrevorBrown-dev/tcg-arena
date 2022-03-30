@@ -1,11 +1,17 @@
 import styled from 'styled-components';
-import { Card, CardRecord } from '../../generated/graphql';
+import {
+    Card,
+    CardRecord,
+    useAddCardToDeckTemplateMutation,
+} from '../../generated/graphql';
+import { useModeContext } from '../Home/Dashboard';
 
 //TODO pull this out to a type later
 
 export type CardRecordPart = {
     amount: number;
     card: {
+        id: number;
         name: string;
         description: string;
         imageUrl?: string;
@@ -43,9 +49,20 @@ const StyledCard = styled.div`
 
 export const CardLibraryCard: React.FC<Props> = ({ cardRecord }) => {
     const { card } = cardRecord;
+    const { mode } = useModeContext();
+    const [, addCard] = useAddCardToDeckTemplateMutation();
 
     return (
-        <StyledCard>
+        <StyledCard
+            onClick={() => {
+                if (mode.mode === 'edit' && mode.targetDeckId) {
+                    addCard({
+                        cardId: card.id,
+                        deckTemplateId: mode.targetDeckId,
+                    });
+                }
+            }}
+        >
             <div className="header">{card.name}</div>
             <div className="image">
                 <img src={'http://via.placeholder.com/640x360'} />

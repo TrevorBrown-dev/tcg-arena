@@ -2,15 +2,15 @@ import styled from 'styled-components';
 import { MyCardLibrary } from './MyCardLibrary';
 import { MyDecks } from './MyDecks';
 
-const StyledViewMode = styled.div`
+export const StytledMode = styled.div`
     display: flex;
 `;
 
 export const ViewMode: React.FC = () => {
     return (
-        <StyledViewMode>
+        <StytledMode>
             <MyCardLibrary />
             <MyDecks />
-        </StyledViewMode>
+        </StytledMode>
     );
 };

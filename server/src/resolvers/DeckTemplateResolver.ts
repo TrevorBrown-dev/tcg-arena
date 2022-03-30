@@ -7,18 +7,12 @@ import {
     Root,
     Subscription,
 } from 'type-graphql';
-import { BaseEntity } from 'typeorm';
 import { pubsub } from '..';
-import { Account } from '../entities/Account';
 import { Card } from '../entities/Card';
 import { CardLibrary } from '../entities/CardLibrary';
 import { CardRecord } from '../entities/CardRecord';
 import { DeckTemplate } from '../entities/DeckTemplate';
 import { MyContext, SubscriptionIterator } from '../types';
-import {
-    getAccountFromCookie,
-    getAccountIdFromCookie,
-} from '../utils/auth/getAccountFromCookie';
 import { parseJWT } from '../utils/parseJWT';
 import { DeckTemplateInput } from './inputs/DeckTemplateInput';
 @Resolver()
@@ -178,6 +172,34 @@ class DeckTemplateResolver {
             );
         }
 
+        await deckTemplate.save();
+
+        pubsub.publish(`deckTemplateUpdated_${id}`, { deckTemplate });
+        return deckTemplate;
+    }
+
+    @Mutation(() => DeckTemplate)
+    async removeCardFromDeckTemplate(
+        @Arg('id') id: number,
+        @Arg('cardId') cardId: number
+    ): Promise<DeckTemplate> {
+        const deckTemplate = await DeckTemplate.findOne({
+            where: { id },
+            relations: ['cardLibrary', 'cards', 'cardLibrary.cards'],
+        });
+        const card = await Card.findOne(cardId);
+
+        if (!deckTemplate)
+            throw new Error(`DeckTemplate not found with id: ${id}`);
+        if (!card) throw new Error(`Card not found with id: ${cardId}`);
+        const recordInDeck = deckTemplate.cards.find(
+            (cardRecord) => cardRecord.card.id === card.id
+        );
+        if (!recordInDeck)
+            throw new Error(
+                `Card not found in Deck Template ${deckTemplate.id}`
+            );
+        await CardRecord.removeCount(deckTemplate, card);
         await deckTemplate.save();
 
         pubsub.publish(`deckTemplateUpdated_${id}`, { deckTemplate });
