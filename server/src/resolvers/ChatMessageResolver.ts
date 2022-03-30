@@ -48,7 +48,6 @@ class ChatMessageResolver {
         await chatMessage.save();
         lobby.chatMessages.push(chatMessage);
         await lobby.save();
-        console.log(lobby.chatMessages);
         pubsub.publish(`watchChat_${lobby.id}`, {
             messages: lobby.chatMessages,
         });
