@@ -1,8 +1,9 @@
 import ws, { WebSocketServer } from 'ws';
 import { Lobby } from '../../entities/Lobby';
+import { parseJWT } from '../parseJWT';
 
 export const handleDisconnects = (wsServer: WebSocketServer) => {
-    wsServer.on('connection', (ws) => {
+    wsServer.on('connection', (ws, req) => {
         //This happens when a subscription is made
         ws.onmessage = (e) => {
             //Grab the data from the subscription
@@ -16,18 +17,17 @@ export const handleDisconnects = (wsServer: WebSocketServer) => {
             //The payload includes the graphql subscription info and variables
             //Right now the only way I know of how to know exactly what the subscription is is
             //by looking at the payload for specific keys
-            if (
-                data?.payload?.variables?.watchLobbyId &&
-                data?.payload?.variables?.accountId
-            ) {
+            if (data?.payload?.variables?.watchLobbyId) {
                 //if we already set an onclose listener for this ws, dont do it again
                 if (ws.onclose) return;
 
                 ws.onclose = () => {
+                    if (!req.headers.cookie) return;
                     const lobbyId = data.payload.variables.watchLobbyId;
-                    const accountId = data.payload.variables.accountId;
+                    const accountId = parseJWT(req.headers.cookie)?.id;
+                    if (!lobbyId || !accountId) return;
                     //This happens when the subscription is closed
-                    Lobby.leaveLobby(lobbyId, accountId);
+                    Lobby.leaveLobby(lobbyId, parseInt(accountId));
                 };
             }
         };

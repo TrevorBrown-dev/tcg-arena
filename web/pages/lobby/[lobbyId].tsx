@@ -9,6 +9,7 @@ import {
 export const ActiveLobby: NextPage = () => {
     const router = useRouter();
     const [me] = useMeQuery();
+    console.log(me);
     const [lobby] = useWatchLobbySubscription({
         pause: !me.data?.me,
         variables: {
@@ -20,14 +21,15 @@ export const ActiveLobby: NextPage = () => {
     useEffect(() => {
         console.log(lobby);
     }, [lobby]);
-
+    const members = lobby.data?.watchLobby.members;
     return (
         <div>
             <h1>Active Lobby</h1>
             <h2>{router.query.lobbyId}</h2>
-            {lobby.data?.watchLobby.members.map((mem) => {
-                return <h3 key={mem.id}>{mem.userName}</h3>;
-            })}
+            {members &&
+                members.map((mem) => {
+                    return <h3 key={mem.id}>{mem.userName}</h3>;
+                })}
         </div>
     );
 };

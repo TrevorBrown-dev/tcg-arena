@@ -1,5 +1,6 @@
 import {
     Arg,
+    Ctx,
     Mutation,
     Query,
     Resolver,
@@ -9,6 +10,8 @@ import {
 import { pubsub } from '..';
 import { Account } from '../entities/Account';
 import { Lobby } from '../entities/Lobby';
+import { MyContext } from '../types';
+import { parseJWT } from '../utils/parseJWT';
 
 @Resolver()
 class LobbyResolver {
@@ -45,22 +48,32 @@ class LobbyResolver {
     }
 
     @Subscription(() => Lobby, {
-        topics: ({ args }) => {
-            setTimeout(async () => {
-                const lobby = await Lobby.joinLobby(args.id, args.accountId);
-                pubsub.publish(`watchLobby_${args.id}`, { lobby });
-            }, 1);
+        topics: ({ args, context }) => {
+            try {
+                const cookie = context.extra.request?.headers?.cookie;
+                const account = parseJWT(cookie);
+                if (!account || !account?.id) {
+                    console.log(
+                        `No account found with cookie ${cookie} and payload response:`,
+                        account
+                    );
+                } else {
+                    setTimeout(async () => {
+                        const lobby = await Lobby.joinLobby(
+                            args.id,
+                            parseInt(account.id)
+                        );
+                        if (!lobby) return;
+                        pubsub.publish(`watchLobby_${args.id}`, { lobby });
+                    }, 1);
+                }
+            } catch (e) {
+                console.log(e);
+            }
             return `watchLobby_${args.id}`;
         },
-        filter: ({ args }) => {
-            return true;
-        },
     })
-    watchLobby(
-        @Root('lobby') lobby: Lobby,
-        @Arg('id') id: string,
-        @Arg('accountId') accountId: number
-    ) {
+    watchLobby(@Root('lobby') lobby: Lobby, @Arg('id') id: string) {
         return lobby;
     }
 }

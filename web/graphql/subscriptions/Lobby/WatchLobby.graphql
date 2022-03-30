@@ -1,5 +1,5 @@
-subscription WatchLobby($watchLobbyId: String!, $accountId: Float!) {
-    watchLobby(id: $watchLobbyId, accountId: $accountId) {
+subscription WatchLobby($watchLobbyId: String!) {
+    watchLobby(id: $watchLobbyId) {
         id
         members {
             id

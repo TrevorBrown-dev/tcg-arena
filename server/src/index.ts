@@ -10,13 +10,20 @@ import { createServer } from 'http';
 import Redis from 'ioredis';
 import path from 'path';
 import { buildSchema, NonEmptyArray } from 'type-graphql';
-import { createConnection } from 'typeorm';
+import {
+    ConnectionManager,
+    createConnection,
+    getConnection,
+    getConnectionManager,
+    QueryBuilder,
+} from 'typeorm';
 import { WebSocketServer } from 'ws';
 import { Account } from './entities/Account';
 import { Lobby } from './entities/Lobby';
 import { testGame } from './game/tester';
 import ormconfig from './ormconfig';
 import { MyContext } from './types';
+import { cleanDb } from './utils/db/cleanDb';
 import { handleDisconnects } from './utils/ws/handleDisconnects';
 type WithKindName = { name: { kind: string; value: string } };
 const options = {
@@ -38,6 +45,7 @@ const main = async () => {
     //Attempt to create typeORM connection to db
     try {
         await createConnection(ormconfig);
+        await cleanDb();
     } catch (e) {
         console.log(e);
     }
@@ -89,6 +97,7 @@ const main = async () => {
     const serverCleanup = useServer(
         {
             schema,
+            context: (req) => req,
         },
         wsServer
     );

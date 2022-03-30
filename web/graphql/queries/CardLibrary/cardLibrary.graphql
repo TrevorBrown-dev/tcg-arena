@@ -1,0 +1,21 @@
+query CardsInLibrary($cardLibraryId: Float!) {
+    cardsInLibrary(id: $cardLibraryId) {
+        amount
+        card {
+            name
+            description
+            imageUrl
+        }
+    }
+}
+
+query MyCardLibrary {
+    myCardLibrary {
+        amount
+        card {
+            name
+            description
+            imageUrl
+        }
+    }
+}

@@ -1,5 +1,6 @@
 import {
     Arg,
+    Ctx,
     Mutation,
     Query,
     Resolver,
@@ -8,11 +9,17 @@ import {
 } from 'type-graphql';
 import { BaseEntity } from 'typeorm';
 import { pubsub } from '..';
+import { Account } from '../entities/Account';
 import { Card } from '../entities/Card';
 import { CardLibrary } from '../entities/CardLibrary';
 import { CardRecord } from '../entities/CardRecord';
 import { DeckTemplate } from '../entities/DeckTemplate';
-import { SubscriptionIterator } from '../types';
+import { MyContext, SubscriptionIterator } from '../types';
+import {
+    getAccountFromCookie,
+    getAccountIdFromCookie,
+} from '../utils/auth/getAccountFromCookie';
+import { parseJWT } from '../utils/parseJWT';
 import { DeckTemplateInput } from './inputs/DeckTemplateInput';
 @Resolver()
 class DeckTemplateResolver {
@@ -26,24 +33,100 @@ class DeckTemplateResolver {
         return deckTemplates;
     }
 
+    @Subscription(() => [DeckTemplate], {
+        topics: ({ args, context }) => {
+            const cookie = context.extra.request?.headers?.cookie;
+            const account = parseJWT(cookie);
+            if (!account || !account?.id) {
+                console.log(
+                    `No account found with cookie ${cookie} and payload response:`,
+                    account
+                );
+                return 'ERROR';
+            }
+
+            setTimeout(async () => {
+                const cardLibrary = await CardLibrary.findOne({
+                    where: { account },
+                    relations: [
+                        'account',
+                        'deckTemplates',
+                        'deckTemplates.cards',
+                    ],
+                });
+                if (!cardLibrary) {
+                    console.log('No card library found');
+                    return;
+                }
+                pubsub.publish(`deckTemplateCreated_${account.id}`, {
+                    deckTemplates: cardLibrary.deckTemplates,
+                });
+            }, 1);
+            return `deckTemplateCreated_${account.id}`;
+        },
+    })
+    async myDeckTemplates(
+        @Root('deckTemplates') deckTemplates: DeckTemplate[]
+    ) {
+        return deckTemplates || [];
+    }
+
     @Mutation(() => DeckTemplate)
     async createDeckTemplate(
-        @Arg('data') data: DeckTemplateInput
-    ): Promise<DeckTemplate> {
-        const cardLibrary = await CardLibrary.findOne(data.cardLibraryId);
+        @Arg('data') data: DeckTemplateInput,
+        @Ctx() { req: { req } }: MyContext
+    ): Promise<DeckTemplate | null> {
+        const authorization = req.headers.cookie;
+        if (!authorization && !data.cardLibraryId) return null;
+        const account = parseJWT(authorization!);
+
+        const cardLibrary = await CardLibrary.findOne({
+            where: { account },
+            relations: ['account', 'deckTemplates', 'deckTemplates.cards'],
+        });
         if (!cardLibrary)
             throw new Error(
                 `CardLibrary not found with id: ${data.cardLibraryId}`
             );
         const deckTemplate = await DeckTemplate.create({
             name: data.name,
-            cardLibrary,
             cards: [],
         }).save();
         if (!deckTemplate)
             throw new Error('DeckTemplate not created something went wrong :(');
+        cardLibrary.deckTemplates.push(deckTemplate);
+        await cardLibrary.save();
+        pubsub.publish(`deckTemplateCreated_${account.id}`, {
+            deckTemplates: cardLibrary.deckTemplates,
+        });
 
         return deckTemplate;
+    }
+
+    @Mutation(() => Boolean)
+    async deleteDeckTemplate(
+        @Arg('id') id: number,
+        @Ctx() { req: { req } }: MyContext
+    ) {
+        const authorization = req.headers.cookie;
+        if (!authorization) return false;
+        const account = parseJWT(authorization!);
+        if (!account) return false;
+        const cardLibrary = await CardLibrary.findOne({
+            where: {
+                account,
+            },
+            relations: ['account', 'deckTemplates', 'deckTemplates.cards'],
+        });
+        if (!cardLibrary) return false;
+        cardLibrary.deckTemplates = cardLibrary.deckTemplates.filter(
+            (deckTemplate) => deckTemplate.id !== id
+        );
+        await cardLibrary.save();
+        pubsub.publish(`deckTemplateCreated_${account.id}`, {
+            deckTemplates: cardLibrary.deckTemplates,
+        });
+        return true;
     }
 
     @Mutation(() => DeckTemplate)

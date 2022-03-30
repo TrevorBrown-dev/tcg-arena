@@ -22,6 +22,7 @@ export class Lobby extends BaseEntity {
     @Field(() => [Account], { nullable: true })
     @OneToMany(() => Account, (account) => account.lobby, {
         onDelete: 'CASCADE',
+        eager: true,
     })
     members!: Account[];
 
@@ -32,7 +33,11 @@ export class Lobby extends BaseEntity {
                 relations: ['members'],
             });
 
-            if (!lobby) throw new Error(`Lobby not found with id: ${lobbyId}`);
+            if (!lobby) {
+                console.log('That lobby does not exist');
+                return null;
+                // throw new Error(`Lobby not found with id: ${lobbyId}`)
+            }
 
             const account = await Account.findOne({
                 where: { id: accountId },
@@ -64,23 +69,31 @@ export class Lobby extends BaseEntity {
             relations: ['members'],
         });
         if (!lobby) {
-            throw new Error('Lobby not found');
+            console.log('No lobby found!');
+            return false;
         }
         const member = lobby.members.find((m) => m.id === accountId);
         if (!member) {
-            throw new Error(
-                `Account with id ${accountId} is not in lobby ${lobbyId}`
-            );
+            return false;
+            // throw new Error(
+            //     `Account with id ${accountId} is not in lobby ${lobbyId}`
+            // );
         }
         lobby.members = lobby.members.filter((m) => m.id !== accountId);
         await lobby.save();
         pubsub.publish(`watchLobby_${lobby.id}`, {
             lobby,
         });
-
-        if (lobby.members.length === 0) {
-            await lobby.remove();
-        }
+        setTimeout(async () => {
+            const lobby = await Lobby.findOne({
+                where: { id: lobbyId },
+                relations: ['members'],
+            });
+            if (lobby?.members.length === 0) {
+                console.log(`Lobby ${lobbyId} is empty, deleting`);
+                await lobby.remove();
+            }
+        }, 5000);
         return true;
     }
 }

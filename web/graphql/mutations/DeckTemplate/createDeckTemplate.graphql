@@ -1,0 +1,9 @@
+mutation CreateDeckTemplate($name: String!) {
+    createDeckTemplate(data: { name: $name }) {
+        id
+        name
+        cards {
+            ...CardRecordParts
+        }
+    }
+}

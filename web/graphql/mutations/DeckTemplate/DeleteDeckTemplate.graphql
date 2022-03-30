@@ -1,0 +1,3 @@
+mutation DeleteDeckTemplate($id: Float!) {
+    deleteDeckTemplate(id: $id)
+}

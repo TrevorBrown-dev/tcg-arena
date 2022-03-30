@@ -47,8 +47,9 @@ export type CardInput = {
 
 export type CardLibrary = {
   __typename?: 'CardLibrary';
+  account?: Maybe<Array<Account>>;
   cards: Array<CardRecord>;
-  deckTemplates: DeckTemplate;
+  deckTemplates?: Maybe<Array<DeckTemplate>>;
   id: Scalars['Float'];
 };
 
@@ -73,7 +74,7 @@ export type DeckTemplate = {
 };
 
 export type DeckTemplateInput = {
-  cardLibraryId: Scalars['Float'];
+  cardLibraryId?: InputMaybe<Scalars['Float']>;
   name: Scalars['String'];
 };
 
@@ -120,6 +121,7 @@ export type Mutation = {
   createDeckTemplate: DeckTemplate;
   createGame: GameEntity;
   createLobby: Lobby;
+  deleteDeckTemplate: Scalars['Boolean'];
   joinLobby: Lobby;
   leaveLobby: Lobby;
   login: AccountResponse;
@@ -159,6 +161,11 @@ export type MutationCreateGameArgs = {
 
 export type MutationCreateLobbyArgs = {
   creatorId: Scalars['Float'];
+};
+
+
+export type MutationDeleteDeckTemplateArgs = {
+  id: Scalars['Float'];
 };
 
 
@@ -222,6 +229,7 @@ export type Query = {
   games: Array<Game>;
   lobbies: Array<Lobby>;
   me?: Maybe<Account>;
+  myCardLibrary: Array<CardRecord>;
 };
 
 
@@ -253,6 +261,7 @@ export type RegisterInput = {
 export type Subscription = {
   __typename?: 'Subscription';
   deckTemplateUpdated: DeckTemplate;
+  myDeckTemplates: Array<DeckTemplate>;
   watchGame: GameEntity;
   watchLobby: Lobby;
 };
@@ -269,11 +278,20 @@ export type SubscriptionWatchGameArgs = {
 
 
 export type SubscriptionWatchLobbyArgs = {
-  accountId: Scalars['Float'];
   id: Scalars['String'];
 };
 
 export type AccountPartsFragment = { __typename?: 'Account', id: number, email: string, userName: string };
+
+export type CardLibraryPartsFragment = { __typename?: 'CardLibrary', id: number, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> };
+
+export type CardPartsFragment = { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null };
+
+export type CardRecordPartsFragment = { __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } };
+
+export type DeckTemplatePartsFragment = { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> };
+
+export type LobbyPartsFragment = { __typename?: 'Lobby', id: string, members?: Array<{ __typename?: 'Account', id: number, userName: string }> | null };
 
 export type LoginMutationVariables = Exact<{
   password: Scalars['String'];
@@ -297,6 +315,20 @@ export type RegisterMutationVariables = Exact<{
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'AccountResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, account?: { __typename?: 'Account', id: number, email: string, userName: string } | null } };
 
+export type DeleteDeckTemplateMutationVariables = Exact<{
+  id: Scalars['Float'];
+}>;
+
+
+export type DeleteDeckTemplateMutation = { __typename?: 'Mutation', deleteDeckTemplate: boolean };
+
+export type CreateDeckTemplateMutationVariables = Exact<{
+  name: Scalars['String'];
+}>;
+
+
+export type CreateDeckTemplateMutation = { __typename?: 'Mutation', createDeckTemplate: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> } };
+
 export type AccountQueryVariables = Exact<{
   id: Scalars['Float'];
 }>;
@@ -307,7 +339,19 @@ export type AccountQuery = { __typename?: 'Query', account: { __typename?: 'Acco
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'Account', userName: string, email: string, id: number, cardLibrary?: { __typename?: 'CardLibrary', id: number } | null } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'Account', id: number, email: string, userName: string } | null };
+
+export type CardsInLibraryQueryVariables = Exact<{
+  cardLibraryId: Scalars['Float'];
+}>;
+
+
+export type CardsInLibraryQuery = { __typename?: 'Query', cardsInLibrary: Array<{ __typename?: 'CardRecord', amount: number, card: { __typename?: 'Card', name: string, description: string, imageUrl?: string | null } }> };
+
+export type MyCardLibraryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyCardLibraryQuery = { __typename?: 'Query', myCardLibrary: Array<{ __typename?: 'CardRecord', amount: number, card: { __typename?: 'Card', name: string, description: string, imageUrl?: string | null } }> };
 
 export type CreateLobbyMutationVariables = Exact<{
   creatorId: Scalars['Float'];
@@ -330,11 +374,15 @@ export type LeaveLobbyMutationVariables = Exact<{
 }>;
 
 
-export type LeaveLobbyMutation = { __typename?: 'Mutation', leaveLobby: { __typename?: 'Lobby', id: string, members?: Array<{ __typename?: 'Account', userName: string }> | null } };
+export type LeaveLobbyMutation = { __typename?: 'Mutation', leaveLobby: { __typename?: 'Lobby', id: string, members?: Array<{ __typename?: 'Account', id: number, userName: string }> | null } };
+
+export type MyDeckTemplatesSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyDeckTemplatesSubscription = { __typename?: 'Subscription', myDeckTemplates: Array<{ __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> }> };
 
 export type WatchLobbySubscriptionVariables = Exact<{
   watchLobbyId: Scalars['String'];
-  accountId: Scalars['Float'];
 }>;
 
 
@@ -345,6 +393,49 @@ export const AccountPartsFragmentDoc = gql`
   id
   email
   userName
+}
+    `;
+export const CardPartsFragmentDoc = gql`
+    fragment CardParts on Card {
+  id
+  name
+  description
+  imageUrl
+}
+    `;
+export const CardRecordPartsFragmentDoc = gql`
+    fragment CardRecordParts on CardRecord {
+  id
+  card {
+    ...CardParts
+  }
+  amount
+}
+    ${CardPartsFragmentDoc}`;
+export const CardLibraryPartsFragmentDoc = gql`
+    fragment CardLibraryParts on CardLibrary {
+  id
+  cards {
+    ...CardRecordParts
+  }
+}
+    ${CardRecordPartsFragmentDoc}`;
+export const DeckTemplatePartsFragmentDoc = gql`
+    fragment DeckTemplateParts on DeckTemplate {
+  id
+  name
+  cards {
+    ...CardRecordParts
+  }
+}
+    ${CardRecordPartsFragmentDoc}`;
+export const LobbyPartsFragmentDoc = gql`
+    fragment LobbyParts on Lobby {
+  id
+  members {
+    id
+    userName
+  }
 }
     `;
 export const LoginDocument = gql`
@@ -391,6 +482,30 @@ export const RegisterDocument = gql`
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
 };
+export const DeleteDeckTemplateDocument = gql`
+    mutation DeleteDeckTemplate($id: Float!) {
+  deleteDeckTemplate(id: $id)
+}
+    `;
+
+export function useDeleteDeckTemplateMutation() {
+  return Urql.useMutation<DeleteDeckTemplateMutation, DeleteDeckTemplateMutationVariables>(DeleteDeckTemplateDocument);
+};
+export const CreateDeckTemplateDocument = gql`
+    mutation CreateDeckTemplate($name: String!) {
+  createDeckTemplate(data: {name: $name}) {
+    id
+    name
+    cards {
+      ...CardRecordParts
+    }
+  }
+}
+    ${CardRecordPartsFragmentDoc}`;
+
+export function useCreateDeckTemplateMutation() {
+  return Urql.useMutation<CreateDeckTemplateMutation, CreateDeckTemplateMutationVariables>(CreateDeckTemplateDocument);
+};
 export const AccountDocument = gql`
     query Account($id: Float!) {
   account(id: $id) {
@@ -405,30 +520,53 @@ export function useAccountQuery(options: Omit<Urql.UseQueryArgs<AccountQueryVari
 export const MeDocument = gql`
     query Me {
   me {
-    userName
-    email
-    id
-    cardLibrary {
-      id
+    ...AccountParts
+  }
+}
+    ${AccountPartsFragmentDoc}`;
+
+export function useMeQuery(options?: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'>) {
+  return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
+};
+export const CardsInLibraryDocument = gql`
+    query CardsInLibrary($cardLibraryId: Float!) {
+  cardsInLibrary(id: $cardLibraryId) {
+    amount
+    card {
+      name
+      description
+      imageUrl
     }
   }
 }
     `;
 
-export function useMeQuery(options?: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'>) {
-  return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
+export function useCardsInLibraryQuery(options: Omit<Urql.UseQueryArgs<CardsInLibraryQueryVariables>, 'query'>) {
+  return Urql.useQuery<CardsInLibraryQuery>({ query: CardsInLibraryDocument, ...options });
 };
-export const CreateLobbyDocument = gql`
-    mutation CreateLobby($creatorId: Float!) {
-  createLobby(creatorId: $creatorId) {
-    id
-    members {
-      id
-      userName
+export const MyCardLibraryDocument = gql`
+    query MyCardLibrary {
+  myCardLibrary {
+    amount
+    card {
+      name
+      description
+      imageUrl
     }
   }
 }
     `;
+
+export function useMyCardLibraryQuery(options?: Omit<Urql.UseQueryArgs<MyCardLibraryQueryVariables>, 'query'>) {
+  return Urql.useQuery<MyCardLibraryQuery>({ query: MyCardLibraryDocument, ...options });
+};
+export const CreateLobbyDocument = gql`
+    mutation CreateLobby($creatorId: Float!) {
+  createLobby(creatorId: $creatorId) {
+    ...LobbyParts
+  }
+}
+    ${LobbyPartsFragmentDoc}`;
 
 export function useCreateLobbyMutation() {
   return Urql.useMutation<CreateLobbyMutation, CreateLobbyMutationVariables>(CreateLobbyDocument);
@@ -436,14 +574,10 @@ export function useCreateLobbyMutation() {
 export const JoinLobbyDocument = gql`
     mutation JoinLobby($accountId: Float!, $joinLobbyId: String!) {
   joinLobby(accountId: $accountId, id: $joinLobbyId) {
-    id
-    members {
-      id
-      userName
-    }
+    ...LobbyParts
   }
 }
-    `;
+    ${LobbyPartsFragmentDoc}`;
 
 export function useJoinLobbyMutation() {
   return Urql.useMutation<JoinLobbyMutation, JoinLobbyMutationVariables>(JoinLobbyDocument);
@@ -451,20 +585,28 @@ export function useJoinLobbyMutation() {
 export const LeaveLobbyDocument = gql`
     mutation LeaveLobby($accountId: Float!, $leaveLobbyId: String!) {
   leaveLobby(accountId: $accountId, id: $leaveLobbyId) {
-    id
-    members {
-      userName
-    }
+    ...LobbyParts
   }
 }
-    `;
+    ${LobbyPartsFragmentDoc}`;
 
 export function useLeaveLobbyMutation() {
   return Urql.useMutation<LeaveLobbyMutation, LeaveLobbyMutationVariables>(LeaveLobbyDocument);
 };
+export const MyDeckTemplatesDocument = gql`
+    subscription MyDeckTemplates {
+  myDeckTemplates {
+    ...DeckTemplateParts
+  }
+}
+    ${DeckTemplatePartsFragmentDoc}`;
+
+export function useMyDeckTemplatesSubscription<TData = MyDeckTemplatesSubscription>(options: Omit<Urql.UseSubscriptionArgs<MyDeckTemplatesSubscriptionVariables>, 'query'> = {}, handler?: Urql.SubscriptionHandler<MyDeckTemplatesSubscription, TData>) {
+  return Urql.useSubscription<MyDeckTemplatesSubscription, TData, MyDeckTemplatesSubscriptionVariables>({ query: MyDeckTemplatesDocument, ...options }, handler);
+};
 export const WatchLobbyDocument = gql`
-    subscription WatchLobby($watchLobbyId: String!, $accountId: Float!) {
-  watchLobby(id: $watchLobbyId, accountId: $accountId) {
+    subscription WatchLobby($watchLobbyId: String!) {
+  watchLobby(id: $watchLobbyId) {
     id
     members {
       id

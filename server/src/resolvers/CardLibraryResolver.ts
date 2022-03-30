@@ -1,7 +1,9 @@
-import { Arg, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
 import { Card } from '../entities/Card';
 import { CardLibrary } from '../entities/CardLibrary';
 import { CardRecord } from '../entities/CardRecord';
+import { MyContext } from '../types';
+import { parseJWT } from '../utils/parseJWT';
 
 @Resolver()
 class CardLibraryResolver {
@@ -12,10 +14,29 @@ class CardLibraryResolver {
         return library.cards || [];
     }
 
+    @Query(() => [CardRecord])
+    async myCardLibrary(
+        @Ctx() { req: { req } }: MyContext
+    ): Promise<CardRecord[]> {
+        const authorization = req.headers.cookie;
+        if (!authorization) throw new Error('Not authenticated');
+        const account = await parseJWT(authorization);
+        if (!account) throw new Error('No account found');
+        const library = await CardLibrary.findOne({
+            where: { account },
+            relations: ['account', 'cards'],
+        });
+
+        if (!library)
+            throw new Error(`CardLibrary not found with id: ${account.id}`);
+        console.log(library);
+        return library.cards;
+    }
+
     @Query(() => [CardLibrary])
     async cardLibraries(): Promise<CardLibrary[]> {
         return await CardLibrary.find({
-            relations: ['cards', 'cards.card'],
+            relations: ['cards', 'cards.card', 'deckTemplates', 'account'],
         });
     }
     @Mutation(() => [CardRecord])

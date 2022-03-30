@@ -5,6 +5,6 @@ export class DeckTemplateInput {
     @Field()
     name: string;
 
-    @Field(() => Number)
+    @Field(() => Number, { nullable: true })
     cardLibraryId: number;
 }
