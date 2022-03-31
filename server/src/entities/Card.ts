@@ -13,9 +13,17 @@ import {
 import { CardLibrary } from './CardLibrary';
 import { CardRecord } from './CardRecord';
 
+export interface CardInfo {
+    id: number;
+    name: string;
+    description: string;
+    imageUrl: string;
+    code: string;
+}
+
 @ObjectType()
 @Entity()
-export class Card extends BaseEntity {
+export class Card extends BaseEntity implements CardInfo {
     @Field(() => Number)
     @PrimaryGeneratedColumn()
     id!: number;
