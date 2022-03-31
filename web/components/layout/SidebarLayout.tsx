@@ -13,6 +13,7 @@ const SidebarContainer = styled.div`
         background-color: var(--color-light);
         color: var(--color-dark);
         flex: 1;
+        overflow: auto;
     }
 `;
 

@@ -18,7 +18,7 @@ import { ChatMessage } from './ChatMessage';
 export class Lobby extends BaseEntity {
     @Field(() => String)
     @PrimaryColumn()
-    id: String = nanoid();
+    id: String = nanoid(6);
 
     @Field(() => [Account], { nullable: true })
     @OneToMany(() => Account, (account) => account.lobby, {

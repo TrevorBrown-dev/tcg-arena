@@ -63,7 +63,6 @@ class LobbyResolver {
                             args.id,
                             parseInt(account.id)
                         );
-                        if (!lobby) return;
                         pubsub.publish(`watchLobby_${args.id}`, { lobby });
                     }, 1);
                 }

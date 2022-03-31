@@ -21,7 +21,6 @@ export class Game {
     }
 
     @Field(() => String)
-    noticeMe: string = 'hello';
 
     constructor(private _player1: Player, private _player2: Player) {}
 }

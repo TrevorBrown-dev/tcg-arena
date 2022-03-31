@@ -67,6 +67,7 @@ class CardLibraryResolver {
         //Either creates or increments the CardRecord of a specific card to the library
         //This CardRecord indicates how much of a specific card is in a CardLibrary
         await CardRecord.addCount(library, card);
+
         return library.cards;
     }
 

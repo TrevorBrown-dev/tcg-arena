@@ -22,9 +22,10 @@ https://github.com/oxalorg/sakura
         font-size: 62.5%;
         font-family: 'Roboto', sans-serif;
         font-weight: 200;
-        overflow: scroll;
-        overflow-x: hidden;
-        overflow-y: overlay;
+        height: 100%;
+    }
+    body {
+        height: 100%;
     }
     label {
         cursor: pointer;

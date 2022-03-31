@@ -9,6 +9,8 @@ import { CardLibraryCard, CardRecordPart } from '../Card/CardLibraryCard';
 const CardLibraryContainer = styled.div`
     flex: 1;
     padding: 2em;
+    overflow: auto;
+    max-height: 100vh;
     .cards {
         display: flex;
         flex-wrap: wrap;

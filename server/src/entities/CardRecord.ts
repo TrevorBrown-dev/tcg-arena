@@ -46,7 +46,7 @@ export class CardRecord extends BaseEntity {
         );
         if (existingRecord) {
             existingRecord.amount += amount;
-            existingRecord.save();
+            await existingRecord.save();
         } else {
             const record = await CardRecord.create({
                 card,
