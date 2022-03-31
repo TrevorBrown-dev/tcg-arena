@@ -104,32 +104,7 @@ class CardLibraryResolver {
         @Arg('cardId') cardId: number,
         @Arg('isFoil', { defaultValue: false }) isFoil: boolean = false
     ): Promise<boolean> {
-        //Finds library based on id
-        const library = await CardLibrary.findOne({
-            where: { id },
-            relations: [
-                'account',
-                'cards',
-                'deckTemplates',
-                'deckTemplates.cards',
-            ],
-        });
-        if (!library) throw new Error(`CardLibrary not found with id: ${id}`);
-
-        //Finds card based on cardId
-        const card = await Card.findOne(cardId);
-        if (!card) throw new Error(`Card not found with id: ${cardId}`);
-
-        //Either deletes or decrements the CardRecord of a specific card to the library
-        //This CardRecord indicates how much of a specific card is in a CardLibrary
-
-        //! Make sure you remove the card from the library before you remove the card from the deck templates
-        const success = await CardRecord.removeCount(library, card, isFoil);
-        await CardLibrary.removeCardFromDeckTemplates(library, card, isFoil);
-        pubsub.publish(`updateCardLibrary_${library.account.id}`, {
-            records: library.cards,
-        });
-        return success;
+        return await CardLibrary.removeCardFromLibrary(id, cardId, isFoil);
     }
 }
 

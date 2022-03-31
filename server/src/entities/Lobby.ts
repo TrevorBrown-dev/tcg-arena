@@ -8,6 +8,7 @@ import {
     ManyToOne,
     OneToMany,
     PrimaryColumn,
+    In,
 } from 'typeorm';
 import { pubsub } from '..';
 import { Account } from './Account';
@@ -32,6 +33,23 @@ export class Lobby extends BaseEntity {
         onUpdate: 'CASCADE',
     })
     chatMessages!: ChatMessage[];
+
+    static async accountInLobby(accountId: number, lobbyId: string) {
+        const lobby = await Lobby.findOne({
+            where: {
+                lobbyId,
+            },
+            relations: ['members'],
+        });
+
+        if (!lobby) throw new Error(`Lobby not found with id: ${lobbyId}`);
+
+        const member = lobby.members.find((m) => m.id === accountId);
+        console.log('runnging accountInLobby', member);
+        if (!member) return false;
+
+        return true;
+    }
 
     static async joinLobby(lobbyId: string, accountId: number) {
         try {
