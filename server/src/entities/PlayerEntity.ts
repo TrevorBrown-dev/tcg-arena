@@ -26,7 +26,7 @@ export class PlayerEntity extends BaseEntity {
     @OneToOne(() => GameEntity, (game) => game.player2)
     game!: GameEntity;
 
-    @Field(() => DeckTemplate, { nullable: true })
+    @Field(() => DeckTemplate)
     @OneToOne(() => DeckTemplate)
     deckTemplate!: DeckTemplate;
 }

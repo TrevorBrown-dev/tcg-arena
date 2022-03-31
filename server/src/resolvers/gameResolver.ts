@@ -6,12 +6,7 @@ import {
     Root,
     Subscription,
 } from 'type-graphql';
-import { pubsub } from '..';
-import { Account } from '../entities/Account';
-import { DeckTemplate } from '../entities/DeckTemplate';
 import { GameEntity } from '../entities/GameEntity';
-import { PlayerEntity } from '../entities/PlayerEntity';
-import { gameMaster } from '../game/GameMaster';
 import { SubscriptionIterator } from '../types';
 import { GameInput } from './inputs/GameInput';
 type GameSubArgs = {
@@ -26,25 +21,25 @@ class GameResolver {
         return game;
     }
 
-    @Mutation(() => GameEntity)
-    async createGame(@Arg('data') data: GameInput): Promise<GameEntity> {
-        const player1Acc = await Account.findOne(data.player1Id);
-        const player2Acc = await Account.findOne(data.player2Id);
-        const deckTemplate1 = await DeckTemplate.findOne(data.p1DeckTemplateId);
-        const deckTemplate2 = await DeckTemplate.findOne(data.p2DeckTemplateId);
-        const player1 = PlayerEntity.create({
-            account: player1Acc,
-            deckTemplate: deckTemplate1,
-        });
-        const player2 = PlayerEntity.create({
-            account: player2Acc,
-            deckTemplate: deckTemplate2,
-        });
+    // @Mutation(() => GameEntity)
+    // async createGame(@Arg('data') data: GameInput): Promise<GameEntity> {
+    //     const player1Acc = await Account.findOne(data.player1Id);
+    //     const player2Acc = await Account.findOne(data.player2Id);
+    //     const deckTemplate1 = await DeckTemplate.findOne(data.p1DeckTemplateId);
+    //     const deckTemplate2 = await DeckTemplate.findOne(data.p2DeckTemplateId);
+    //     const player1 = PlayerEntity.create({
+    //         account: player1Acc,
+    //         deckTemplate: deckTemplate1,
+    //     });
+    //     const player2 = PlayerEntity.create({
+    //         account: player2Acc,
+    //         deckTemplate: deckTemplate2,
+    //     });
 
-        //? Player 2 should be nullable?
-        const game = gameMaster.createGame(player1, player2);
-        return game;
-    }
+    //     //? Player 2 should be nullable?
+    //     const game = gameMaster.createGame(player1, player2);
+    //     return game;
+    // }
 
     //! These two down here are old and shouldn't be used I think
     @Mutation(() => GameEntity)

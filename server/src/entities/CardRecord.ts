@@ -1,3 +1,4 @@
+import { CardObj } from '../game/Card';
 import { Field, ObjectType } from 'type-graphql';
 import {
     BaseEntity,
@@ -89,11 +90,11 @@ export class CardRecord extends BaseEntity {
     }
 
     //! Needs to be reworked to use non-entity version of cards
-    static mapRecordsToCards(records: CardRecord[]): Card[] {
-        const allCards: Card[] = [];
+    static mapRecordsToCards(records: CardRecord[]): CardObj[] {
+        const allCards: CardObj[] = [];
         records.forEach((record) => {
             for (let i = 0; i < record.amount; i++) {
-                allCards.push(record.card);
+                allCards.push(new CardObj(record.card, record.isFoil));
             }
         });
         return allCards;

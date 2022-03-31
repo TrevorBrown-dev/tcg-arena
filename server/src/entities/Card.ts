@@ -1,25 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
-import {
-    BaseEntity,
-    PrimaryGeneratedColumn,
-    Entity,
-    Column,
-    ManyToMany,
-    OneToMany,
-    AfterInsert,
-    OneToOne,
-    AfterUpdate,
-} from 'typeorm';
-import { CardLibrary } from './CardLibrary';
-import { CardRecord } from './CardRecord';
-
-export interface CardInfo {
-    id: number;
-    name: string;
-    description: string;
-    imageUrl: string;
-    code: string;
-}
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { CardInfo } from '../utils/types/CardTypes';
 
 @ObjectType()
 @Entity()

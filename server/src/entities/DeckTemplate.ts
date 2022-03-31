@@ -34,8 +34,8 @@ export class DeckTemplate extends BaseEntity implements WithCardRecords {
     @ManyToOne(() => CardLibrary, (cardLibrary) => cardLibrary.deckTemplates)
     cardLibrary!: CardLibrary;
 
-    public loadCardsFromTemplate() {
-        const cards = CardRecord.mapRecordsToCards(this.cards);
+    public static loadCardsFromTemplate(template: DeckTemplate) {
+        const cards = CardRecord.mapRecordsToCards(template.cards);
         return cards;
     }
 }
