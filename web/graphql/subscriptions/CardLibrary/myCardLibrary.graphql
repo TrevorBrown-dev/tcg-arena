@@ -1,7 +1,8 @@
-query MyCardLibrary {
+subscription MyCardLibrary {
     myCardLibrary {
         id
         amount
+        isFoil
         card {
             id
             name

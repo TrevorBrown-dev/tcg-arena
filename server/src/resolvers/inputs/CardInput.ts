@@ -14,3 +14,18 @@ export class CardInput {
     @Field()
     code: string;
 }
+
+@InputType()
+export class UpdateCardInput {
+    @Field({ nullable: true })
+    name: string;
+
+    @Field({ nullable: true })
+    description: string;
+
+    @Field({ nullable: true })
+    imageUrl: string;
+
+    @Field({ nullable: true })
+    code: string;
+}

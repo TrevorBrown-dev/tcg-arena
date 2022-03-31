@@ -1,4 +1,13 @@
-import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
+import {
+    Arg,
+    Ctx,
+    Mutation,
+    Query,
+    Resolver,
+    Root,
+    Subscription,
+} from 'type-graphql';
+import { pubsub } from '..';
 import { Card } from '../entities/Card';
 import { CardLibrary } from '../entities/CardLibrary';
 import { CardRecord } from '../entities/CardRecord';
@@ -16,27 +25,41 @@ class CardLibraryResolver {
     }
 
     //Reads authorization cookie and returns the logged in user's cardLibrary
-    @Query(() => [CardRecord])
+    //Might need to be a subscription
+    @Subscription(() => [CardRecord], {
+        topics: ({ args, context }) => {
+            const cookie = context.extra.request?.headers?.cookie;
+            const account = parseJWT(cookie);
+            if (!account || !account?.id) {
+                console.log(
+                    `No account found with cookie ${cookie} and payload response:`,
+                    account
+                );
+            }
+
+            setTimeout(async () => {
+                const library = await CardLibrary.findOne({
+                    where: {
+                        account,
+                    },
+                    relations: ['account', 'cards'],
+                });
+                if (!library)
+                    throw new Error(
+                        `CardLibrary not found with account id: ${account.id}`
+                    );
+                pubsub.publish(`updateCardLibrary_${account.id}`, {
+                    records: library.cards || [],
+                });
+            }, 1);
+
+            return `updateCardLibrary_${account.id}`;
+        },
+    })
     async myCardLibrary(
-        @Ctx() { req: { req } }: MyContext
+        @Root('records') records: CardRecord[]
     ): Promise<CardRecord[]> {
-        //Checks authorization cookie
-        const authorization = req.headers.cookie;
-        if (!authorization) throw new Error('Not authenticated');
-
-        //Finds account based on id located in JWT
-        const account = await parseJWT(authorization);
-        if (!account) throw new Error('No account found');
-
-        //Finds the card library based on the account and returns in
-        const library = await CardLibrary.findOne({
-            where: { account },
-            relations: ['account', 'cards'],
-        });
-
-        if (!library)
-            throw new Error(`CardLibrary not found with id: ${account.id}`);
-        return library.cards;
+        return records;
     }
 
     //Pulls all cardLibraries
@@ -51,7 +74,8 @@ class CardLibraryResolver {
     @Mutation(() => [CardRecord])
     async addCardToLibrary(
         @Arg('id') id: number,
-        @Arg('cardId') cardId: number
+        @Arg('cardId') cardId: number,
+        @Arg('isFoil', { defaultValue: false }) isFoil: boolean = false
     ): Promise<CardRecord[]> {
         //Finds library based on id
         const library = await CardLibrary.findOne({
@@ -66,8 +90,10 @@ class CardLibraryResolver {
 
         //Either creates or increments the CardRecord of a specific card to the library
         //This CardRecord indicates how much of a specific card is in a CardLibrary
-        await CardRecord.addCount(library, card);
-
+        await CardRecord.addCount(library, card, isFoil);
+        pubsub.publish(`updateCardLibrary_${library.account.id}`, {
+            records: library.cards,
+        });
         return library.cards;
     }
 
@@ -75,12 +101,18 @@ class CardLibraryResolver {
     @Mutation(() => Boolean)
     async removeCardFromLibrary(
         @Arg('id') id: number,
-        @Arg('cardId') cardId: number
+        @Arg('cardId') cardId: number,
+        @Arg('isFoil', { defaultValue: false }) isFoil: boolean = false
     ): Promise<boolean> {
         //Finds library based on id
         const library = await CardLibrary.findOne({
             where: { id },
-            relations: ['account'],
+            relations: [
+                'account',
+                'cards',
+                'deckTemplates',
+                'deckTemplates.cards',
+            ],
         });
         if (!library) throw new Error(`CardLibrary not found with id: ${id}`);
 
@@ -90,7 +122,14 @@ class CardLibraryResolver {
 
         //Either deletes or decrements the CardRecord of a specific card to the library
         //This CardRecord indicates how much of a specific card is in a CardLibrary
-        return await CardRecord.removeCount(library, card);
+
+        //! Make sure you remove the card from the library before you remove the card from the deck templates
+        const success = await CardRecord.removeCount(library, card, isFoil);
+        await CardLibrary.removeCardFromDeckTemplates(library, card, isFoil);
+        pubsub.publish(`updateCardLibrary_${library.account.id}`, {
+            records: library.cards,
+        });
+        return success;
     }
 }
 

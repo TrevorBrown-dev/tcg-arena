@@ -25,6 +25,10 @@ export class CardRecord extends BaseEntity {
     @Column()
     amount: number;
 
+    @Field(() => Boolean)
+    @Column({ default: false })
+    isFoil: boolean;
+
     static async createRecord(
         card: Card,
         amount: number = 1
@@ -39,10 +43,12 @@ export class CardRecord extends BaseEntity {
     static async addCount(
         owner: WithCardRecords & BaseEntity,
         card: Card,
+        isFoil: boolean = false,
         amount: number = 1
     ) {
         const existingRecord = owner.cards.find(
-            (cardRecord) => cardRecord.card.id === card.id
+            (cardRecord) =>
+                cardRecord.card.id === card.id && cardRecord.isFoil === isFoil
         );
         if (existingRecord) {
             existingRecord.amount += amount;
@@ -51,6 +57,7 @@ export class CardRecord extends BaseEntity {
             const record = await CardRecord.create({
                 card,
                 amount,
+                isFoil,
             }).save();
             owner.cards.push(record);
         }
@@ -60,15 +67,17 @@ export class CardRecord extends BaseEntity {
     static async removeCount(
         owner: WithCardRecords & BaseEntity,
         card: Card,
+        isFoil: boolean = false,
         amount: number = 1
     ): Promise<boolean> {
         const record = owner.cards.find(
-            (cardRecord) => cardRecord.card.id === card.id
+            (cardRecord) =>
+                cardRecord.card.id === card.id && cardRecord.isFoil === isFoil
         );
         if (!record) return false;
         if (record.amount <= amount) {
             owner.cards = owner.cards.filter(
-                (cardRecord) => cardRecord.card.id !== card.id
+                (cardRecord) => cardRecord.id !== record.id
             );
             await record.remove();
         } else {
@@ -79,6 +88,7 @@ export class CardRecord extends BaseEntity {
         return true;
     }
 
+    //! Needs to be reworked to use non-entity version of cards
     static mapRecordsToCards(records: CardRecord[]): Card[] {
         const allCards: Card[] = [];
         records.forEach((record) => {

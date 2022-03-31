@@ -1,6 +1,7 @@
 query CardsInLibrary($cardLibraryId: Float!) {
     cardsInLibrary(id: $cardLibraryId) {
         amount
+        isFoil
         card {
             name
             description

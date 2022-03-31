@@ -1,10 +1,13 @@
 import jwt from 'jsonwebtoken';
 
-export const parseJWT = (cookies: string): { id: string } => {
+export const parseJWT = (
+    cookies: string,
+    identifier: string = 'token'
+): { id: string } => {
     //find the authorization cookie
     const authorization = cookies
         .split(';')
-        .find((c) => c.trim().startsWith('token='));
+        .find((c) => c.trim().startsWith(`${identifier}=`));
     if (!authorization) {
         throw new Error('Not authenticated');
     }

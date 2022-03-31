@@ -2,7 +2,6 @@ import { getConnection } from 'typeorm';
 import { Lobby } from '../../entities/Lobby';
 
 export const cleanDb = async () => {
-    // const changes = [];
     const lobbies = await Lobby.find();
     const changes: any[] = [];
     lobbies.forEach(async (lobby) => {

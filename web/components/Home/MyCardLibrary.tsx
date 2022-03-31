@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import {
     useCardsInLibraryQuery,
     useMeQuery,
-    useMyCardLibraryQuery,
+    useMyCardLibrarySubscription,
 } from '../../generated/graphql';
 import { CardLibraryCard, CardRecordPart } from '../Card/CardLibraryCard';
 
@@ -18,7 +18,7 @@ const CardLibraryContainer = styled.div`
     }
 `;
 export const MyCardLibrary: React.FC = () => {
-    const [cards] = useMyCardLibraryQuery();
+    const [cards] = useMyCardLibrarySubscription();
     console.log(cards);
     return (
         <CardLibraryContainer>

@@ -54,6 +54,7 @@ export const EditDeck: React.FC = () => {
                                     removeCard({
                                         cardId: card.card.id,
                                         id: deck.id,
+                                        isFoil: card.isFoil,
                                     });
                                 }}
                             >

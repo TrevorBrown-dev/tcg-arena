@@ -1,6 +1,6 @@
 import { Arg, Mutation, Query, Resolver } from 'type-graphql';
 import { Card } from '../entities/Card';
-import { CardInput } from './inputs/CardInput';
+import { CardInput, UpdateCardInput } from './inputs/CardInput';
 
 @Resolver(Card)
 class CardResolver {
@@ -22,6 +22,17 @@ class CardResolver {
     @Mutation(() => Card)
     async createCard(@Arg('data') data: CardInput): Promise<Card> {
         return await Card.create(data).save();
+    }
+
+    @Mutation(() => Card)
+    async updateCard(
+        @Arg('id') id: number,
+        @Arg('data') data: UpdateCardInput
+    ): Promise<Card> {
+        const card = await Card.findOne(id);
+        if (!card) throw new Error(`Card not found with id: ${id}`);
+        Object.assign(card, data);
+        return await card.save();
     }
 }
 

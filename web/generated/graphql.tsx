@@ -57,6 +57,7 @@ export type CardRecord = {
   amount: Scalars['Float'];
   card: Card;
   id: Scalars['Float'];
+  isFoil: Scalars['Boolean'];
 };
 
 export type ChatMessage = {
@@ -93,7 +94,6 @@ export type FieldError = {
 export type Game = {
   __typename?: 'Game';
   id: Scalars['String'];
-  noticeMe: Scalars['String'];
   player1: Player;
   player2: Player;
 };
@@ -136,6 +136,7 @@ export type Mutation = {
   register: AccountResponse;
   removeCardFromDeckTemplate: DeckTemplate;
   removeCardFromLibrary: Scalars['Boolean'];
+  updateCard: Card;
   updateGame: GameEntity;
 };
 
@@ -143,12 +144,14 @@ export type Mutation = {
 export type MutationAddCardToDeckTemplateArgs = {
   cardId: Scalars['Float'];
   id: Scalars['Float'];
+  isFoil?: InputMaybe<Scalars['Boolean']>;
 };
 
 
 export type MutationAddCardToLibraryArgs = {
   cardId: Scalars['Float'];
   id: Scalars['Float'];
+  isFoil?: InputMaybe<Scalars['Boolean']>;
 };
 
 
@@ -209,11 +212,19 @@ export type MutationRegisterArgs = {
 export type MutationRemoveCardFromDeckTemplateArgs = {
   cardId: Scalars['Float'];
   id: Scalars['Float'];
+  isFoil?: InputMaybe<Scalars['Boolean']>;
 };
 
 
 export type MutationRemoveCardFromLibraryArgs = {
   cardId: Scalars['Float'];
+  id: Scalars['Float'];
+  isFoil?: InputMaybe<Scalars['Boolean']>;
+};
+
+
+export type MutationUpdateCardArgs = {
+  data: UpdateCardInput;
   id: Scalars['Float'];
 };
 
@@ -250,7 +261,6 @@ export type Query = {
   games: Array<Game>;
   lobbies: Array<Lobby>;
   me?: Maybe<Account>;
-  myCardLibrary: Array<CardRecord>;
 };
 
 
@@ -282,6 +292,7 @@ export type RegisterInput = {
 export type Subscription = {
   __typename?: 'Subscription';
   deckTemplateUpdated: DeckTemplate;
+  myCardLibrary: Array<CardRecord>;
   myDeckTemplates: Array<DeckTemplate>;
   watchChat: Array<ChatMessage>;
   watchGame: GameEntity;
@@ -308,17 +319,24 @@ export type SubscriptionWatchLobbyArgs = {
   id: Scalars['String'];
 };
 
+export type UpdateCardInput = {
+  code?: InputMaybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']>;
+  imageUrl?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+};
+
 export type AccountPartsFragment = { __typename?: 'Account', id: number, email: string, userName: string };
 
-export type CardLibraryPartsFragment = { __typename?: 'CardLibrary', id: number, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> };
+export type CardLibraryPartsFragment = { __typename?: 'CardLibrary', id: number, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> };
 
 export type CardPartsFragment = { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null };
 
-export type CardRecordPartsFragment = { __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } };
+export type CardRecordPartsFragment = { __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } };
 
 export type ChatMessagePartsFragment = { __typename?: 'ChatMessage', id: number, message: string, account: { __typename?: 'Account', id: number, userName: string } };
 
-export type DeckTemplatePartsFragment = { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> };
+export type DeckTemplatePartsFragment = { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> };
 
 export type LobbyPartsFragment = { __typename?: 'Lobby', id: string, members?: Array<{ __typename?: 'Account', id: number, userName: string }> | null };
 
@@ -354,25 +372,27 @@ export type DeleteDeckTemplateMutation = { __typename?: 'Mutation', deleteDeckTe
 export type RemoveCardFromDeckTemplateMutationVariables = Exact<{
   id: Scalars['Float'];
   cardId: Scalars['Float'];
+  isFoil: Scalars['Boolean'];
 }>;
 
 
-export type RemoveCardFromDeckTemplateMutation = { __typename?: 'Mutation', removeCardFromDeckTemplate: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> } };
+export type RemoveCardFromDeckTemplateMutation = { __typename?: 'Mutation', removeCardFromDeckTemplate: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> } };
 
 export type CreateDeckTemplateMutationVariables = Exact<{
   name: Scalars['String'];
 }>;
 
 
-export type CreateDeckTemplateMutation = { __typename?: 'Mutation', createDeckTemplate: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> } };
+export type CreateDeckTemplateMutation = { __typename?: 'Mutation', createDeckTemplate: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> } };
 
 export type AddCardToDeckTemplateMutationVariables = Exact<{
   cardId: Scalars['Float'];
   deckTemplateId: Scalars['Float'];
+  isFoil?: InputMaybe<Scalars['Boolean']>;
 }>;
 
 
-export type AddCardToDeckTemplateMutation = { __typename?: 'Mutation', addCardToDeckTemplate: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> } };
+export type AddCardToDeckTemplateMutation = { __typename?: 'Mutation', addCardToDeckTemplate: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> } };
 
 export type CreateLobbyMutationVariables = Exact<{
   creatorId: Scalars['Float'];
@@ -422,24 +442,24 @@ export type CardsInLibraryQueryVariables = Exact<{
 }>;
 
 
-export type CardsInLibraryQuery = { __typename?: 'Query', cardsInLibrary: Array<{ __typename?: 'CardRecord', amount: number, card: { __typename?: 'Card', name: string, description: string, imageUrl?: string | null } }> };
+export type CardsInLibraryQuery = { __typename?: 'Query', cardsInLibrary: Array<{ __typename?: 'CardRecord', amount: number, isFoil: boolean, card: { __typename?: 'Card', name: string, description: string, imageUrl?: string | null } }> };
 
-export type MyCardLibraryQueryVariables = Exact<{ [key: string]: never; }>;
+export type MyCardLibrarySubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MyCardLibraryQuery = { __typename?: 'Query', myCardLibrary: Array<{ __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> };
+export type MyCardLibrarySubscription = { __typename?: 'Subscription', myCardLibrary: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> };
 
 export type MyDeckTemplatesSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MyDeckTemplatesSubscription = { __typename?: 'Subscription', myDeckTemplates: Array<{ __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> }> };
+export type MyDeckTemplatesSubscription = { __typename?: 'Subscription', myDeckTemplates: Array<{ __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> }> };
 
 export type WatchDeckTemplateSubscriptionVariables = Exact<{
   deckTemplateId: Scalars['Float'];
 }>;
 
 
-export type WatchDeckTemplateSubscription = { __typename?: 'Subscription', deckTemplateUpdated: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> } };
+export type WatchDeckTemplateSubscription = { __typename?: 'Subscription', deckTemplateUpdated: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> } };
 
 export type WatchLobbySubscriptionVariables = Exact<{
   watchLobbyId: Scalars['String'];
@@ -477,6 +497,7 @@ export const CardRecordPartsFragmentDoc = gql`
     ...CardParts
   }
   amount
+  isFoil
 }
     ${CardPartsFragmentDoc}`;
 export const CardLibraryPartsFragmentDoc = gql`
@@ -569,8 +590,8 @@ export function useDeleteDeckTemplateMutation() {
   return Urql.useMutation<DeleteDeckTemplateMutation, DeleteDeckTemplateMutationVariables>(DeleteDeckTemplateDocument);
 };
 export const RemoveCardFromDeckTemplateDocument = gql`
-    mutation RemoveCardFromDeckTemplate($id: Float!, $cardId: Float!) {
-  removeCardFromDeckTemplate(id: $id, cardId: $cardId) {
+    mutation RemoveCardFromDeckTemplate($id: Float!, $cardId: Float!, $isFoil: Boolean!) {
+  removeCardFromDeckTemplate(id: $id, cardId: $cardId, isFoil: $isFoil) {
     ...DeckTemplateParts
   }
 }
@@ -595,8 +616,8 @@ export function useCreateDeckTemplateMutation() {
   return Urql.useMutation<CreateDeckTemplateMutation, CreateDeckTemplateMutationVariables>(CreateDeckTemplateDocument);
 };
 export const AddCardToDeckTemplateDocument = gql`
-    mutation AddCardToDeckTemplate($cardId: Float!, $deckTemplateId: Float!) {
-  addCardToDeckTemplate(cardId: $cardId, id: $deckTemplateId) {
+    mutation AddCardToDeckTemplate($cardId: Float!, $deckTemplateId: Float!, $isFoil: Boolean) {
+  addCardToDeckTemplate(cardId: $cardId, id: $deckTemplateId, isFoil: $isFoil) {
     ...DeckTemplateParts
   }
 }
@@ -675,6 +696,7 @@ export const CardsInLibraryDocument = gql`
     query CardsInLibrary($cardLibraryId: Float!) {
   cardsInLibrary(id: $cardLibraryId) {
     amount
+    isFoil
     card {
       name
       description
@@ -688,10 +710,11 @@ export function useCardsInLibraryQuery(options: Omit<Urql.UseQueryArgs<CardsInLi
   return Urql.useQuery<CardsInLibraryQuery>({ query: CardsInLibraryDocument, ...options });
 };
 export const MyCardLibraryDocument = gql`
-    query MyCardLibrary {
+    subscription MyCardLibrary {
   myCardLibrary {
     id
     amount
+    isFoil
     card {
       id
       name
@@ -702,8 +725,8 @@ export const MyCardLibraryDocument = gql`
 }
     `;
 
-export function useMyCardLibraryQuery(options?: Omit<Urql.UseQueryArgs<MyCardLibraryQueryVariables>, 'query'>) {
-  return Urql.useQuery<MyCardLibraryQuery>({ query: MyCardLibraryDocument, ...options });
+export function useMyCardLibrarySubscription<TData = MyCardLibrarySubscription>(options: Omit<Urql.UseSubscriptionArgs<MyCardLibrarySubscriptionVariables>, 'query'> = {}, handler?: Urql.SubscriptionHandler<MyCardLibrarySubscription, TData>) {
+  return Urql.useSubscription<MyCardLibrarySubscription, TData, MyCardLibrarySubscriptionVariables>({ query: MyCardLibraryDocument, ...options }, handler);
 };
 export const MyDeckTemplatesDocument = gql`
     subscription MyDeckTemplates {

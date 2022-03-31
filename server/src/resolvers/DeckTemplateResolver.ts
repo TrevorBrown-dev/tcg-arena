@@ -113,7 +113,7 @@ class DeckTemplateResolver {
         if (!authorization) return false;
         const account = parseJWT(authorization!);
         if (!account) return false;
-        
+
         //Finds cardLibrary based on account
         const cardLibrary = await CardLibrary.findOne({
             where: {
@@ -140,7 +140,8 @@ class DeckTemplateResolver {
     @Mutation(() => DeckTemplate)
     async addCardToDeckTemplate(
         @Arg('id') id: number,
-        @Arg('cardId') cardId: number
+        @Arg('cardId') cardId: number,
+        @Arg('isFoil', { defaultValue: false }) isFoil: boolean = false
     ): Promise<DeckTemplate> {
         const deckTemplate = await DeckTemplate.findOne({
             where: { id },
@@ -152,7 +153,8 @@ class DeckTemplateResolver {
             throw new Error(`DeckTemplate not found with id: ${id}`);
         if (!card) throw new Error(`Card not found with id: ${cardId}`);
         const recordInLibrary = deckTemplate.cardLibrary.cards.find(
-            (cardRecord) => cardRecord.card.id === card.id
+            (cardRecord) =>
+                cardRecord.card.id === card.id && cardRecord.isFoil === isFoil
         );
 
         //TODO: SOME CUSTOM ERROR RESPONSES LIKE ACCOUNT
@@ -162,7 +164,8 @@ class DeckTemplateResolver {
             );
 
         const recordInDeck = deckTemplate.cards.find(
-            (cardRecord) => cardRecord.card.id === card.id
+            (cardRecord) =>
+                cardRecord.card.id === card.id && cardRecord.isFoil === isFoil
         );
         if (recordInDeck) {
             if (recordInDeck.amount >= recordInLibrary.amount) {
@@ -172,12 +175,13 @@ class DeckTemplateResolver {
                     `Reached limit of ${recordInLibrary.amount} of card ID ${card.id} in Deck Template ${deckTemplate.id}`
                 );
             } else {
-                await CardRecord.addCount(deckTemplate, card);
+                await CardRecord.addCount(deckTemplate, card, isFoil);
             }
         } else if (recordInLibrary.amount > 0) {
             const record = await CardRecord.create({
                 card,
                 amount: 1,
+                isFoil,
             }).save();
             deckTemplate.cards.push(record);
         } else {
@@ -195,7 +199,8 @@ class DeckTemplateResolver {
     @Mutation(() => DeckTemplate)
     async removeCardFromDeckTemplate(
         @Arg('id') id: number,
-        @Arg('cardId') cardId: number
+        @Arg('cardId') cardId: number,
+        @Arg('isFoil', { defaultValue: false }) isFoil: boolean = false
     ): Promise<DeckTemplate> {
         const deckTemplate = await DeckTemplate.findOne({
             where: { id },
@@ -207,13 +212,14 @@ class DeckTemplateResolver {
             throw new Error(`DeckTemplate not found with id: ${id}`);
         if (!card) throw new Error(`Card not found with id: ${cardId}`);
         const recordInDeck = deckTemplate.cards.find(
-            (cardRecord) => cardRecord.card.id === card.id
+            (cardRecord) =>
+                cardRecord.card.id === card.id && cardRecord.isFoil === isFoil
         );
         if (!recordInDeck)
             throw new Error(
                 `Card not found in Deck Template ${deckTemplate.id}`
             );
-        await CardRecord.removeCount(deckTemplate, card);
+        await CardRecord.removeCount(deckTemplate, card, isFoil);
         await deckTemplate.save();
 
         pubsub.publish(`deckTemplateUpdated_${id}`, { deckTemplate });

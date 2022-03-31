@@ -10,6 +10,7 @@ import { useModeContext } from '../Home/Dashboard';
 
 export type CardRecordPart = {
     amount: number;
+    isFoil: boolean;
     card: {
         id: number;
         name: string;
@@ -21,10 +22,11 @@ type Props = {
     cardRecord: CardRecordPart;
 };
 
-const StyledCard = styled.div`
+const StyledCard = styled.div<{ isFoil?: boolean }>`
     width: 15em;
     height: 20em;
-    border: 2px solid var(--color-dark);
+    border: 2px solid;
+    border-color: ${(props) => (props.isFoil ? '#ffc107' : '#2196f3')};
     border-radius: 1rem;
     padding: 1em;
     display: flex;
@@ -77,11 +79,13 @@ export const CardLibraryCard: React.FC<Props> = ({ cardRecord }) => {
 
     return (
         <StyledCard
+            isFoil={cardRecord.isFoil}
             onClick={() => {
                 if (mode.mode === 'edit' && mode.targetDeckId) {
                     addCard({
                         cardId: card.id,
                         deckTemplateId: mode.targetDeckId,
+                        isFoil: cardRecord.isFoil,
                     });
                 }
             }}

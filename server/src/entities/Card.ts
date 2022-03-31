@@ -6,6 +6,9 @@ import {
     Column,
     ManyToMany,
     OneToMany,
+    AfterInsert,
+    OneToOne,
+    AfterUpdate,
 } from 'typeorm';
 import { CardLibrary } from './CardLibrary';
 import { CardRecord } from './CardRecord';

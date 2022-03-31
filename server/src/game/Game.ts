@@ -20,7 +20,5 @@ export class Game {
         return this._player2;
     }
 
-    @Field(() => String)
-
     constructor(private _player1: Player, private _player2: Player) {}
 }
