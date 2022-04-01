@@ -1,3 +1,5 @@
+import { EventInboxContext } from 'components/layout/ContextLayout';
+import { EventInboxLayout } from 'components/layout/EventInboxLayout/EventInboxLayout';
 import React, { createContext } from 'react';
 import { Logout } from '../auth/Logout';
 import { SidebarNavLayout } from '../layout/SidebarNavLayout';
@@ -28,11 +30,13 @@ export const Dashboard: React.FC = () => {
         mode: 'view',
     });
     return (
-        <SidebarNavLayout>
-            <modeContext.Provider value={{ mode, setMode }}>
-                {mode.mode === 'view' && <ViewMode />}
-                {mode.mode === 'edit' && <EditMode />}
-            </modeContext.Provider>
-        </SidebarNavLayout>
+        <EventInboxLayout>
+            <SidebarNavLayout>
+                <modeContext.Provider value={{ mode, setMode }}>
+                    {mode.mode === 'view' && <ViewMode />}
+                    {mode.mode === 'edit' && <EditMode />}
+                </modeContext.Provider>
+            </SidebarNavLayout>
+        </EventInboxLayout>
     );
 };

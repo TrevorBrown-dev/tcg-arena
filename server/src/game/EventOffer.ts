@@ -1,5 +1,6 @@
 import { nanoid } from 'nanoid';
 import { Field, ObjectType, registerEnumType } from 'type-graphql';
+import { pubsub } from '..';
 import { Account } from '../entities/Account';
 import { PreGameLobby } from './PreGameLobby';
 
@@ -60,6 +61,11 @@ export class EventOffer {
     @Field(() => EventOfferStatus)
     status: EventOfferStatus = EventOfferStatus.PENDING;
 
+    @Field(() => String, { nullable: true })
+    lobbyId?: string;
+
+    ttl: number = 60 * 1000;
+
     accept() {
         this.status = EventOfferStatus.ACCEPTED;
         const preGameLobby = new PreGameLobby(this.issuer, this.recipient);
@@ -84,6 +90,12 @@ export class EventOffer {
     ) {
         const event = new EventOffer(issuer, recipient, type);
         EventOffer.eventOffers.set(event.id, event);
+        pubsub.publish(`eventOfferInbox_${event.issuer.id}`, {
+            eventOffer: event,
+        });
+        pubsub.publish(`eventOfferInbox_${event.recipient.id}`, {
+            eventOffer: event,
+        });
         return event;
     }
 
@@ -95,7 +107,16 @@ export class EventOffer {
     static initiateEvent(eventOffer: EventOffer) {
         switch (eventOffer.type) {
             case EventOfferType.GAME:
-                return eventOffer.accept().id;
+                const lobbyId = eventOffer.accept().id;
+                eventOffer.lobbyId = lobbyId;
+                pubsub.publish(`eventOfferInbox_${eventOffer.recipient.id}`, {
+                    eventOffer,
+                });
+                pubsub.publish(`eventOfferInbox_${eventOffer.issuer.id}`, {
+                    eventOffer,
+                });
+                EventOffer.remove(eventOffer.id);
+                return lobbyId;
             case EventOfferType.TRADE:
                 return eventOffer.accept().id;
             case EventOfferType.FRIEND_REQUEST:
@@ -103,5 +124,11 @@ export class EventOffer {
             default:
                 return null;
         }
+    }
+
+    static declineOffer(offer: EventOffer) {
+        offer.status = EventOfferStatus.REJECTED;
+        EventOffer.remove(offer.id);
+        return offer;
     }
 }

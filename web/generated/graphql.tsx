@@ -83,6 +83,7 @@ export type EventOffer = {
   __typename?: 'EventOffer';
   id: Scalars['String'];
   issuer: Account;
+  lobbyId?: Maybe<Scalars['String']>;
   recipient: Account;
   status: EventOfferStatus;
   type: EventOfferType;
@@ -137,6 +138,7 @@ export type Mutation = {
   createDeckTemplate: DeckTemplate;
   createLobby: Lobby;
   createOffer: EventOffer;
+  declineOffer: EventOffer;
   deleteDeckTemplate: Scalars['Boolean'];
   joinLobby: Lobby;
   leaveLobby: Lobby;
@@ -195,6 +197,11 @@ export type MutationCreateLobbyArgs = {
 export type MutationCreateOfferArgs = {
   recipientId: Scalars['Float'];
   type: Scalars['String'];
+};
+
+
+export type MutationDeclineOfferArgs = {
+  id: Scalars['String'];
 };
 
 
@@ -271,6 +278,7 @@ export type PlayerEntity = {
 
 export type PreGameLobby = {
   __typename?: 'PreGameLobby';
+  gameId?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   player1: PreGamePlayer;
   player2: PreGamePlayer;
@@ -395,9 +403,11 @@ export type ChatMessagePartsFragment = { __typename?: 'ChatMessage', id: number,
 
 export type DeckTemplatePartsFragment = { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> };
 
-export type EventOfferPartsFragment = { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, issuer: { __typename?: 'Account', id: number, userName: string }, recipient: { __typename?: 'Account', id: number, userName: string } };
+export type EventOfferPartsFragment = { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string }, recipient: { __typename?: 'Account', id: number, userName: string } };
 
 export type LobbyPartsFragment = { __typename?: 'Lobby', id: string, members?: Array<{ __typename?: 'Account', id: number, userName: string }> | null };
+
+export type PreGameLobbyPartsFragment = { __typename?: 'PreGameLobby', id: string, ready: boolean, gameId?: string | null, players: Array<{ __typename?: 'PreGamePlayer', id: string, ready: boolean, account: { __typename?: 'Account', id: number, userName: string } }> };
 
 export type LoginMutationVariables = Exact<{
   password: Scalars['String'];
@@ -453,13 +463,27 @@ export type AddCardToDeckTemplateMutationVariables = Exact<{
 
 export type AddCardToDeckTemplateMutation = { __typename?: 'Mutation', addCardToDeckTemplate: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> } };
 
+export type AcceptEventOfferMutationVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type AcceptEventOfferMutation = { __typename?: 'Mutation', acceptOffer: { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string }, recipient: { __typename?: 'Account', id: number, userName: string } } };
+
 export type CreateEventMutationVariables = Exact<{
   type: Scalars['String'];
   recipientId: Scalars['Float'];
 }>;
 
 
-export type CreateEventMutation = { __typename?: 'Mutation', createOffer: { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, issuer: { __typename?: 'Account', id: number, userName: string }, recipient: { __typename?: 'Account', id: number, userName: string } } };
+export type CreateEventMutation = { __typename?: 'Mutation', createOffer: { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string }, recipient: { __typename?: 'Account', id: number, userName: string } } };
+
+export type DeclineEventOfferMutationVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type DeclineEventOfferMutation = { __typename?: 'Mutation', declineOffer: { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string }, recipient: { __typename?: 'Account', id: number, userName: string } } };
 
 export type CreateLobbyMutationVariables = Exact<{
   creatorId: Scalars['Float'];
@@ -492,6 +516,21 @@ export type SendMessageMutationVariables = Exact<{
 
 export type SendMessageMutation = { __typename?: 'Mutation', createChatMessage: { __typename?: 'ChatMessage', id: number, message: string, account: { __typename?: 'Account', id: number, userName: string } } };
 
+export type ReadyUpMutationVariables = Exact<{
+  preGameLobbyId: Scalars['String'];
+}>;
+
+
+export type ReadyUpMutation = { __typename?: 'Mutation', readyUp: { __typename?: 'PreGameLobby', id: string, ready: boolean, gameId?: string | null, players: Array<{ __typename?: 'PreGamePlayer', id: string, ready: boolean, account: { __typename?: 'Account', id: number, userName: string } }> } };
+
+export type SelectDeckMutationVariables = Exact<{
+  deckTemplateId: Scalars['Float'];
+  preGameLobbyId: Scalars['String'];
+}>;
+
+
+export type SelectDeckMutation = { __typename?: 'Mutation', selectDeck: { __typename?: 'PreGameLobby', id: string, ready: boolean, gameId?: string | null, players: Array<{ __typename?: 'PreGamePlayer', id: string, ready: boolean, account: { __typename?: 'Account', id: number, userName: string } }> } };
+
 export type AccountQueryVariables = Exact<{
   id: Scalars['Float'];
 }>;
@@ -516,7 +555,7 @@ export type EventOffersQueryVariables = Exact<{
 }>;
 
 
-export type EventOffersQuery = { __typename?: 'Query', eventOffers: Array<{ __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, issuer: { __typename?: 'Account', id: number, userName: string }, recipient: { __typename?: 'Account', id: number, userName: string } }> };
+export type EventOffersQuery = { __typename?: 'Query', eventOffers: Array<{ __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string }, recipient: { __typename?: 'Account', id: number, userName: string } }> };
 
 export type MyCardLibrarySubscriptionVariables = Exact<{ [key: string]: never; }>;
 
@@ -538,7 +577,7 @@ export type WatchDeckTemplateSubscription = { __typename?: 'Subscription', deckT
 export type EventOfferInboxSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type EventOfferInboxSubscription = { __typename?: 'Subscription', eventOfferInbox: { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, issuer: { __typename?: 'Account', id: number, userName: string }, recipient: { __typename?: 'Account', id: number, userName: string } } };
+export type EventOfferInboxSubscription = { __typename?: 'Subscription', eventOfferInbox: { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string }, recipient: { __typename?: 'Account', id: number, userName: string } } };
 
 export type WatchLobbySubscriptionVariables = Exact<{
   watchLobbyId: Scalars['String'];
@@ -553,6 +592,13 @@ export type WatchChatSubscriptionVariables = Exact<{
 
 
 export type WatchChatSubscription = { __typename?: 'Subscription', watchChat: Array<{ __typename?: 'ChatMessage', id: number, message: string, account: { __typename?: 'Account', id: number, userName: string } }> };
+
+export type WatchPreGameLobbySubscriptionVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type WatchPreGameLobbySubscription = { __typename?: 'Subscription', watchPreGameLobby: { __typename?: 'PreGameLobby', id: string, ready: boolean, gameId?: string | null, players: Array<{ __typename?: 'PreGamePlayer', id: string, ready: boolean, account: { __typename?: 'Account', id: number, userName: string } }> } };
 
 export const AccountPartsFragmentDoc = gql`
     fragment AccountParts on Account {
@@ -611,6 +657,7 @@ export const EventOfferPartsFragmentDoc = gql`
   id
   type
   status
+  lobbyId
   issuer {
     id
     userName
@@ -627,6 +674,21 @@ export const LobbyPartsFragmentDoc = gql`
   members {
     id
     userName
+  }
+}
+    `;
+export const PreGameLobbyPartsFragmentDoc = gql`
+    fragment PreGameLobbyParts on PreGameLobby {
+  id
+  ready
+  gameId
+  players {
+    id
+    ready
+    account {
+      id
+      userName
+    }
   }
 }
     `;
@@ -720,6 +782,17 @@ export const AddCardToDeckTemplateDocument = gql`
 export function useAddCardToDeckTemplateMutation() {
   return Urql.useMutation<AddCardToDeckTemplateMutation, AddCardToDeckTemplateMutationVariables>(AddCardToDeckTemplateDocument);
 };
+export const AcceptEventOfferDocument = gql`
+    mutation AcceptEventOffer($id: String!) {
+  acceptOffer(id: $id) {
+    ...EventOfferParts
+  }
+}
+    ${EventOfferPartsFragmentDoc}`;
+
+export function useAcceptEventOfferMutation() {
+  return Urql.useMutation<AcceptEventOfferMutation, AcceptEventOfferMutationVariables>(AcceptEventOfferDocument);
+};
 export const CreateEventDocument = gql`
     mutation CreateEvent($type: String!, $recipientId: Float!) {
   createOffer(type: $type, recipientId: $recipientId) {
@@ -730,6 +803,17 @@ export const CreateEventDocument = gql`
 
 export function useCreateEventMutation() {
   return Urql.useMutation<CreateEventMutation, CreateEventMutationVariables>(CreateEventDocument);
+};
+export const DeclineEventOfferDocument = gql`
+    mutation DeclineEventOffer($id: String!) {
+  declineOffer(id: $id) {
+    ...EventOfferParts
+  }
+}
+    ${EventOfferPartsFragmentDoc}`;
+
+export function useDeclineEventOfferMutation() {
+  return Urql.useMutation<DeclineEventOfferMutation, DeclineEventOfferMutationVariables>(DeclineEventOfferDocument);
 };
 export const CreateLobbyDocument = gql`
     mutation CreateLobby($creatorId: Float!) {
@@ -774,6 +858,28 @@ export const SendMessageDocument = gql`
 
 export function useSendMessageMutation() {
   return Urql.useMutation<SendMessageMutation, SendMessageMutationVariables>(SendMessageDocument);
+};
+export const ReadyUpDocument = gql`
+    mutation ReadyUp($preGameLobbyId: String!) {
+  readyUp(preGameLobbyId: $preGameLobbyId) {
+    ...PreGameLobbyParts
+  }
+}
+    ${PreGameLobbyPartsFragmentDoc}`;
+
+export function useReadyUpMutation() {
+  return Urql.useMutation<ReadyUpMutation, ReadyUpMutationVariables>(ReadyUpDocument);
+};
+export const SelectDeckDocument = gql`
+    mutation SelectDeck($deckTemplateId: Float!, $preGameLobbyId: String!) {
+  selectDeck(deckTemplateId: $deckTemplateId, preGameLobbyId: $preGameLobbyId) {
+    ...PreGameLobbyParts
+  }
+}
+    ${PreGameLobbyPartsFragmentDoc}`;
+
+export function useSelectDeckMutation() {
+  return Urql.useMutation<SelectDeckMutation, SelectDeckMutationVariables>(SelectDeckDocument);
 };
 export const AccountDocument = gql`
     query Account($id: Float!) {
@@ -902,4 +1008,15 @@ export const WatchChatDocument = gql`
 
 export function useWatchChatSubscription<TData = WatchChatSubscription>(options: Omit<Urql.UseSubscriptionArgs<WatchChatSubscriptionVariables>, 'query'> = {}, handler?: Urql.SubscriptionHandler<WatchChatSubscription, TData>) {
   return Urql.useSubscription<WatchChatSubscription, TData, WatchChatSubscriptionVariables>({ query: WatchChatDocument, ...options }, handler);
+};
+export const WatchPreGameLobbyDocument = gql`
+    subscription WatchPreGameLobby($id: String!) {
+  watchPreGameLobby(id: $id) {
+    ...PreGameLobbyParts
+  }
+}
+    ${PreGameLobbyPartsFragmentDoc}`;
+
+export function useWatchPreGameLobbySubscription<TData = WatchPreGameLobbySubscription>(options: Omit<Urql.UseSubscriptionArgs<WatchPreGameLobbySubscriptionVariables>, 'query'> = {}, handler?: Urql.SubscriptionHandler<WatchPreGameLobbySubscription, TData>) {
+  return Urql.useSubscription<WatchPreGameLobbySubscription, TData, WatchPreGameLobbySubscriptionVariables>({ query: WatchPreGameLobbyDocument, ...options }, handler);
 };

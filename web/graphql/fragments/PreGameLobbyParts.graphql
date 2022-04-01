@@ -1,0 +1,13 @@
+fragment PreGameLobbyParts on PreGameLobby {
+    id
+    ready
+    gameId
+    players {
+        id
+        ready
+        account {
+            id
+            userName
+        }
+    }
+}

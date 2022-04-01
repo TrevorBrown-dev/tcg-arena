@@ -49,12 +49,7 @@ class EventOfferResolver {
                 `Accounts not found with ids : ${issuerId}, ${recipientId}`
             );
         const offer = EventOffer.createEventOffer(issuer, recipient, type);
-        pubsub.publish(`eventOfferInbox_${issuerId}`, {
-            eventOffer: offer,
-        });
-        pubsub.publish(`eventOfferInbox_${recipient.id}`, {
-            eventOffer: offer,
-        });
+
         return offer;
     }
 
@@ -64,13 +59,22 @@ class EventOfferResolver {
         if (!offer) throw new Error(`EventOffer not found with id: ${offerId}`);
         const lobbyId = EventOffer.initiateEvent(offer);
         if (!lobbyId) throw new Error(`Could not initiate event`);
+
+        return lobbyId;
+    }
+
+    @Mutation(() => EventOffer)
+    async declineOffer(@Arg('id') offerId: string) {
+        const offer = EventOffer.get(offerId);
+        if (!offer) throw new Error(`EventOffer not found with id: ${offerId}`);
+        EventOffer.declineOffer(offer);
         pubsub.publish(`eventOfferInbox_${offer.recipient.id}`, {
             eventOffer: offer,
         });
         pubsub.publish(`eventOfferInbox_${offer.issuer.id}`, {
             eventOffer: offer,
         });
-        return lobbyId;
+        return offer;
     }
 
     @Subscription(() => EventOffer, {

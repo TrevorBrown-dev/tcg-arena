@@ -37,7 +37,11 @@ export class Game {
     constructor(player1: PlayerInput, player2: PlayerInput) {
         this.player1 = new Player(player1.deckTemplate, player1.account);
         this.player2 = new Player(player2.deckTemplate, player2.account);
+    }
 
-        Game.games.set(this.id, this);
+    static create(player1: PlayerInput, player2: PlayerInput) {
+        const game = new Game(player1, player2);
+        Game.games.set(game.id, game);
+        return game;
     }
 }

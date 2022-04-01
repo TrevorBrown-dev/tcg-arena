@@ -1,0 +1,8 @@
+mutation SelectDeck($deckTemplateId: Float!, $preGameLobbyId: String!) {
+    selectDeck(
+        deckTemplateId: $deckTemplateId
+        preGameLobbyId: $preGameLobbyId
+    ) {
+        ...PreGameLobbyParts
+    }
+}

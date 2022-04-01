@@ -1,0 +1,5 @@
+mutation ReadyUp($preGameLobbyId: String!) {
+    readyUp(preGameLobbyId: $preGameLobbyId) {
+        ...PreGameLobbyParts
+    }
+}

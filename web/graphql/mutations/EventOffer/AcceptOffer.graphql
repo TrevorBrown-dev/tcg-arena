@@ -1,0 +1,5 @@
+mutation AcceptEventOffer($id: String!) {
+    acceptOffer(id: $id) {
+        ...EventOfferParts
+    }
+}

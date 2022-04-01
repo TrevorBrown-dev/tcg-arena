@@ -2,6 +2,7 @@ import { nanoid } from 'nanoid';
 import { Field, ObjectType } from 'type-graphql';
 import { Account } from '../entities/Account';
 import { DeckTemplate } from '../entities/DeckTemplate';
+import { Game } from './Game';
 
 @ObjectType()
 export class PreGamePlayer {
@@ -69,6 +70,9 @@ export class PreGameLobby {
         return this.players.every((player) => player.ready);
     }
 
+    @Field(() => String, { nullable: true })
+    gameId?: string;
+
     constructor(player1: Account, player2: Account) {
         this.players = [new PreGamePlayer(player1), new PreGamePlayer(player2)];
         PreGameLobby.preGameLobbies.set(this.id, this);
@@ -76,5 +80,23 @@ export class PreGameLobby {
 
     static chooseDeck(player: PreGamePlayer, deckTemplate: DeckTemplate) {
         PreGameLobby.chooseDeck(player, deckTemplate);
+    }
+
+    static startGame(preGameLobby: PreGameLobby) {
+        if (!preGameLobby.ready) return;
+        if (!preGameLobby.players.every((player) => player.deckTemplate))
+            return;
+        const game = Game.create(
+            {
+                account: preGameLobby.player1.account,
+                deckTemplate: preGameLobby.player1.deckTemplate!,
+            },
+            {
+                account: preGameLobby.player2.account,
+                deckTemplate: preGameLobby.player2.deckTemplate!,
+            }
+        );
+        preGameLobby.gameId = game.id;
+        return game;
     }
 }

@@ -2,6 +2,7 @@ fragment EventOfferParts on EventOffer {
     id
     type
     status
+    lobbyId
     issuer {
         id
         userName

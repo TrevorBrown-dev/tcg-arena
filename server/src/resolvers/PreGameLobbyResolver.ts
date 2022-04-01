@@ -1,3 +1,4 @@
+import e from 'express';
 import {
     Arg,
     Ctx,
@@ -34,13 +35,15 @@ class PreGameLobbyResolver {
                 `No account found with cookie ${authorization} and payload response`
             );
         }
-        const myId = account.id;
+        const myId = parseInt(account.id);
         const lobby = PreGameLobby.get(preGameLobbyId);
         if (!lobby)
             throw new Error(
                 `PreGameLobby not found with id: ${preGameLobbyId}`
             );
-        const myPlayer = lobby.players.find((player) => player.id === myId);
+        const myPlayer = lobby.players.find(
+            (player) => player.account.id === myId
+        );
         if (!myPlayer)
             throw new Error(
                 `Player not found with id: ${myId} in PreGameLobby with id: ${preGameLobbyId}`
@@ -48,21 +51,23 @@ class PreGameLobbyResolver {
         const deckTemplate = await DeckTemplate.findOne({
             where: {
                 id: deckTemplateId,
-                cardLibrary: {
-                    account: myId,
-                },
             },
-            relations: ['cards', 'cardLibrary', 'cardLibrary.account'],
+            relations: ['cards', 'cardLibrary'],
         });
+        console.log(
+            `Deck template in room ${preGameLobbyId} is:`,
+            deckTemplate
+        );
         if (!deckTemplate)
             throw new Error(
                 `DeckTemplate not found with id: ${deckTemplateId}`
             );
 
         myPlayer.chooseDeck(deckTemplate);
-        pubsub.publish(`preGameLobby_${preGameLobbyId}`, {
+        pubsub.publish(`watchPreGameLobby_${preGameLobbyId}`, {
             preGameLobby: lobby,
         });
+        return lobby;
     }
 
     @Mutation(() => PreGameLobby)
@@ -78,21 +83,29 @@ class PreGameLobbyResolver {
                 `No account found with cookie ${authorization} and payload response`
             );
         }
-        const myId = account.id;
+        const myId = parseInt(account.id);
         const lobby = PreGameLobby.get(preGameLobbyId);
         if (!lobby)
             throw new Error(
                 `PreGameLobby not found with id: ${preGameLobbyId}`
             );
-        const myPlayer = lobby.players.find((player) => player.id === myId);
+        const myPlayer = lobby.players.find(
+            (player) => player.account.id === myId
+        );
         if (!myPlayer)
             throw new Error(
                 `Player not found with id: ${myId} in PreGameLobby with id: ${preGameLobbyId}`
             );
         myPlayer.setReady();
         if (!myPlayer.ready) {
+            //maybe do something else
             throw new Error(`You can't ready up until you choose a deck.`);
+        } else {
+            if (lobby.ready) {
+                PreGameLobby.startGame(lobby);
+            }
         }
+
         pubsub.publish(`watchPreGameLobby_${preGameLobbyId}`, {
             preGameLobby: lobby,
         });
@@ -105,7 +118,7 @@ class PreGameLobbyResolver {
                 const lobby = PreGameLobby.get(args.id);
                 if (!lobby)
                     console.log(`PreGameLobby not found with id: ${args.id}`);
-                pubsub.publish(`preGameLobby_${args.id}`, {
+                pubsub.publish(`watchPreGameLobby_${args.id}`, {
                     preGameLobby: lobby,
                 });
             }, 1);

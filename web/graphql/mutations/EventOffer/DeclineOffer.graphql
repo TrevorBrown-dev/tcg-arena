@@ -1,0 +1,5 @@
+mutation DeclineEventOffer($id: String!) {
+    declineOffer(id: $id) {
+        ...EventOfferParts
+    }
+}
