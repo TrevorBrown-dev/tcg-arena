@@ -1,0 +1,5 @@
+subscription EventOfferInbox {
+    eventOfferInbox {
+        ...EventOfferParts
+    }
+}

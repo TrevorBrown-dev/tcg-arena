@@ -1,0 +1,5 @@
+mutation CreateEvent($type: String!, $recipientId: Float!) {
+    createOffer(type: $type, recipientId: $recipientId) {
+        ...EventOfferParts
+    }
+}

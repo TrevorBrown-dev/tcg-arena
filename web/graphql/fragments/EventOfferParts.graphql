@@ -1,0 +1,13 @@
+fragment EventOfferParts on EventOffer {
+    id
+    type
+    status
+    issuer {
+        id
+        userName
+    }
+    recipient {
+        id
+        userName
+    }
+}

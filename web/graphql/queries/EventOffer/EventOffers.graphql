@@ -1,0 +1,5 @@
+query EventOffers($accountId: Float) {
+    eventOffers(accountId: $accountId) {
+        ...EventOfferParts
+    }
+}
