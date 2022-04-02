@@ -1,5 +1,6 @@
 fragment PrivateGameParts on Game {
     id
+    health
     players {
         ...PlayerParts
     }

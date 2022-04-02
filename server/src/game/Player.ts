@@ -13,6 +13,9 @@ export class Player {
     @Field(() => Deck, { nullable: true })
     deck: Deck;
 
+    @Field(() => Number, { nullable: true })
+    health: number = 30;
+
     @Field(() => Account)
     account: Account;
 

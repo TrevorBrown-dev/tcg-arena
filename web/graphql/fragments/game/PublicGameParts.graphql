@@ -2,6 +2,7 @@ fragment PublicGameParts on Game {
     id
     players {
         id
+        health
         deck {
             numCardsInDeck
         }
