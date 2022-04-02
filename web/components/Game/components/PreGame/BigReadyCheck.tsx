@@ -1,7 +1,7 @@
 import { useReadyUpMutation } from '@graphql-gen';
+import { useLobbyContext } from 'components/Game/utils/lobbyContext';
+import { useGetPlayers } from 'components/Game/utils/useGetPlayers';
 import styled from 'styled-components';
-import { useLobbyContext } from '../utils/lobbyContext';
-import { useGetPlayers } from '../utils/useGetPlayers';
 
 type StyledProps = {
     ready: boolean;

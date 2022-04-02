@@ -5,6 +5,7 @@ import {
     dedupExchange,
     fetchExchange,
     ssrExchange,
+    cacheExchange as defaultCacheExchange,
 } from '@urql/core';
 import {
     Cache,
@@ -12,6 +13,7 @@ import {
     ResolveInfo,
     Variables,
 } from '@urql/exchange-graphcache';
+
 import { SSRExchange } from 'next-urql';
 import { subscriptionExchange } from 'urql';
 // import { wsClient } from './wsClient';
@@ -44,7 +46,6 @@ export const urqlConfig: ClientOptions = {
     },
     exchanges: [
         dedupExchange,
-        cacheExchange({}),
         ssrCache,
         fetchExchange,
         subscriptionExchange({

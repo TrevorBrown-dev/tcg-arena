@@ -1,8 +1,8 @@
 import { PreGameLobbyPartsFragment, useMeQuery } from '@graphql-gen';
 import styled from 'styled-components';
-import { BigReadyCheck } from './components/BigReadyCheck';
-import { PreGameLobbyHeader } from './components/PreGameLobbyHeader';
-import { SelectMyDeck } from './components/SelectMyDeck';
+import { BigReadyCheck } from './components/PreGame/BigReadyCheck';
+import { PreGameLobbyHeader } from './components/PreGame/PreGameLobbyHeader';
+import { SelectMyDeck } from './components/PreGame/SelectMyDeck';
 import { useLobbyContext } from './utils/lobbyContext';
 import { useGetPlayers } from './utils/useGetPlayers';
 

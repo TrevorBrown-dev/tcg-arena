@@ -22,22 +22,20 @@ export class Game {
         return Array.from(Game.games.values());
     }
 
-    static remove(id: string) {
-        Game.games.delete(id);
-    }
-
     @Field(() => String)
     id: string = nanoid();
 
     @Field(() => [Player])
     players: Player[];
 
-    @Field(() => Player)
+    static remove(id: string) {
+        Game.games.delete(id);
+    }
+
     get player1(): Player {
         return this.players[0];
     }
 
-    @Field(() => Player)
     get player2(): Player {
         return this.players[1];
     }

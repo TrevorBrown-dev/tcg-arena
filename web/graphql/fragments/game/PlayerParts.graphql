@@ -3,6 +3,7 @@ fragment PlayerParts on Player {
     hand {
         ...HandParts
     }
+
     deckTemplate {
         ...DeckTemplateParts
     }

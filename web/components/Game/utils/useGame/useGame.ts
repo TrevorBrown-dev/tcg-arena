@@ -3,6 +3,7 @@ import {
     PrivateGamePartsFragment,
     PublicGamePartsFragment,
 } from '@graphql-gen';
+import { useEffect, useState } from 'react';
 import { useLobbyContext } from '../lobbyContext';
 import { useMyPrivateGame } from './useMyPrivateGame';
 import { usePrivateGame } from './usePrivateGame';
@@ -15,11 +16,10 @@ export type UseGameResponse = {
 };
 
 //Needs reworking this will be for spectating
-export const useSpectateGame = (accountId: number): UseGameResponse => {
+export const useSpectateGame = (accountId: number) => {
     const lobby = useLobbyContext();
     const privateGame = usePrivateGame(accountId)!;
     const publicGame = usePublicGame()!;
-
     return {
         lobby,
         publicGame: publicGame,
@@ -27,14 +27,28 @@ export const useSpectateGame = (accountId: number): UseGameResponse => {
     };
 };
 
-export const useGame = (): UseGameResponse => {
+export const useGame = () => {
     const lobby = useLobbyContext();
-    const privateGame = useMyPrivateGame()!;
-    const publicGame = usePublicGame()!;
+    const privateGame = useMyPrivateGame();
+    const publicGame = usePublicGame();
+    const myPlayer = privateGame?.players[0];
+    const myPublicPlayer = publicGame?.players.find(
+        (player) => player.id === myPlayer?.id
+    );
+    const otherPlayer = publicGame?.players.find((player) => {
+        return player.id !== myPlayer?.id;
+    });
 
-    return {
+    const state = {
         lobby,
-        publicGame: publicGame,
-        privateGame: privateGame,
+        publicGame,
+        privateGame,
+        myPlayer: {
+            ...myPublicPlayer,
+            ...myPlayer,
+        },
+        otherPlayer,
     };
+
+    return state;
 };

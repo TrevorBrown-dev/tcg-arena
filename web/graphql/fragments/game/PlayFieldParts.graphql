@@ -1,0 +1,6 @@
+fragment PlayFieldParts on PlayField {
+    id
+    cards {
+        ...CardObjParts
+    }
+}

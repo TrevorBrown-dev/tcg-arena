@@ -1,5 +1,6 @@
+import { useGetPlayers } from 'components/Game/utils/useGetPlayers';
 import styled from 'styled-components';
-import { useGetPlayers } from '../utils/useGetPlayers';
+
 const StyledHeader = styled.header`
     padding: 1em;
     display: flex;

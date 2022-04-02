@@ -1,9 +1,10 @@
 import { nanoid } from 'nanoid';
 import { Field, ObjectType } from 'type-graphql';
 import { CardObj } from './Card';
+import { WithCards } from './utils/WithCards';
 
 @ObjectType()
-export class Hand {
+export class Hand implements WithCards {
     @Field(() => String)
     id: string = nanoid();
 
@@ -27,15 +28,21 @@ export class Hand {
         return this.cards.filter((card) => uuids.includes(card.uuid));
     }
 
+    addCards(cards: CardObj[]): void {
+        this.cards = [...this.cards, ...cards];
+    }
+
+    removeCards(cards: CardObj[]) {
+        this.cards = this.cards.filter((card) => !cards.includes(card));
+    }
+
     static addCardsToHand(hand: Hand, cards: CardObj[]) {
-        hand.cards = [...hand.cards, ...cards];
+        hand.addCards(cards);
         return hand;
     }
 
     static removeCardsFromHand(hand: Hand, cards: CardObj[]) {
-        hand.cards = hand.cards.filter(
-            (card) => !cards.some((c) => c.uuid === card.uuid)
-        );
+        hand.removeCards(cards);
         return hand;
     }
 }

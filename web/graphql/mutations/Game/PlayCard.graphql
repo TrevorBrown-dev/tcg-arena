@@ -1,0 +1,3 @@
+mutation PlayCard($gameId: String!, $uuid: String!) {
+    playCard(gameId: $gameId, uuid: $uuid)
+}

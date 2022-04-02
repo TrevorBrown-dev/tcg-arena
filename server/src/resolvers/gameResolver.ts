@@ -1,4 +1,12 @@
-import { Arg, Ctx, Mutation, Query, Root, Subscription } from 'type-graphql';
+import {
+    Arg,
+    Ctx,
+    Mutation,
+    Query,
+    Resolver,
+    Root,
+    Subscription,
+} from 'type-graphql';
 import { pubsub } from '..';
 import { GameEntity } from '../entities/GameEntity';
 import { Game } from '../game/Game';
@@ -7,6 +15,7 @@ import { MyContext, SubscriptionIterator } from '../types';
 import { getAccountIdFromCookie } from '../utils/auth/getAccountFromCookie';
 import { parseJWT } from '../utils/parseJWT';
 
+@Resolver()
 class GameResolver {
     @Query(() => Game)
     async game(@Arg('id') id: string) {
@@ -15,7 +24,7 @@ class GameResolver {
         return game;
     }
 
-    @Mutation(() => Game)
+    @Mutation(() => Boolean)
     async playCard(
         @Arg('gameId') gameId: string,
         @Arg('uuid') uuid: string,
@@ -38,21 +47,21 @@ class GameResolver {
             );
 
         //Remove the card from the hand
-        Hand.removeCardsFromHand(player.hand, [card]);
-
+        player.playCard(card);
         //Run interpreter
 
         //Publish changes
         Game.publishGame(game);
 
-        return game;
+        return true;
     }
 
     @Query(() => Game)
     initialPublicGame(@Arg('gameId') gameId: string) {
         const game = Game.get(gameId);
         if (!game) throw new Error(`Game not found with id: ${gameId}`);
-        return game;
+        console.log(game.players.map((p) => p.account.id));
+        return { ...game };
     }
 
     @Query(() => Game)
@@ -91,7 +100,9 @@ class GameResolver {
     }
 
     @Subscription(() => Game, {
-        topics: ({ args }) => `watchPrivateGame_${args.gameId}`,
+        topics: ({ args }) => {
+            return `watchPrivateGame_${args.gameId}`;
+        },
     })
     watchMyPrivateGame(
         @Arg('gameId') gameId: string,

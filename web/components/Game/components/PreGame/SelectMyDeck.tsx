@@ -3,9 +3,9 @@ import {
     useMyDeckTemplatesSubscription,
     useSelectDeckMutation,
 } from '@graphql-gen';
+import { useLobbyContext } from 'components/Game/utils/lobbyContext';
 import { useState } from 'react';
 import styled from 'styled-components';
-import { useLobbyContext } from '../utils/lobbyContext';
 
 const StyledSelectDeck = styled.aside`
     height: 100%;

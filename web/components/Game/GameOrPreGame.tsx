@@ -15,7 +15,6 @@ export const GameOrPreGame: React.FC<Props> = ({ lobbyId }) => {
         },
     });
 
-    console.log('LOBBY', lobbyResponse);
     const lobby = lobbyResponse?.data?.watchPreGameLobby;
     if (!lobby || lobbyResponse.fetching) {
         return <Loading />;

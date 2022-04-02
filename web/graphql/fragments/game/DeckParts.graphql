@@ -1,6 +1,6 @@
 fragment DeckParts on Deck {
     id
-    deck {
+    cards {
         ...CardObjParts
     }
     template {

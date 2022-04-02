@@ -1,10 +1,11 @@
+import { CardRecordPart } from 'components/Card/types';
 import styled from 'styled-components';
 import {
     useCardsInLibraryQuery,
     useMeQuery,
     useMyCardLibrarySubscription,
 } from '../../generated/graphql';
-import { CardLibraryCard, CardRecordPart } from '../Card/CardLibraryCard';
+import { CardLibraryCard } from '../Card/CardLibraryCard';
 
 const CardLibraryContainer = styled.div`
     flex: 1;

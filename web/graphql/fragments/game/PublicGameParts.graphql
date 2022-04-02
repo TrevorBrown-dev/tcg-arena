@@ -2,11 +2,15 @@ fragment PublicGameParts on Game {
     id
     players {
         id
-        health
+        playField {
+            ...PlayFieldParts
+        }
         deck {
+            id
             numCardsInDeck
         }
         hand {
+            id
             numCardsInHand
         }
     }

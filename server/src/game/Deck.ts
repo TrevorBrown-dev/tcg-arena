@@ -4,27 +4,28 @@ import { DeckTemplate } from '../entities/DeckTemplate';
 import { shuffleArray } from '../utils/shuffleArray';
 import { Hand } from './Hand';
 import { nanoid } from 'nanoid';
+import { WithCards } from './utils/WithCards';
 
 @ObjectType()
-export class Deck {
+export class Deck implements WithCards {
     @Field(() => String)
     id: string = nanoid();
 
     @Field(() => [CardObj], { nullable: true })
-    deck: CardObj[];
+    cards: CardObj[];
 
     @Field(() => DeckTemplate, { nullable: true })
     template: DeckTemplate;
 
     @Field(() => Number)
     get numCardsInDeck(): number {
-        return this.deck.length;
+        return this.cards.length;
     }
 
     constructor(template: DeckTemplate) {
         this.template = template;
-        this.deck = DeckTemplate.loadCardsFromTemplate(this.template);
-        this.deck = shuffleArray(this.deck);
+        this.cards = DeckTemplate.loadCardsFromTemplate(this.template);
+        this.cards = shuffleArray(this.cards);
     }
 
     static drawFromDeck(deck: Deck, hand: Hand, numCards: number = 1) {
@@ -33,8 +34,16 @@ export class Deck {
         return deck;
     }
 
+    addCards(cards: CardObj[]): void {
+        this.cards = [...this.cards, ...cards];
+    }
+
+    removeCards(cards: CardObj[]) {
+        this.cards = this.cards.filter((card) => !cards.includes(card));
+    }
+
     draw(numCards: number = 1) {
-        const drawnCards = this.deck.splice(0, numCards);
+        const drawnCards = this.cards.splice(0, numCards);
         return drawnCards;
     }
 
@@ -53,10 +62,10 @@ export class Deck {
     }
 
     shuffle() {
-        this.deck = shuffleArray(this.deck);
+        this.cards = shuffleArray(this.cards);
     }
 
     replace(cards: CardObj[]) {
-        this.deck = [...cards, ...this.deck];
+        this.cards = [...cards, ...this.cards];
     }
 }

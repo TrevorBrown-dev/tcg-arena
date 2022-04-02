@@ -2,7 +2,9 @@ import { nanoid } from 'nanoid';
 import { Field, ObjectType } from 'type-graphql';
 import { Account } from '../entities/Account';
 import { DeckTemplate } from '../entities/DeckTemplate';
+import { CardObj } from './Card';
 import { Deck } from './Deck';
+import { PlayField } from './PlayField';
 import { Hand } from './Hand';
 
 @ObjectType()
@@ -19,10 +21,13 @@ export class Player {
     @Field(() => Account)
     account: Account;
 
-    @Field(() => Hand)
+    @Field(() => Hand, { nullable: true })
     hand: Hand;
 
-    @Field(() => DeckTemplate)
+    @Field(() => PlayField, { nullable: true })
+    playField = new PlayField();
+
+    @Field(() => DeckTemplate, { nullable: true })
     deckTemplate: DeckTemplate;
 
     drawCards(numCards: number = 1) {
@@ -31,6 +36,11 @@ export class Player {
 
     drawCard() {
         this.drawCards(1);
+    }
+
+    playCard(card: CardObj) {
+        Hand.removeCardsFromHand(this.hand, [card]);
+        this.playField.playCard(card);
     }
 
     constructor(deckTemplate: DeckTemplate, account: Account) {
