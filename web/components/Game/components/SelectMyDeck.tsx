@@ -5,7 +5,7 @@ import {
 } from '@graphql-gen';
 import { useState } from 'react';
 import styled from 'styled-components';
-import { useLobbyContext } from '../GameOrPreGame';
+import { useLobbyContext } from '../utils/lobbyContext';
 
 const StyledSelectDeck = styled.aside`
     height: 100%;

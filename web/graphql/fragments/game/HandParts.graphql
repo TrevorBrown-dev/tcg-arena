@@ -1,0 +1,7 @@
+fragment HandParts on Hand {
+    id
+    numCardsInHand
+    cards {
+        ...CardObjParts
+    }
+}

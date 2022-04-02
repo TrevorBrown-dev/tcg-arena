@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { BigReadyCheck } from './components/BigReadyCheck';
 import { PreGameLobbyHeader } from './components/PreGameLobbyHeader';
 import { SelectMyDeck } from './components/SelectMyDeck';
-import { useLobbyContext } from './GameOrPreGame';
+import { useLobbyContext } from './utils/lobbyContext';
 import { useGetPlayers } from './utils/useGetPlayers';
 
 const StyledPreGameLobby = styled.div`

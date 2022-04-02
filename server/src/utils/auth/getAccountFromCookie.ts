@@ -1,7 +1,7 @@
 import { Account } from '../../entities/Account';
 import { parseJWT } from '../parseJWT';
 
-export const getAccountIdFromCookie = async (cookies: string) => {
+export const getAccountIdFromCookie = (cookies: string | undefined) => {
     const authorization = cookies;
     if (!authorization) return null;
     const account = parseJWT(authorization!);

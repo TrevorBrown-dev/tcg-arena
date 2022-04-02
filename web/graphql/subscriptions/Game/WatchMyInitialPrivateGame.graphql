@@ -1,0 +1,5 @@
+subscription WatchMyPrivateGame($gameId: String!) {
+    watchMyPrivateGame(gameId: $gameId) {
+        ...PrivateGameParts
+    }
+}

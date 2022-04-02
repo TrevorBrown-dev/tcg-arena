@@ -1,0 +1,8 @@
+fragment CardObjParts on CardObj {
+    id
+    uuid
+    name
+    description
+    imageUrl
+    isFoil
+}

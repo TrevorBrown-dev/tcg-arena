@@ -1,13 +1,30 @@
+import { nanoid } from 'nanoid';
 import { Field, ObjectType } from 'type-graphql';
 import { CardObj } from './Card';
 
 @ObjectType()
 export class Hand {
-    @Field(() => [CardObj])
+    @Field(() => String)
+    id: string = nanoid();
+
+    @Field(() => [CardObj], { nullable: true })
     cards: CardObj[];
+
+    @Field(() => Number)
+    get numCardsInHand(): number {
+        return this.cards.length;
+    }
 
     constructor(cards: CardObj[] = []) {
         this.cards = cards;
+    }
+
+    findCard(uuid: string) {
+        return this.cards.find((card) => card.uuid === uuid);
+    }
+
+    findCards(uuids: string[]) {
+        return this.cards.filter((card) => uuids.includes(card.uuid));
     }
 
     static addCardsToHand(hand: Hand, cards: CardObj[]) {

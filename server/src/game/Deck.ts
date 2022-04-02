@@ -3,14 +3,23 @@ import { Field, ObjectType } from 'type-graphql';
 import { DeckTemplate } from '../entities/DeckTemplate';
 import { shuffleArray } from '../utils/shuffleArray';
 import { Hand } from './Hand';
+import { nanoid } from 'nanoid';
 
 @ObjectType()
 export class Deck {
+    @Field(() => String)
+    id: string = nanoid();
+
     @Field(() => [CardObj], { nullable: true })
     deck: CardObj[];
 
     @Field(() => DeckTemplate, { nullable: true })
     template: DeckTemplate;
+
+    @Field(() => Number)
+    get numCardsInDeck(): number {
+        return this.deck.length;
+    }
 
     constructor(template: DeckTemplate) {
         this.template = template;

@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid';
 import { Field, ObjectType } from 'type-graphql';
 import { Account } from '../entities/Account';
 import { DeckTemplate } from '../entities/DeckTemplate';
@@ -6,7 +7,10 @@ import { Hand } from './Hand';
 
 @ObjectType()
 export class Player {
-    @Field(() => Deck)
+    @Field(() => String)
+    id: string = nanoid();
+
+    @Field(() => Deck, { nullable: true })
     deck: Deck;
 
     @Field(() => Account)
@@ -17,6 +21,14 @@ export class Player {
 
     @Field(() => DeckTemplate)
     deckTemplate: DeckTemplate;
+
+    drawCards(numCards: number = 1) {
+        Hand.addCardsToHand(this.hand, this.deck.draw(numCards));
+    }
+
+    drawCard() {
+        this.drawCards(1);
+    }
 
     constructor(deckTemplate: DeckTemplate, account: Account) {
         this.deckTemplate = deckTemplate;

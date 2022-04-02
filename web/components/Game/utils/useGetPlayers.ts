@@ -1,5 +1,5 @@
 import { useMeQuery } from '@graphql-gen';
-import { useLobbyContext } from '../GameOrPreGame';
+import { useLobbyContext } from './lobbyContext';
 
 export const useGetPlayers = () => {
     const [me] = useMeQuery();

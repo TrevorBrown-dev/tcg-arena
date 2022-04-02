@@ -1,6 +1,6 @@
 import { useReadyUpMutation } from '@graphql-gen';
 import styled from 'styled-components';
-import { useLobbyContext } from '../GameOrPreGame';
+import { useLobbyContext } from '../utils/lobbyContext';
 import { useGetPlayers } from '../utils/useGetPlayers';
 
 type StyledProps = {

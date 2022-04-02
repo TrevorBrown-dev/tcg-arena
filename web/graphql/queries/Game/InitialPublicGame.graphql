@@ -1,0 +1,5 @@
+query InitialPublicGame($gameId: String!) {
+    initialPublicGame(gameId: $gameId) {
+        ...PublicGameParts
+    }
+}

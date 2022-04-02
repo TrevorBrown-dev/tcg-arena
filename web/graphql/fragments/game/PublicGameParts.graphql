@@ -1,0 +1,12 @@
+fragment PublicGameParts on Game {
+    id
+    players {
+        id
+        deck {
+            numCardsInDeck
+        }
+        hand {
+            numCardsInHand
+        }
+    }
+}

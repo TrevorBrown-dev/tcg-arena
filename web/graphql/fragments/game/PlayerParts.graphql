@@ -1,0 +1,9 @@
+fragment PlayerParts on Player {
+    id
+    hand {
+        ...HandParts
+    }
+    deckTemplate {
+        ...DeckTemplateParts
+    }
+}

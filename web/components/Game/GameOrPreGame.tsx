@@ -1,18 +1,12 @@
-import {
-    PreGameLobbyPartsFragment,
-    useWatchPreGameLobbySubscription,
-} from '@graphql-gen';
+import { useWatchPreGameLobbySubscription } from '@graphql-gen';
 import { Loading } from 'components/Loading';
-import { createContext, useContext } from 'react';
 import { GameLobby } from './GameLobby';
 import { PreGameLobby } from './PreGameLobby';
+import { lobbyContext } from './utils/lobbyContext';
 
 type Props = {
     lobbyId: string;
 };
-
-const lobbyContext = createContext<PreGameLobbyPartsFragment | null>(null);
-export const useLobbyContext = () => useContext(lobbyContext)!;
 
 export const GameOrPreGame: React.FC<Props> = ({ lobbyId }) => {
     const [lobbyResponse] = useWatchPreGameLobbySubscription({

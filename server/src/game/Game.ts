@@ -3,6 +3,7 @@ import { Account } from '../entities/Account';
 import { DeckTemplate } from '../entities/DeckTemplate';
 import { Field, ObjectType } from 'type-graphql';
 import { Player } from './Player';
+import { pubsub } from '..';
 
 //create a class decorator that will inject a property called id
 type PlayerInput = {
@@ -28,20 +29,47 @@ export class Game {
     @Field(() => String)
     id: string = nanoid();
 
-    @Field(() => Player)
-    player1: Player;
+    @Field(() => [Player])
+    players: Player[];
 
     @Field(() => Player)
-    player2: Player;
+    get player1(): Player {
+        return this.players[0];
+    }
+
+    @Field(() => Player)
+    get player2(): Player {
+        return this.players[1];
+    }
+
+    getPlayer(playerId: number) {
+        return this.players.find((p) => p.account.id === playerId);
+    }
 
     constructor(player1: PlayerInput, player2: PlayerInput) {
-        this.player1 = new Player(player1.deckTemplate, player1.account);
-        this.player2 = new Player(player2.deckTemplate, player2.account);
+        const p1 = new Player(player1.deckTemplate, player1.account);
+        const p2 = new Player(player2.deckTemplate, player2.account);
+
+        this.players = [p1, p2];
+        this.player1.drawCards(3);
+        this.player2.drawCards(3);
     }
 
     static create(player1: PlayerInput, player2: PlayerInput) {
         const game = new Game(player1, player2);
         Game.games.set(game.id, game);
         return game;
+    }
+
+    static publishGame(game: Game) {
+        pubsub.publish(`watchPublicGame_${game.id}`, {
+            publicGame: game,
+        });
+        pubsub.publish(`watchPrivateGame_${game.id}`, {
+            privateGame: game,
+        });
+        pubsub.publish(`watchPrivateGame_${game.id}`, {
+            privateGame: game,
+        });
     }
 }

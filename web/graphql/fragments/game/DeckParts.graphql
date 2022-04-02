@@ -1,0 +1,9 @@
+fragment DeckParts on Deck {
+    id
+    deck {
+        ...CardObjParts
+    }
+    template {
+        ...DeckTemplateParts
+    }
+}
