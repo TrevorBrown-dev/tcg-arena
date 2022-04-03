@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 export const CardLayout = styled.div<{ isFoil?: boolean }>`
+    font-size: 0.8em;
     width: 15em;
     height: 20em;
     border: 2px solid;
@@ -8,6 +9,7 @@ export const CardLayout = styled.div<{ isFoil?: boolean }>`
     border-radius: 1rem;
     padding: 1em;
     display: flex;
+    flex: 0 0 auto;
     flex-direction: column;
     .header {
         font-size: 1.5em;
@@ -51,12 +53,14 @@ export const CardLayout = styled.div<{ isFoil?: boolean }>`
 `;
 
 export const BlankCard = styled.div`
+    font-size: 0.8em;
     width: 15em;
     height: 20em;
     border: 2px solid;
     border-color: #2196f3;
     background-color: #2196f3;
     border-radius: 1rem;
+    flex: 0 0 auto;
     ::after {
         content: 'TCG Arena';
     }

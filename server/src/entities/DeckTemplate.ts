@@ -35,7 +35,6 @@ export class DeckTemplate extends BaseEntity implements WithCardRecords {
     cardLibrary!: CardLibrary;
 
     public static loadCardsFromTemplate(template: DeckTemplate) {
-        console.log('loading cards from template');
         const cards = CardRecord.mapRecordsToCards(template.cards);
         return cards;
     }

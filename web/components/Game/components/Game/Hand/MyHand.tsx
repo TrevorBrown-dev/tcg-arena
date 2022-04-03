@@ -1,12 +1,13 @@
 import { usePlayCardMutation } from '@graphql-gen';
 import { Card } from 'components/Card/Card';
 import { useGameContext } from 'components/Game/utils/useGame/useGame';
+import { StyledHand } from './StyledHand';
 
 export const MyHand: React.FC = () => {
     const game = useGameContext();
     const [, playCard] = usePlayCardMutation();
     return (
-        <div className="flex">
+        <StyledHand>
             {game?.myPlayer?.hand?.cards &&
                 game.myPlayer.hand.cards.map((card, i) => (
                     <Card
@@ -22,6 +23,6 @@ export const MyHand: React.FC = () => {
                         cardRecord={{ card, isFoil: card.isFoil } as any}
                     />
                 ))}
-        </div>
+        </StyledHand>
     );
 };

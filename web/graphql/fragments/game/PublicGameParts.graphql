@@ -5,6 +5,11 @@ fragment PublicGameParts on Game {
     }
     players {
         id
+        health
+        account {
+            id
+            userName
+        }
         playField {
             ...PlayFieldParts
         }

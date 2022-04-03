@@ -45,7 +45,7 @@ export const urqlConfig: ClientOptions = {
     },
     exchanges: [
         dedupExchange,
-        cacheExchange({}),
+        // cacheExchange({}),
         ssrCache,
         fetchExchange,
         subscriptionExchange({

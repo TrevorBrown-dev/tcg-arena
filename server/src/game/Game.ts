@@ -6,12 +6,11 @@ import { Player } from './Player';
 import { pubsub } from '..';
 import { GameLogs } from './GameLogs';
 import { Interpreter } from '../interpreter/Interpreter';
-import { AccountInfo } from './PreGameLobby';
 
 //create a class decorator that will inject a property called id
 type PlayerInput = {
     deckTemplate: DeckTemplate;
-    account: AccountInfo;
+    account: Account;
 };
 @ObjectType()
 export class Game {
@@ -54,7 +53,6 @@ export class Game {
             return;
         }
         console.log(player1, player2);
-        console.log('RUNNING GAME CONSTRUCTOR FOR SOME REASON');
         const p1 = new Player(player1.deckTemplate, player1.account);
         const p2 = new Player(player2.deckTemplate, player2.account);
 
@@ -78,13 +76,8 @@ export class Game {
         });
         console.log('publishing private game');
 
-        try {
-            await pubsub.publish(`watchPrivateGame_${game.id}`, {
-                privateGame: game,
-            });
-        } catch (e) {
-            console.log(e);
-        }
-        console.log('private game published');
+        await pubsub.publish(`watchPrivateGame_${game.id}`, {
+            privateGame: game,
+        });
     }
 }

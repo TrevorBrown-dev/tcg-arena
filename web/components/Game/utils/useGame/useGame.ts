@@ -33,9 +33,9 @@ export const useGame = () => {
     const privateGame = useMyPrivateGame();
     const publicGame = usePublicGame();
     const myPlayer = privateGame?.players[0];
-    // const myPublicPlayer = publicGame?.players.find(
-    //     (player) => player.id === myPlayer?.id
-    // );
+    const myPublicPlayer = publicGame?.players.find(
+        (player) => player.id === myPlayer?.id
+    );
 
     const otherPlayer = publicGame?.players.find((player) => {
         return player.id !== myPlayer?.id;
@@ -44,7 +44,12 @@ export const useGame = () => {
         lobby,
         publicGame,
         privateGame,
-        myPlayer,
+        myPlayer: {
+            ...myPublicPlayer,
+            ...myPlayer,
+            hand: myPlayer?.hand,
+            account: myPublicPlayer?.account,
+        },
         otherPlayer,
     };
 

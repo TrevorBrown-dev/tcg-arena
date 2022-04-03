@@ -5,13 +5,6 @@ import { DeckTemplate } from '../entities/DeckTemplate';
 import { Game } from './Game';
 
 @ObjectType()
-export class AccountInfo {
-    @Field(() => Number)
-    id: number;
-    @Field(() => String)
-    userName: string;
-}
-@ObjectType()
 export class PreGamePlayer {
     @Field(() => String)
     id: string = nanoid();
@@ -19,8 +12,8 @@ export class PreGamePlayer {
     @Field(() => DeckTemplate)
     deckTemplate: DeckTemplate;
 
-    @Field(() => AccountInfo)
-    account: AccountInfo;
+    @Field(() => Account)
+    account: Account;
 
     @Field(() => Boolean)
     ready: boolean = false;
@@ -31,7 +24,7 @@ export class PreGamePlayer {
         }
     }
 
-    constructor(account: AccountInfo) {
+    constructor(account: Account) {
         this.account = account;
     }
 
@@ -80,10 +73,10 @@ export class PreGameLobby {
     @Field(() => String, { nullable: true })
     gameId?: string;
 
-    constructor(player1: AccountInfo, player2: AccountInfo) {
+    constructor(player1: Account, player2: Account) {
         this.players = [new PreGamePlayer(player1), new PreGamePlayer(player2)];
     }
-    static create(player1: AccountInfo, player2: AccountInfo) {
+    static create(player1: Account, player2: Account) {
         const lobby = new PreGameLobby(player1, player2);
         PreGameLobby.preGameLobbies.set(lobby.id, lobby);
         return lobby;
@@ -99,7 +92,6 @@ export class PreGameLobby {
         if (!preGameLobby.ready) return;
         if (!preGameLobby.players.every((player) => !!player.deckTemplate))
             return;
-        console.log('RUNNING START GAME FOR SOME REASON', preGameLobby.id);
         const game = Game.create(
             {
                 account: preGameLobby.player1.account,

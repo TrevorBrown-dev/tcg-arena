@@ -7,6 +7,7 @@ const StyledPlayFields = styled.div`
     display: flex;
     flex-direction: column;
     gap: 1em;
+    justify-content: center;
 `;
 
 const StyledPlayField = styled.div`
@@ -35,6 +36,7 @@ export const PlayFields: React.FC = () => {
     return (
         <StyledPlayFields>
             <PlayField playerId={game?.otherPlayer?.id} />
+            <hr />
             <PlayField playerId={game?.myPlayer?.id} />
         </StyledPlayFields>
     );

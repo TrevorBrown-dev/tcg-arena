@@ -1,3 +1,4 @@
+//deprecated
 import { Field, ObjectType } from 'type-graphql';
 import {
     BaseEntity,
@@ -8,7 +9,6 @@ import {
 } from 'typeorm';
 
 import { PlayerEntity } from './PlayerEntity';
-
 @Entity()
 @ObjectType()
 export class GameEntity extends BaseEntity {

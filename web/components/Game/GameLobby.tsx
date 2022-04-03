@@ -1,9 +1,17 @@
 import { Loading } from 'components/Loading';
 import { useEffect } from 'react';
-import { MyHand } from './components/Game/MyHand';
-import { OpponentHand } from './components/Game/OpponentHand';
-import { PlayFields } from './components/Game/PlayFields';
+import styled from 'styled-components';
+import { Game } from './components/Game/Game';
+import { GameSidebar } from './components/Game/GameSidebar';
 import { gameContext, useGame } from './utils/useGame/useGame';
+
+const GameLayout = styled.div`
+    display: flex;
+    height: 100%;
+    flex: 1;
+    /*! REMOVE THIS LATER */
+    overflow: hidden;
+`;
 
 export const GameLobby: React.FC = () => {
     const game = useGame();
@@ -16,22 +24,10 @@ export const GameLobby: React.FC = () => {
 
     return (
         <gameContext.Provider value={game}>
-            <div style={{ height: '100%' }}>
-                <div
-                    className="flex"
-                    style={{
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        height: '100%',
-                        flex: 1,
-                    }}
-                >
-                    <OpponentHand />
-                    <PlayFields />
-                    <MyHand />
-                </div>
-            </div>
+            <GameLayout>
+                <GameSidebar />
+                <Game />
+            </GameLayout>
         </gameContext.Provider>
     );
 };

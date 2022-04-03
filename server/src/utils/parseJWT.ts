@@ -15,7 +15,6 @@ export const parseJWT = (
     const payload = jwt.verify(token, process.env.JWT_SECRET as string, {
         ignoreExpiration: true,
     });
-    console.log(payload);
 
     return payload as any;
 };

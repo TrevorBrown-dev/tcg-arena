@@ -1,7 +1,7 @@
 import { Game } from '../game/Game';
 import { GameLogs } from '../game/GameLogs';
 
-const Verbs = ['DRAW', 'DISCARD', 'SHUFFLE', 'DAMAGE'];
+const Verbs = ['DRAW', 'ATTACK'];
 const Keywords = ['SELF', 'OTHER', 'ALL'];
 type Token = {
     type: string;
@@ -12,8 +12,10 @@ class _Interpreter {
     constructor() {}
 
     tokenize(code: string): Token[] {
+        console.log(code);
         const statements = code.trim().split(';');
         const tokens = [];
+
         for (const statement of statements) {
             const words = statement.split(' ');
 
@@ -31,6 +33,9 @@ class _Interpreter {
             if (token.type) {
                 tokens.push(token);
             }
+        }
+        if (tokens.length === 0) {
+            throw new Error('No actions found');
         }
         return tokens;
     }
@@ -71,10 +76,13 @@ class _Interpreter {
                     );
 
                     break;
-                case 'DISCARD':
+                case 'ATTACK':
+                    const [dmg] = token.values;
+                    const dmgAmount = parseInt(dmg);
+                    otherPlayer.damage(dmgAmount);
                     break;
                 default:
-                    break;
+                    throw new Error('This is not a valid verb');
             }
         }
     }

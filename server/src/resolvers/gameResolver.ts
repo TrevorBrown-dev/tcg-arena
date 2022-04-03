@@ -47,21 +47,11 @@ class GameResolver {
             );
 
         //Remove the card from the hand
+        game.executeAction(player.id, card.code);
         player.playCard(card);
         //Run interpreter
-        // game.executeAction(player.id, card.code);
         //Publish changes
-        console.log('PUBLISHING');
-        await pubsub.publish(`watchPublicGame_${game.id}`, {
-            publicGame: { ...game },
-        });
-        console.log('publishing private game');
-
-        await pubsub.publish(`watchPrivateGame_${game.id}`, {
-            privateGame: { ...game },
-        });
-
-        // await Game.publishGame(game);
+        await Game.publishGame(game);
         return true;
     }
 
@@ -116,7 +106,6 @@ class GameResolver {
         @Root('privateGame') privateGame: Game,
         @Ctx() { accountId }: any
     ) {
-        console.log('OTHER STUFF', accountId);
         if (!accountId) throw new Error('No authorization cookie found');
         if (!privateGame) throw new Error(`Game not found with id: ${gameId}`);
         if (!privateGame.players.find((p) => p.account.id === accountId)) {
@@ -126,7 +115,6 @@ class GameResolver {
         return {
             ...privateGame,
             players: privateGame.players.filter((p) => {
-                console.log('hmmm', p.account.id);
                 return p.account.id === accountId;
             }),
         };
