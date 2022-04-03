@@ -8,6 +8,7 @@ const StyledGame = styled.main`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    overflow: auto;
     background-color: var(--color-light);
     color: var(--color-dark);
 `;

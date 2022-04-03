@@ -28,32 +28,24 @@ class CardLibraryResolver {
     //Might need to be a subscription
     @Subscription(() => [CardRecord], {
         topics: ({ args, context }) => {
-            const cookie = context.extra.request?.headers?.cookie;
-            const account = parseJWT(cookie);
-            if (!account || !account?.id) {
-                console.log(
-                    `No account found with cookie ${cookie} and payload response:`,
-                    account
-                );
-            }
-
+            const { accountId } = context;
             setTimeout(async () => {
                 const library = await CardLibrary.findOne({
                     where: {
-                        account,
+                        account: { id: accountId },
                     },
                     relations: ['account', 'cards'],
                 });
                 if (!library)
                     throw new Error(
-                        `CardLibrary not found with account id: ${account.id}`
+                        `CardLibrary not found with account id: ${accountId}`
                     );
-                pubsub.publish(`updateCardLibrary_${account.id}`, {
+                pubsub.publish(`updateCardLibrary_${accountId}`, {
                     records: library.cards || [],
                 });
             }, 1);
 
-            return `updateCardLibrary_${account.id}`;
+            return `updateCardLibrary_${accountId}`;
         },
     })
     async myCardLibrary(

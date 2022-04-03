@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid';
 import { Account } from '../entities/Account';
 import { DeckTemplate } from '../entities/DeckTemplate';
 import { Field, ObjectType } from 'type-graphql';
-import { Player } from './Player';
+import { Player } from './Player/Player';
 import { pubsub } from '..';
 import { GameLogs } from './GameLogs';
 import { Interpreter } from '../interpreter/Interpreter';
@@ -44,8 +44,12 @@ export class Game {
         return this.players.find((p) => p.id === playerId);
     }
 
-    executeAction(playerId: string, action: string) {
-        Interpreter.interpret(action, this, playerId);
+    async executeAction(playerId: string, action: string, cardId?: string) {
+        if (cardId) {
+            await Interpreter.interpret(action, this, playerId, cardId);
+        } else {
+            await Interpreter.interpret(action, this, playerId);
+        }
     }
 
     constructor(player1: PlayerInput, player2: PlayerInput) {
@@ -57,10 +61,8 @@ export class Game {
         const p2 = new Player(player2.deckTemplate, player2.account);
 
         this.players = [p1, p2];
-        p1.drawCards(3);
-        p2.drawCards(3);
-        // this.executeAction(p1.id, 'DRAW SELF 3;');
-        // this.executeAction(p2.id, 'DRAW SELF 3;');
+        this.executeAction(p1.id, 'DRAW SELF 3;');
+        this.executeAction(p2.id, 'DRAW SELF 3;');
     }
 
     static create(player1: PlayerInput, player2: PlayerInput) {

@@ -6,6 +6,10 @@ fragment PublicGameParts on Game {
     players {
         id
         health
+        graveyard {
+            ...GraveyardParts
+        }
+
         account {
             id
             userName

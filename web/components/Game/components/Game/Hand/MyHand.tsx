@@ -8,21 +8,23 @@ export const MyHand: React.FC = () => {
     const [, playCard] = usePlayCardMutation();
     return (
         <StyledHand>
-            {game?.myPlayer?.hand?.cards &&
-                game.myPlayer.hand.cards.map((card, i) => (
-                    <Card
-                        key={i}
-                        onClick={() => {
-                            if (!game?.lobby.gameId) return;
-                            console.log(game.lobby.gameId);
-                            playCard({
-                                gameId: game.lobby.gameId,
-                                uuid: card.uuid,
-                            });
-                        }}
-                        cardRecord={{ card, isFoil: card.isFoil } as any}
-                    />
-                ))}
+            <div className="container">
+                {game?.myPlayer?.hand?.cards &&
+                    game.myPlayer.hand.cards.map((card, i) => (
+                        <Card
+                            key={i}
+                            onClick={() => {
+                                if (!game?.lobby.gameId) return;
+                                console.log(game.lobby.gameId);
+                                playCard({
+                                    gameId: game.lobby.gameId,
+                                    uuid: card.uuid,
+                                });
+                            }}
+                            cardRecord={{ card, isFoil: card.isFoil } as any}
+                        />
+                    ))}
+            </div>
         </StyledHand>
     );
 };

@@ -6,8 +6,11 @@ export class GameLogs {
     @Field(() => [String])
     logs: string[] = [];
 
-    push(log: string) {
+    push(log: string, game?: Game) {
         this.logs.push(log);
+        if (game) {
+            Game.publishGame(game);
+        }
     }
 
     logAction(game: Game, playerId: string, action: string) {

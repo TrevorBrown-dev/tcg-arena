@@ -1,0 +1,6 @@
+fragment GraveyardParts on Graveyard {
+    id
+    cards {
+        ...CardObjParts
+    }
+}

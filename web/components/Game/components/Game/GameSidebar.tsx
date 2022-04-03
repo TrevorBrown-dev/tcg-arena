@@ -29,6 +29,13 @@ const StyledGameSidebar = styled.aside`
 
     .my-player {
         justify-content: space-between;
+
+        .logs {
+            display: flex;
+            flex-direction: column;
+            height: 15em;
+            overflow-y: auto;
+        }
     }
     hr {
         width: 100%;

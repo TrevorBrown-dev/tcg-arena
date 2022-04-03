@@ -1,7 +1,9 @@
 import { Game } from '../game/Game';
 import { GameLogs } from '../game/GameLogs';
+import { CardObj } from '../game/Player/Card';
+import { sleep } from '../utils/sleep';
 
-const Verbs = ['DRAW', 'ATTACK'];
+const Verbs = ['DRAW', 'ATTACK', 'DESTROY'];
 const Keywords = ['SELF', 'OTHER', 'ALL'];
 type Token = {
     type: string;
@@ -40,7 +42,12 @@ class _Interpreter {
         return tokens;
     }
 
-    interpret(code: string, game: Game, playerId: string) {
+    async interpret(
+        code: string,
+        game: Game,
+        playerId: string,
+        cardId?: string
+    ) {
         const tokens = this.tokenize(code);
         const actingPlayer = game.players.find((p) => p.id === playerId);
         const otherPlayer = game.players.find((p) => p.id !== playerId);
@@ -72,7 +79,8 @@ class _Interpreter {
                         `${playerWhoDrew} drew ${amount} ${GameLogs.pluralize(
                             amount,
                             'card'
-                        )}`
+                        )}`,
+                        game
                     );
 
                     break;
@@ -81,9 +89,23 @@ class _Interpreter {
                     const dmgAmount = parseInt(dmg);
                     otherPlayer.damage(dmgAmount);
                     break;
+                case 'DESTROY':
+                    console.log(cardId);
+                    if (!cardId) {
+                        throw new Error('No card id found');
+                    }
+                    actingPlayer.playField.transferCards(
+                        [cardId],
+                        actingPlayer.graveyard
+                    );
+                    game.logs.push(`Card ${cardId} was destroyed`, game);
+                    break;
                 default:
                     throw new Error('This is not a valid verb');
             }
+
+            await Game.publishGame(game);
+            await sleep(1000);
         }
     }
 }

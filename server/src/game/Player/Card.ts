@@ -1,6 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import { nanoid } from 'nanoid';
-import { CardInfo } from '../utils/types/CardTypes';
+import { CardInfo } from '../../utils/types/CardTypes';
 
 @ObjectType()
 export class CardObj implements CardInfo {

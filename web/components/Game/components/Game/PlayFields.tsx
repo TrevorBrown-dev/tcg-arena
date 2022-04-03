@@ -11,6 +11,7 @@ const StyledPlayFields = styled.div`
 `;
 
 const StyledPlayField = styled.div`
+    padding: 0 5em;
     display: flex;
     gap: 0.5em;
 `;

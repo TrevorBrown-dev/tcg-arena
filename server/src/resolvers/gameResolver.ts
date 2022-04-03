@@ -7,13 +7,10 @@ import {
     Root,
     Subscription,
 } from 'type-graphql';
-import { pubsub } from '..';
 import { GameEntity } from '../entities/GameEntity';
 import { Game } from '../game/Game';
-import { Hand } from '../game/Hand';
 import { MyContext, SubscriptionIterator } from '../types';
 import { getAccountIdFromCookie } from '../utils/auth/getAccountFromCookie';
-import { parseJWT } from '../utils/parseJWT';
 
 @Resolver()
 class GameResolver {
@@ -28,11 +25,9 @@ class GameResolver {
     async playCard(
         @Arg('gameId') gameId: string,
         @Arg('uuid') uuid: string,
-        @Ctx() { req: { req } }: MyContext
+        @Ctx() { accountId }: MyContext
     ) {
         //Validation Step
-        const authorization = req.headers.cookie;
-        const accountId = getAccountIdFromCookie(authorization);
         if (!accountId) throw new Error('No authorization cookie found');
 
         const game = Game.get(gameId);
@@ -46,10 +41,11 @@ class GameResolver {
                 `Card not found with uuid: ${uuid} in player's hand`
             );
 
-        //Remove the card from the hand
-        game.executeAction(player.id, card.code);
-        player.playCard(card);
         //Run interpreter
+        player.playCard(card);
+        await Game.publishGame(game);
+        await game.executeAction(player.id, card.code, card.uuid);
+        //Remove the card from the hand
         //Publish changes
         await Game.publishGame(game);
         return true;
@@ -79,11 +75,10 @@ class GameResolver {
     @Query(() => Game)
     myInitialPrivateGame(
         @Arg('gameId') gameId: string,
-        @Ctx() { req: { req } }: MyContext
+        @Ctx() { accountId }: MyContext
     ) {
         const privateGame = Game.get(gameId);
         if (!privateGame) throw new Error(`Game not found with id: ${gameId}`);
-        const accountId = getAccountIdFromCookie(req.headers.cookie);
         if (!accountId) throw new Error('No authorization cookie found');
         if (!privateGame.players.find((p) => p.account.id === accountId)) {
             throw new Error(`You are not a player in game with id: ${gameId}`);

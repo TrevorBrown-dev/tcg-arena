@@ -1,4 +1,3 @@
-import { CardObj } from '../game/Card';
 import { Field, ObjectType } from 'type-graphql';
 import {
     BaseEntity,
@@ -9,6 +8,7 @@ import {
     JoinColumn,
     ManyToOne,
 } from 'typeorm';
+import { CardObj } from '../game/Player/Card';
 import { Card } from './Card';
 
 @ObjectType()

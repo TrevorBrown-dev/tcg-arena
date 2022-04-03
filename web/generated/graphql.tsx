@@ -137,6 +137,12 @@ export type GameLogs = {
   logs: Array<Scalars['String']>;
 };
 
+export type Graveyard = {
+  __typename?: 'Graveyard';
+  cards?: Maybe<Array<CardObj>>;
+  id: Scalars['String'];
+};
+
 export type Hand = {
   __typename?: 'Hand';
   cards?: Maybe<Array<CardObj>>;
@@ -301,6 +307,7 @@ export type Player = {
   __typename?: 'Player';
   account: Account;
   deck?: Maybe<Deck>;
+  graveyard: Graveyard;
   hand?: Maybe<Hand>;
   health?: Maybe<Scalars['Float']>;
   id: Scalars['String'];
@@ -476,6 +483,8 @@ export type CardObjPartsFragment = { __typename?: 'CardObj', id: number, uuid: s
 
 export type DeckPartsFragment = { __typename?: 'Deck', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null };
 
+export type GraveyardPartsFragment = { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null };
+
 export type HandPartsFragment = { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null };
 
 export type PlayFieldPartsFragment = { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null };
@@ -484,7 +493,7 @@ export type PlayerPartsFragment = { __typename?: 'Player', id: string, hand?: { 
 
 export type PrivateGamePartsFragment = { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', id: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null }> };
 
-export type PublicGamePartsFragment = { __typename?: 'Game', id: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', id: string, health?: number | null, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> };
+export type PublicGamePartsFragment = { __typename?: 'Game', id: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', id: string, health?: number | null, graveyard: { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null }, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> };
 
 export type LoginMutationVariables = Exact<{
   password: Scalars['String'];
@@ -655,7 +664,7 @@ export type InitialPublicGameQueryVariables = Exact<{
 }>;
 
 
-export type InitialPublicGameQuery = { __typename?: 'Query', initialPublicGame: { __typename?: 'Game', id: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', id: string, health?: number | null, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> } };
+export type InitialPublicGameQuery = { __typename?: 'Query', initialPublicGame: { __typename?: 'Game', id: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', id: string, health?: number | null, graveyard: { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null }, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> } };
 
 export type MyInitialPrivateGameQueryVariables = Exact<{
   gameId: Scalars['String'];
@@ -706,7 +715,7 @@ export type WatchPublicGameSubscriptionVariables = Exact<{
 }>;
 
 
-export type WatchPublicGameSubscription = { __typename?: 'Subscription', watchPublicGame: { __typename?: 'Game', id: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', id: string, health?: number | null, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> } };
+export type WatchPublicGameSubscription = { __typename?: 'Subscription', watchPublicGame: { __typename?: 'Game', id: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', id: string, health?: number | null, graveyard: { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null }, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> } };
 
 export type WatchLobbySubscriptionVariables = Exact<{
   watchLobbyId: Scalars['String'];
@@ -864,6 +873,14 @@ export const PrivateGamePartsFragmentDoc = gql`
   }
 }
     ${PlayerPartsFragmentDoc}`;
+export const GraveyardPartsFragmentDoc = gql`
+    fragment GraveyardParts on Graveyard {
+  id
+  cards {
+    ...CardObjParts
+  }
+}
+    ${CardObjPartsFragmentDoc}`;
 export const PlayFieldPartsFragmentDoc = gql`
     fragment PlayFieldParts on PlayField {
   id
@@ -881,6 +898,9 @@ export const PublicGamePartsFragmentDoc = gql`
   players {
     id
     health
+    graveyard {
+      ...GraveyardParts
+    }
     account {
       id
       userName
@@ -898,7 +918,8 @@ export const PublicGamePartsFragmentDoc = gql`
     }
   }
 }
-    ${PlayFieldPartsFragmentDoc}`;
+    ${GraveyardPartsFragmentDoc}
+${PlayFieldPartsFragmentDoc}`;
 export const LoginDocument = gql`
     mutation Login($password: String!, $email: String!) {
   login(password: $password, email: $email) {
