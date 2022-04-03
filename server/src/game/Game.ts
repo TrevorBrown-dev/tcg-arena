@@ -6,11 +6,12 @@ import { Player } from './Player';
 import { pubsub } from '..';
 import { GameLogs } from './GameLogs';
 import { Interpreter } from '../interpreter/Interpreter';
+import { AccountInfo } from './PreGameLobby';
 
 //create a class decorator that will inject a property called id
 type PlayerInput = {
     deckTemplate: DeckTemplate;
-    account: Account;
+    account: AccountInfo;
 };
 @ObjectType()
 export class Game {
@@ -49,6 +50,11 @@ export class Game {
     }
 
     constructor(player1: PlayerInput, player2: PlayerInput) {
+        if (!player1 || !player2) {
+            return;
+        }
+        console.log(player1, player2);
+        console.log('RUNNING GAME CONSTRUCTOR FOR SOME REASON');
         const p1 = new Player(player1.deckTemplate, player1.account);
         const p2 = new Player(player2.deckTemplate, player2.account);
 
@@ -68,13 +74,13 @@ export class Game {
     static async publishGame(game: Game) {
         console.log('publishing public game');
         await pubsub.publish(`watchPublicGame_${game.id}`, {
-            publicGame: { ...game },
+            publicGame: game,
         });
         console.log('publishing private game');
 
         try {
             await pubsub.publish(`watchPrivateGame_${game.id}`, {
-                privateGame: { ...game },
+                privateGame: game,
             });
         } catch (e) {
             console.log(e);

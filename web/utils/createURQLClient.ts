@@ -30,7 +30,7 @@ const isServer = typeof window === 'undefined';
 
 export const ssrCache = ssrExchange({
     isClient: !isServer,
-    initialState: !isServer ? (window as any).__URQL_DATA__ : undefined,
+    // initialState: !isServer ? (window as any).__URQL_DATA__ : undefined,
 });
 
 export const urqlConfig: ClientOptions = {

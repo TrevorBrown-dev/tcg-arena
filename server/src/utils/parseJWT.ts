@@ -12,6 +12,10 @@ export const parseJWT = (
         throw new Error('Not authenticated');
     }
     const token = authorization.split('=')[1];
-    const payload = jwt.verify(token, process.env.JWT_SECRET as string) as any;
-    return payload;
+    const payload = jwt.verify(token, process.env.JWT_SECRET as string, {
+        ignoreExpiration: true,
+    });
+    console.log(payload);
+
+    return payload as any;
 };

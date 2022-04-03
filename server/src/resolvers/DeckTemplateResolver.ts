@@ -27,19 +27,19 @@ class DeckTemplateResolver {
 
     @Subscription(() => [DeckTemplate], {
         topics: ({ args, context }) => {
-            const cookie = context.extra.request?.headers?.cookie;
-            const account = parseJWT(cookie);
-            if (!account || !account?.id) {
-                console.log(
-                    `No account found with cookie ${cookie} and payload response:`,
-                    account
-                );
+            const { accountId } = context;
+            if (!accountId) {
+                console.log(`No account fount in context at myDeckTemplates:`);
                 return 'ERROR';
             }
 
             setTimeout(async () => {
                 const cardLibrary = await CardLibrary.findOne({
-                    where: { account },
+                    where: {
+                        account: {
+                            id: accountId,
+                        },
+                    },
                     relations: [
                         'account',
                         'deckTemplates',
@@ -50,11 +50,11 @@ class DeckTemplateResolver {
                     console.log('No card library found');
                     return;
                 }
-                pubsub.publish(`deckTemplateCreated_${account.id}`, {
+                pubsub.publish(`deckTemplateCreated_${accountId}`, {
                     deckTemplates: cardLibrary.deckTemplates,
                 });
             }, 1);
-            return `deckTemplateCreated_${account.id}`;
+            return `deckTemplateCreated_${accountId}`;
         },
     })
     async myDeckTemplates(

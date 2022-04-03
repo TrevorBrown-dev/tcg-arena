@@ -6,9 +6,12 @@ import { CardObj } from './Card';
 import { Deck } from './Deck';
 import { PlayField } from './PlayField';
 import { Hand } from './Hand';
+import { AccountInfo } from './PreGameLobby';
 
 @ObjectType()
 export class Player {
+    static players = new Map<string, Player>();
+
     @Field(() => String)
     id: string = nanoid();
 
@@ -18,8 +21,8 @@ export class Player {
     @Field(() => Number, { nullable: true })
     health: number = 30;
 
-    @Field(() => Account)
-    account: Account;
+    @Field(() => AccountInfo)
+    account: AccountInfo;
 
     @Field(() => Hand, { nullable: true })
     hand: Hand;
@@ -40,11 +43,16 @@ export class Player {
         this.playField.playCard(card);
     }
 
-    constructor(deckTemplate: DeckTemplate, account: Account) {
+    constructor(deckTemplate: DeckTemplate, account: AccountInfo) {
         console.log('MY DECK TEMPLATE', deckTemplate);
         this.account = account;
         this.deck = Deck.create(deckTemplate);
 
         this.hand = new Hand();
+    }
+    static create(deckTemplate: DeckTemplate, account: AccountInfo) {
+        const player = new Player(deckTemplate, account);
+        Player.players.set(player.id, player);
+        return player;
     }
 }

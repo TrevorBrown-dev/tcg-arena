@@ -79,15 +79,13 @@ class EventOfferResolver {
 
     @Subscription(() => EventOffer, {
         topics: ({ context }) => {
-            const cookie = context.extra.request?.headers?.cookie;
-            const account = parseJWT(cookie);
-            if (!account || !account?.id) {
+            const { accountId } = context;
+            if (!accountId) {
                 console.log(
-                    `No account found with cookie ${cookie} and payload response:`,
-                    account
+                    `No accountId found in context for eventOfferInbox_${accountId}`
                 );
             }
-            return `eventOfferInbox_${account.id}`;
+            return `eventOfferInbox_${accountId}`;
         },
     })
     async eventOfferInbox(@Root('eventOffer') eventOffer: EventOffer) {

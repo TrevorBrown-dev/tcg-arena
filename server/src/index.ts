@@ -24,6 +24,7 @@ import { testGame } from './game/tester';
 import ormconfig from './ormconfig';
 import { MyContext } from './types';
 import { cleanDb } from './utils/db/cleanDb';
+import { parseJWT } from './utils/parseJWT';
 import { handleDisconnects } from './utils/ws/handleDisconnects';
 type WithKindName = { name: { kind: string; value: string } };
 const options = {
@@ -99,7 +100,28 @@ const main = async () => {
     const serverCleanup = useServer(
         {
             schema,
-            context: (req) => req,
+            context: (context, msg, args) => {
+                const cookie = context.extra.request?.headers?.cookie;
+                const defaultContext = {
+                    context,
+                    msg,
+                    args,
+                };
+                if (!cookie) {
+                    return defaultContext;
+                }
+                const account = parseJWT(cookie);
+                if (!account || !account?.id) {
+                    return defaultContext;
+                }
+
+                return {
+                    context,
+                    msg,
+                    args,
+                    accountId: account.id,
+                };
+            },
         },
         wsServer
     );
@@ -107,7 +129,20 @@ const main = async () => {
     //Setup for apolloServer with grahpql schema and websockets
     const apolloServer = new ApolloServer({
         schema,
-        context: (req): MyContext => ({ req }),
+        context: (req): MyContext => {
+            const cookie = req.req.headers.cookie;
+            if (cookie) {
+                const accountInfo = parseJWT(cookie);
+                if (accountInfo && parseInt(accountInfo.id)) {
+                    return {
+                        req,
+                        accountId: parseInt(accountInfo.id),
+                        cookie,
+                    };
+                }
+            }
+            return { req, cookie };
+        },
 
         plugins: [
             ApolloServerPluginDrainHttpServer({ httpServer }),

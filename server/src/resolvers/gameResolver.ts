@@ -51,13 +51,14 @@ class GameResolver {
         //Run interpreter
         // game.executeAction(player.id, card.code);
         //Publish changes
+        console.log('PUBLISHING');
         await pubsub.publish(`watchPublicGame_${game.id}`, {
-            publicGame: game,
+            publicGame: { ...game },
         });
         console.log('publishing private game');
 
         await pubsub.publish(`watchPrivateGame_${game.id}`, {
-            privateGame: game,
+            privateGame: { ...game },
         });
 
         // await Game.publishGame(game);
@@ -97,10 +98,11 @@ class GameResolver {
         if (!privateGame.players.find((p) => p.account.id === accountId)) {
             throw new Error(`You are not a player in game with id: ${gameId}`);
         }
-        const myPlayer = privateGame.getPlayerByAccountId(accountId);
         return {
             ...privateGame,
-            players: [myPlayer],
+            players: privateGame.players.filter(
+                (p) => p.account.id === accountId
+            ),
         };
     }
 
@@ -109,24 +111,24 @@ class GameResolver {
             return `watchPrivateGame_${args.gameId}`;
         },
     })
-    watchMyPrivateGame(
+    async watchMyPrivateGame(
         @Arg('gameId') gameId: string,
-        @Ctx() { req: { req } }: MyContext,
-        @Root('privateGame') privateGame: Game
+        @Root('privateGame') privateGame: Game,
+        @Ctx() { accountId }: any
     ) {
-        if (!privateGame) throw new Error(`Game not found with id: ${gameId}`);
-        const accountId = getAccountIdFromCookie(req.headers.cookie);
-        console.log(accountId);
+        console.log('OTHER STUFF', accountId);
         if (!accountId) throw new Error('No authorization cookie found');
+        if (!privateGame) throw new Error(`Game not found with id: ${gameId}`);
         if (!privateGame.players.find((p) => p.account.id === accountId)) {
             console.log('Whoops');
             throw new Error(`You are not a player in game with id: ${gameId}`);
         }
-        console.log('WE FOUND', privateGame);
-        const myPlayer = privateGame.getPlayerByAccountId(accountId);
         return {
             ...privateGame,
-            players: [myPlayer],
+            players: privateGame.players.filter((p) => {
+                console.log('hmmm', p.account.id);
+                return p.account.id === accountId;
+            }),
         };
     }
 

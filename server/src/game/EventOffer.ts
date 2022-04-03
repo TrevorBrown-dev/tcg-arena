@@ -68,7 +68,7 @@ export class EventOffer {
 
     accept() {
         this.status = EventOfferStatus.ACCEPTED;
-        const preGameLobby = new PreGameLobby(this.issuer, this.recipient);
+        const preGameLobby = PreGameLobby.create(this.issuer, this.recipient);
         //! need to publish to both players when that is implemented
         //? Maybe not here though
         return preGameLobby;
