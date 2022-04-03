@@ -25,7 +25,7 @@ export const useMyPrivateGame = () => {
         if (initialPrivateGame.data) {
             setPrivateGame(initialPrivateGame.data.myInitialPrivateGame);
         }
-    }, [initialPrivateGame.data?.myInitialPrivateGame]);
+    }, [initialPrivateGame.fetching]);
 
     const [privateGameResponse] = useWatchMyPrivateGameSubscription({
         pause: !lobby.gameId,
@@ -36,9 +36,14 @@ export const useMyPrivateGame = () => {
 
     useEffect(() => {
         if (privateGameResponse.data) {
+            console.log('We got cards?', privateGameResponse);
             setPrivateGame(privateGameResponse.data.watchMyPrivateGame);
         }
     }, [privateGameResponse.data?.watchMyPrivateGame]);
+
+    useEffect(() => {
+        console.log('ERROR', privateGameResponse.error);
+    }, [privateGameResponse.error]);
 
     return privateGame;
 };

@@ -91,7 +91,9 @@ const main = async () => {
         server: httpServer,
         path: '/graphql',
     });
-
+    wsServer.on('error', (error) => {
+        console.log('WS ERROR: ', error);
+    });
     handleDisconnects(wsServer);
 
     const serverCleanup = useServer(

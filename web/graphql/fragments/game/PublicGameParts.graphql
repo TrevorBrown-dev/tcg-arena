@@ -1,5 +1,8 @@
 fragment PublicGameParts on Game {
     id
+    logs {
+        logs
+    }
     players {
         id
         playField {

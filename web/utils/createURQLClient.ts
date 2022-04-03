@@ -32,7 +32,6 @@ export const ssrCache = ssrExchange({
     isClient: !isServer,
     initialState: !isServer ? (window as any).__URQL_DATA__ : undefined,
 });
-// const cache = cacheExchange();
 
 export const urqlConfig: ClientOptions = {
     url: `/graphql`,
@@ -46,6 +45,7 @@ export const urqlConfig: ClientOptions = {
     },
     exchanges: [
         dedupExchange,
+        cacheExchange({}),
         ssrCache,
         fetchExchange,
         subscriptionExchange({

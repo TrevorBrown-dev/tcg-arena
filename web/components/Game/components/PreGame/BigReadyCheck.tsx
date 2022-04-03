@@ -28,7 +28,7 @@ export const BigReadyCheck: React.FC<Props> = ({ player }) => {
     const { myPlayer } = useGetPlayers();
     return (
         <StyledBigReadyCheck
-            ready={player.ready}
+            ready={player?.ready}
             onClick={() => {
                 if (myPlayer?.id === player.id) {
                     readyUp({ preGameLobbyId: lobby.id });

@@ -2,8 +2,9 @@ import {
     PreGameLobbyPartsFragment,
     PrivateGamePartsFragment,
     PublicGamePartsFragment,
+    usePlayCardMutation,
 } from '@graphql-gen';
-import { useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useLobbyContext } from '../lobbyContext';
 import { useMyPrivateGame } from './useMyPrivateGame';
 import { usePrivateGame } from './usePrivateGame';
@@ -32,23 +33,26 @@ export const useGame = () => {
     const privateGame = useMyPrivateGame();
     const publicGame = usePublicGame();
     const myPlayer = privateGame?.players[0];
-    const myPublicPlayer = publicGame?.players.find(
-        (player) => player.id === myPlayer?.id
-    );
+    // const myPublicPlayer = publicGame?.players.find(
+    //     (player) => player.id === myPlayer?.id
+    // );
+
     const otherPlayer = publicGame?.players.find((player) => {
         return player.id !== myPlayer?.id;
     });
-
     const state = {
         lobby,
         publicGame,
         privateGame,
-        myPlayer: {
-            ...myPublicPlayer,
-            ...myPlayer,
-        },
+        myPlayer,
         otherPlayer,
     };
 
     return state;
 };
+
+export const gameContext = createContext<ReturnType<typeof useGame> | null>(
+    null
+);
+
+export const useGameContext = () => useContext(gameContext)!;

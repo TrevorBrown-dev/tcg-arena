@@ -9,8 +9,8 @@ export class PreGamePlayer {
     @Field(() => String)
     id: string = nanoid();
 
-    @Field(() => DeckTemplate, { nullable: true })
-    deckTemplate: DeckTemplate | null = null;
+    @Field(() => DeckTemplate)
+    deckTemplate: DeckTemplate;
 
     @Field(() => Account)
     account: Account;
@@ -84,7 +84,7 @@ export class PreGameLobby {
 
     static startGame(preGameLobby: PreGameLobby) {
         if (!preGameLobby.ready) return;
-        if (!preGameLobby.players.every((player) => player.deckTemplate))
+        if (!preGameLobby.players.every((player) => !!player.deckTemplate))
             return;
         const game = Game.create(
             {

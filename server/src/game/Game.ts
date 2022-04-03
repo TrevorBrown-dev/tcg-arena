@@ -4,6 +4,8 @@ import { DeckTemplate } from '../entities/DeckTemplate';
 import { Field, ObjectType } from 'type-graphql';
 import { Player } from './Player';
 import { pubsub } from '..';
+import { GameLogs } from './GameLogs';
+import { Interpreter } from '../interpreter/Interpreter';
 
 //create a class decorator that will inject a property called id
 type PlayerInput = {
@@ -21,6 +23,9 @@ export class Game {
     static getAll() {
         return Array.from(Game.games.values());
     }
+    static remove(id: string) {
+        Game.games.delete(id);
+    }
 
     @Field(() => String)
     id: string = nanoid();
@@ -28,20 +33,19 @@ export class Game {
     @Field(() => [Player])
     players: Player[];
 
-    static remove(id: string) {
-        Game.games.delete(id);
+    @Field(() => GameLogs, { nullable: true })
+    logs: GameLogs = new GameLogs();
+
+    getPlayerByAccountId(accountId: number) {
+        return this.players.find((p) => p.account.id === accountId);
     }
 
-    get player1(): Player {
-        return this.players[0];
+    getPlayer(playerId: string) {
+        return this.players.find((p) => p.id === playerId);
     }
 
-    get player2(): Player {
-        return this.players[1];
-    }
-
-    getPlayer(playerId: number) {
-        return this.players.find((p) => p.account.id === playerId);
+    executeAction(playerId: string, action: string) {
+        Interpreter.interpret(action, this, playerId);
     }
 
     constructor(player1: PlayerInput, player2: PlayerInput) {
@@ -49,8 +53,10 @@ export class Game {
         const p2 = new Player(player2.deckTemplate, player2.account);
 
         this.players = [p1, p2];
-        this.player1.drawCards(3);
-        this.player2.drawCards(3);
+        p1.drawCards(3);
+        p2.drawCards(3);
+        // this.executeAction(p1.id, 'DRAW SELF 3;');
+        // this.executeAction(p2.id, 'DRAW SELF 3;');
     }
 
     static create(player1: PlayerInput, player2: PlayerInput) {
@@ -59,15 +65,20 @@ export class Game {
         return game;
     }
 
-    static publishGame(game: Game) {
-        pubsub.publish(`watchPublicGame_${game.id}`, {
-            publicGame: game,
+    static async publishGame(game: Game) {
+        console.log('publishing public game');
+        await pubsub.publish(`watchPublicGame_${game.id}`, {
+            publicGame: { ...game },
         });
-        pubsub.publish(`watchPrivateGame_${game.id}`, {
-            privateGame: game,
-        });
-        pubsub.publish(`watchPrivateGame_${game.id}`, {
-            privateGame: game,
-        });
+        console.log('publishing private game');
+
+        try {
+            await pubsub.publish(`watchPrivateGame_${game.id}`, {
+                privateGame: { ...game },
+            });
+        } catch (e) {
+            console.log(e);
+        }
+        console.log('private game published');
     }
 }

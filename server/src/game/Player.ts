@@ -27,9 +27,6 @@ export class Player {
     @Field(() => PlayField, { nullable: true })
     playField = new PlayField();
 
-    @Field(() => DeckTemplate, { nullable: true })
-    deckTemplate: DeckTemplate;
-
     drawCards(numCards: number = 1) {
         Hand.addCardsToHand(this.hand, this.deck.draw(numCards));
     }
@@ -44,9 +41,10 @@ export class Player {
     }
 
     constructor(deckTemplate: DeckTemplate, account: Account) {
-        this.deckTemplate = deckTemplate;
+        console.log('MY DECK TEMPLATE', deckTemplate);
         this.account = account;
-        this.deck = new Deck(deckTemplate);
+        this.deck = Deck.create(deckTemplate);
+
         this.hand = new Hand();
     }
 }

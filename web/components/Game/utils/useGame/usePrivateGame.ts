@@ -38,7 +38,7 @@ export const usePrivateGame = (accountId: number) => {
         if (privateGameResponse.data) {
             setPrivateGame(privateGameResponse.data.watchPrivateGame);
         }
-    }, [privateGameResponse.data?.watchPrivateGame]);
+    }, [privateGameResponse.data]);
 
     return privateGame;
 };

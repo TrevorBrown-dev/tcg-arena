@@ -1,6 +1,6 @@
 import { PlayFieldPartsFragment } from '@graphql-gen';
 import { Card } from 'components/Card/Card';
-import { useGame } from 'components/Game/utils/useGame/useGame';
+import { useGame, useGameContext } from 'components/Game/utils/useGame/useGame';
 import styled from 'styled-components';
 
 const StyledPlayFields = styled.div`
@@ -14,9 +14,11 @@ const StyledPlayField = styled.div`
     gap: 0.5em;
 `;
 
-const PlayField: React.FC<{ playField: PlayFieldPartsFragment }> = ({
-    playField,
-}) => {
+const PlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
+    const game = useGameContext();
+    const playField = game?.publicGame?.players?.find(
+        (player) => player.id === playerId
+    )?.playField;
     return (
         <StyledPlayField>
             {playField?.cards?.map((card, i) => {
@@ -29,11 +31,11 @@ const PlayField: React.FC<{ playField: PlayFieldPartsFragment }> = ({
 };
 
 export const PlayFields: React.FC = () => {
-    const game = useGame();
+    const game = useGameContext();
     return (
         <StyledPlayFields>
-            <PlayField playField={game?.otherPlayer?.playField!} />
-            <PlayField playField={game?.myPlayer?.playField!} />
+            <PlayField playerId={game?.otherPlayer?.id} />
+            <PlayField playerId={game?.myPlayer?.id} />
         </StyledPlayFields>
     );
 };

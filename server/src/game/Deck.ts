@@ -12,20 +12,20 @@ export class Deck implements WithCards {
     id: string = nanoid();
 
     @Field(() => [CardObj], { nullable: true })
-    cards: CardObj[];
-
-    @Field(() => DeckTemplate, { nullable: true })
-    template: DeckTemplate;
+    cards: CardObj[] = [];
 
     @Field(() => Number)
     get numCardsInDeck(): number {
         return this.cards.length;
     }
 
-    constructor(template: DeckTemplate) {
-        this.template = template;
-        this.cards = DeckTemplate.loadCardsFromTemplate(this.template);
-        this.cards = shuffleArray(this.cards);
+    constructor() {}
+
+    static create(template: DeckTemplate) {
+        const deck = new Deck();
+        deck.cards = DeckTemplate.loadCardsFromTemplate(template);
+        deck.cards = shuffleArray(deck.cards);
+        return deck;
     }
 
     static drawFromDeck(deck: Deck, hand: Hand, numCards: number = 1) {

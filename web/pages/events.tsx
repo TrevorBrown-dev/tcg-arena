@@ -25,7 +25,7 @@ export const Events: NextPage = () => {
                         onClick={() => {
                             createEvent({
                                 type: EventOfferType.Game,
-                                recipientId: 7,
+                                recipientId: 1,
                             });
                         }}
                     >

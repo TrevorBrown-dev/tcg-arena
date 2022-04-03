@@ -37,7 +37,7 @@ class GameResolver {
 
         const game = Game.get(gameId);
         if (!game) throw new Error(`Game not found with id: ${gameId}`);
-        const player = game.getPlayer(accountId);
+        const player = game.getPlayerByAccountId(accountId);
         if (!player)
             throw new Error(`You are not a player in game with id: ${gameId}`);
         const card = player.hand.findCard(uuid);
@@ -49,10 +49,18 @@ class GameResolver {
         //Remove the card from the hand
         player.playCard(card);
         //Run interpreter
-
+        // game.executeAction(player.id, card.code);
         //Publish changes
-        Game.publishGame(game);
+        await pubsub.publish(`watchPublicGame_${game.id}`, {
+            publicGame: game,
+        });
+        console.log('publishing private game');
 
+        await pubsub.publish(`watchPrivateGame_${game.id}`, {
+            privateGame: game,
+        });
+
+        // await Game.publishGame(game);
         return true;
     }
 
@@ -60,8 +68,7 @@ class GameResolver {
     initialPublicGame(@Arg('gameId') gameId: string) {
         const game = Game.get(gameId);
         if (!game) throw new Error(`Game not found with id: ${gameId}`);
-        console.log(game.players.map((p) => p.account.id));
-        return { ...game };
+        return game;
     }
 
     @Query(() => Game)
@@ -71,11 +78,10 @@ class GameResolver {
     ) {
         const privateGame = Game.get(gameId);
         if (!privateGame) throw new Error(`Game not found with id: ${gameId}`);
+        const myPlayer = privateGame.getPlayerByAccountId(accountId);
         return {
             ...privateGame,
-            players: privateGame.players.filter(
-                (p) => p.account.id === accountId
-            ),
+            players: [myPlayer],
         };
     }
 
@@ -91,11 +97,10 @@ class GameResolver {
         if (!privateGame.players.find((p) => p.account.id === accountId)) {
             throw new Error(`You are not a player in game with id: ${gameId}`);
         }
+        const myPlayer = privateGame.getPlayerByAccountId(accountId);
         return {
             ...privateGame,
-            players: privateGame.players.filter(
-                (p) => p.account.id === accountId
-            ),
+            players: [myPlayer],
         };
     }
 
@@ -111,15 +116,17 @@ class GameResolver {
     ) {
         if (!privateGame) throw new Error(`Game not found with id: ${gameId}`);
         const accountId = getAccountIdFromCookie(req.headers.cookie);
+        console.log(accountId);
         if (!accountId) throw new Error('No authorization cookie found');
         if (!privateGame.players.find((p) => p.account.id === accountId)) {
+            console.log('Whoops');
             throw new Error(`You are not a player in game with id: ${gameId}`);
         }
+        console.log('WE FOUND', privateGame);
+        const myPlayer = privateGame.getPlayerByAccountId(accountId);
         return {
             ...privateGame,
-            players: privateGame.players.filter(
-                (p) => p.account.id === accountId
-            ),
+            players: [myPlayer],
         };
     }
 

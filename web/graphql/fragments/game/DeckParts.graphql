@@ -3,7 +3,4 @@ fragment DeckParts on Deck {
     cards {
         ...CardObjParts
     }
-    template {
-        ...DeckTemplateParts
-    }
 }
