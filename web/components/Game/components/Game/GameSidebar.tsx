@@ -43,24 +43,12 @@ export const GameSidebar: React.FC = () => {
             <div className="other-player">
                 <div className="player-info">
                     <h1>{game.otherPlayer?.account.userName}</h1>
-                    <h2>
-                        <span className="material-icons-outlined">
-                            favorite
-                        </span>{' '}
-                        {game.otherPlayer?.health}
-                    </h2>
                 </div>
             </div>
             <hr />
             <div className="my-player">
                 <div className="player-info">
                     <h1>{game.myPlayer.account?.userName}</h1>
-                    <h2>
-                        <span className="material-icons-outlined">
-                            favorite
-                        </span>{' '}
-                        {game.myPlayer.health}
-                    </h2>
                 </div>
 
                 <Logs />

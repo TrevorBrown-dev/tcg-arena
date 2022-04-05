@@ -1,4 +1,5 @@
 import { Card } from 'components/Card/Card';
+import { PlayerHealth } from 'components/Game/utils/PlayerHealth';
 import { useGameContext } from 'components/Game/utils/useGame/useGame';
 import styled from 'styled-components';
 
@@ -23,6 +24,79 @@ const StyledPlayField = styled.div`
     }
 `;
 
+const StyledDivider = styled.div`
+    display: flex;
+    align-items: center;
+    max-height: 1px;
+    overflow: visible;
+    margin: 4em 0;
+    hr {
+        flex: 1;
+    }
+    .box {
+        min-width: 5em;
+        min-height: 5em;
+        max-width: 5em;
+        max-height: 5em;
+        border: 2px solid black;
+        transform: rotate(45deg);
+        background-color: var(--color-light);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 0 0.5em 0.1em rgba(0, 0, 0, 0.3);
+        .content {
+            flex: 1;
+            transform: rotate(-45deg) translateX(-1em);
+            text-align: center;
+
+            .top,
+            .bottom {
+                color: var(--color-warning);
+                width: calc(100% + 2em);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.2em;
+                --space: 0.2em;
+            }
+            .top {
+                margin-bottom: var(--space);
+            }
+            .bottom {
+                margin-top: var(--space);
+            }
+            hr {
+                max-height: 1px;
+                width: calc(100% + 2em);
+                border: 0.5px solid var(--color-dark);
+                overflow: visible;
+            }
+        }
+    }
+`;
+
+const Divider: React.FC = () => {
+    const game = useGameContext();
+    return (
+        <StyledDivider>
+            <hr />
+            <div className="box">
+                <div className="content">
+                    <div className="top">
+                        <PlayerHealth health={game?.otherPlayer?.health!} />
+                    </div>
+                    <hr />
+                    <div className="bottom">
+                        <PlayerHealth health={game?.myPlayer.health!} />
+                    </div>
+                </div>
+            </div>
+            <hr />
+        </StyledDivider>
+    );
+};
+
 const PlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
     const game = useGameContext();
     const playField = game?.publicGame?.players?.find(
@@ -45,7 +119,7 @@ export const PlayFields: React.FC = () => {
     return (
         <StyledPlayFields>
             <PlayField playerId={game?.otherPlayer?.id} />
-            <hr />
+            <Divider />
             <PlayField playerId={game?.myPlayer?.id} />
         </StyledPlayFields>
     );

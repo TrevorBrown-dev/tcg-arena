@@ -2,6 +2,7 @@ import styled from 'styled-components';
 
 export const StyledHand = styled.div`
     display: flex;
+    flex: 2;
     min-width: 0;
     width: 100%;
     .container {
