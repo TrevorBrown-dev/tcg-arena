@@ -1,3 +1,4 @@
+import { CardPreviewContextLayout } from 'components/Card/CardPreview';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import React from 'react';
@@ -27,7 +28,9 @@ function MyApp({ Component, pageProps, ...rest }: AppProps) {
             </Head>
             <Provider value={urqlClient}>
                 <GlobalStyle />
-                <Component {...pageProps} />
+                <CardPreviewContextLayout>
+                    <Component {...pageProps} />
+                </CardPreviewContextLayout>
             </Provider>
         </>
     );

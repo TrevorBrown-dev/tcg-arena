@@ -56,23 +56,25 @@ const DeckTemplateControls: React.FC = () => {
     );
 };
 
+const StyledDeckListItem = styled.div`
+    cursor: pointer;
+`;
+
 const DeckListItem: React.FC<{ name: string; id: number }> = ({ name, id }) => {
     const { setMode } = useModeContext();
     return (
-        <div
+        <StyledDeckListItem
             onClick={() => {
                 setMode({ mode: 'edit', targetDeckId: id });
             }}
         >
             {name}
-        </div>
+        </StyledDeckListItem>
     );
 };
 
 export const MyDecks: React.FC = () => {
     const [deckTemplates] = useMyDeckTemplatesSubscription();
-    const [, deleteDeckTemplate] = useDeleteDeckTemplateMutation();
-    console.log(deckTemplates);
     return (
         <DeckSidebar>
             <DeckTemplateControls />

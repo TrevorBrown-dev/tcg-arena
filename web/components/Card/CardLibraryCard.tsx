@@ -14,6 +14,7 @@ export const CardLibraryCard: React.FC<WithCardRecord> = ({ cardRecord }) => {
     return (
         <Card
             cardRecord={cardRecord}
+            displayAmount={true}
             onClick={() => {
                 if (mode.mode === 'edit' && mode.targetDeckId) {
                     addCard({

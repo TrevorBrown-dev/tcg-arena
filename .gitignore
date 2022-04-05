@@ -6,3 +6,4 @@ out.txt
 out.json
 .credentials
 .ssl
+compiler/.venv

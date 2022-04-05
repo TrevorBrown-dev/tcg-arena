@@ -4,7 +4,7 @@ import { CardObj } from '../game/Player/Card';
 import { sleep } from '../utils/sleep';
 
 const Verbs = ['DRAW', 'ATTACK', 'DESTROY'];
-const Keywords = ['SELF', 'OTHER', 'ALL'];
+const Targets = ['SELF', 'SELF_FIELD', 'OTHER', 'OTHER_FIELD', 'ALL', '$'];
 type Token = {
     type: string;
     values: string[];
@@ -51,6 +51,7 @@ class _Interpreter {
         const tokens = this.tokenize(code);
         const actingPlayer = game.players.find((p) => p.id === playerId);
         const otherPlayer = game.players.find((p) => p.id !== playerId);
+        let card: CardObj | undefined;
         if (!actingPlayer) {
             console.log('No player found');
             throw new Error('No player found');
@@ -59,7 +60,9 @@ class _Interpreter {
             console.log('No other player found');
             throw new Error('No other player found');
         }
-
+        if (cardId) {
+            card = actingPlayer.playField.getCards([cardId])[0];
+        }
         for (const token of tokens) {
             switch (token.type) {
                 case 'DRAW':
@@ -98,14 +101,14 @@ class _Interpreter {
                         [cardId],
                         actingPlayer.graveyard
                     );
-                    game.logs.push(`Card ${cardId} was destroyed`, game);
+                    game.logs.push(`${card?.name} was destroyed.`, game);
                     break;
                 default:
                     throw new Error('This is not a valid verb');
             }
 
-            await Game.publishGame(game);
             await sleep(1000);
+            await Game.publishGame(game);
         }
     }
 }

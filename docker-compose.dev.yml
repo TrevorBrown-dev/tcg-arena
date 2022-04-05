@@ -39,6 +39,15 @@ services:
             - redis
             - db
 
+    # compiler:
+    #     build:
+    #         context: ./compiler
+    #         dockerfile: Dockerfile
+    #     expose:
+    #         - '6969'
+    #     volumes:
+    #         - ./compiler/src:/usr/app/src
+
     web:
         build:
             context: ./web

@@ -1,3 +1,5 @@
+import { useCardPreviewContext } from 'components/Card/CardPreview';
+import { CardRecordPart, WithCardRecord } from 'components/Card/types';
 import styled from 'styled-components';
 import {
     useDeleteDeckTemplateMutation,
@@ -19,8 +21,72 @@ const EditDeckContainer = styled.div`
     .bottom-half {
         display: flex;
         justify-content: space-between;
+        margin-bottom: 2em;
+    }
+    .delete {
+        transition: all 0.2s ease-in-out;
+        color: var(--color-medium);
+        &:hover {
+            color: var(--color-warning);
+            cursor: pointer;
+        }
     }
 `;
+
+const StyledCardEntry = styled.div`
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    .left {
+        display: flex;
+        gap: 0.8ch;
+    }
+    strong {
+        display: block;
+        transition: all 0.1s ease-in-out;
+        cursor: zoom-in;
+        &:hover {
+            transform: scale(1.05);
+        }
+    }
+`;
+
+const CardEntry: React.FC<WithCardRecord> = ({ cardRecord }) => {
+    const { onMouseEnter, onMouseLeave } = useCardPreviewContext();
+    const [, removeCard] = useRemoveCardFromDeckTemplateMutation();
+    const { mode } = useModeContext();
+
+    return (
+        <StyledCardEntry>
+            <div className="left">
+                <strong
+                    onMouseEnter={() =>
+                        onMouseEnter(cardRecord as CardRecordPart)
+                    }
+                    onMouseLeave={onMouseLeave}
+                >
+                    {cardRecord.card.name}
+                </strong>
+                <span>{'-'}</span>
+                <span>{cardRecord.amount}</span>
+            </div>
+            <div className="right">
+                <span
+                    className="material-icons-outlined delete"
+                    onClick={() => {
+                        removeCard({
+                            cardId: cardRecord.card.id,
+                            id: mode.targetDeckId!,
+                            isFoil: cardRecord.isFoil,
+                        });
+                    }}
+                >
+                    delete
+                </span>
+            </div>
+        </StyledCardEntry>
+    );
+};
 
 export const EditDeck: React.FC = () => {
     const { mode, setMode } = useModeContext();
@@ -31,8 +97,6 @@ export const EditDeck: React.FC = () => {
         },
     });
     const [, deleteDeck] = useDeleteDeckTemplateMutation();
-
-    const [, removeCard] = useRemoveCardFromDeckTemplateMutation();
 
     const handleDeleteDeck = async () => {
         if (!mode.targetDeckId) return;
@@ -48,18 +112,10 @@ export const EditDeck: React.FC = () => {
                     <h1>{deck?.name}</h1>
                     <div className="cards">
                         {deck?.cards.map((card, i) => (
-                            <div
+                            <CardEntry
                                 key={i}
-                                onClick={() => {
-                                    removeCard({
-                                        cardId: card.card.id,
-                                        id: deck.id,
-                                        isFoil: card.isFoil,
-                                    });
-                                }}
-                            >
-                                {card.card.name} - {card.amount}
-                            </div>
+                                cardRecord={card as CardRecordPart}
+                            />
                         ))}
                     </div>
                 </div>
@@ -74,7 +130,7 @@ export const EditDeck: React.FC = () => {
                         Back
                     </Button>
                     <Button className="warning" onClick={handleDeleteDeck}>
-                        Delete
+                        Delete Deck
                     </Button>
                 </div>
             </EditDeckContainer>

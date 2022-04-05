@@ -1,5 +1,6 @@
 import { useGameContext } from 'components/Game/utils/useGame/useGame';
 import styled from 'styled-components';
+import { Logs } from './Logs';
 
 const StyledGameSidebar = styled.aside`
     display: flex;
@@ -29,13 +30,6 @@ const StyledGameSidebar = styled.aside`
 
     .my-player {
         justify-content: space-between;
-
-        .logs {
-            display: flex;
-            flex-direction: column;
-            height: 15em;
-            overflow-y: auto;
-        }
     }
     hr {
         width: 100%;
@@ -69,11 +63,7 @@ export const GameSidebar: React.FC = () => {
                     </h2>
                 </div>
 
-                <div className="logs">
-                    {game.publicGame?.logs?.logs.map((log, i) => {
-                        return <div>{log}</div>;
-                    })}
-                </div>
+                <Logs />
             </div>
         </StyledGameSidebar>
     );

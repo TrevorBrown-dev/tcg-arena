@@ -1,5 +1,6 @@
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
+import axios from 'axios';
 import cors from 'cors';
 import express from 'express';
 import jwt from 'express-jwt';
@@ -23,6 +24,7 @@ import { Lobby } from './entities/Lobby';
 import { testGame } from './game/tester';
 import ormconfig from './ormconfig';
 import { MyContext } from './types';
+import { compiler } from './utils/axios';
 import { cleanDb } from './utils/db/cleanDb';
 import { parseJWT } from './utils/parseJWT';
 import { handleDisconnects } from './utils/ws/handleDisconnects';

@@ -1,6 +1,5 @@
-import { PlayFieldPartsFragment } from '@graphql-gen';
 import { Card } from 'components/Card/Card';
-import { useGame, useGameContext } from 'components/Game/utils/useGame/useGame';
+import { useGameContext } from 'components/Game/utils/useGame/useGame';
 import styled from 'styled-components';
 
 const StyledPlayFields = styled.div`
@@ -14,6 +13,14 @@ const StyledPlayField = styled.div`
     padding: 0 5em;
     display: flex;
     gap: 0.5em;
+    .spacer {
+        font-size: 0.8em;
+        height: 20em;
+        ::before {
+            content: '';
+            display: block;
+        }
+    }
 `;
 
 const PlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
@@ -23,6 +30,7 @@ const PlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
     )?.playField;
     return (
         <StyledPlayField>
+            <div className="spacer"></div>
             {playField?.cards?.map((card, i) => {
                 return (
                     <Card key={i} cardRecord={{ card, isFoil: true } as any} />
