@@ -66,12 +66,13 @@ export const CardLayout = styled(SharedStyles)<{ isFoil?: boolean }>`
     }
 `;
 
-export const StyledBlankCard = styled(SharedStyles)`
+export const StyledBlankCard = styled(SharedStyles)<{ flipped?: boolean }>`
     background-color: var(--color-dark);
     color: var(--color-light);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    ${({ flipped }) => (flipped ? 'transform: rotateY(180deg)' : '')};
     padding: 1em 1.5em;
     svg {
         height: 3.5em;
@@ -109,9 +110,9 @@ export const StyledBlankCard = styled(SharedStyles)`
     }
 `;
 
-export const BlankCard: React.FC = () => {
+export const BlankCard: React.FC<{ flipped?: boolean }> = ({ flipped }) => {
     return (
-        <StyledBlankCard>
+        <StyledBlankCard flipped={flipped}>
             <div className="top">
                 <Sword className="sword" />
                 <Cup className="cup" />

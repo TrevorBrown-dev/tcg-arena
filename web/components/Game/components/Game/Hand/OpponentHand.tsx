@@ -12,7 +12,7 @@ export const OpponentHand: React.FC = () => {
                     {new Array(game?.otherPlayer?.hand?.numCardsInHand || 0)
                         .fill(0)
                         .map((_, i) => {
-                            return <BlankCard key={i} />;
+                            return <BlankCard key={i} flipped={true} />;
                         })}
                 </div>
             </StyledHand>
