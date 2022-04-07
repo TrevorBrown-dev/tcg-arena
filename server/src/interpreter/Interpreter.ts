@@ -11,7 +11,7 @@ type Token = {
 };
 
 class _Interpreter {
-    constructor() {}
+    constructor(private speed: number) {}
 
     tokenize(code: string): Token[] {
         console.log(code);
@@ -49,8 +49,8 @@ class _Interpreter {
         cardId?: string
     ) {
         const tokens = this.tokenize(code);
-        const actingPlayer = game.players.find((p) => p.id === playerId);
-        const otherPlayer = game.players.find((p) => p.id !== playerId);
+        const { actingPlayer, otherPlayer } =
+            game.getActingAndOtherPlayer(playerId);
         let card: CardObj | undefined;
         if (!actingPlayer) {
             console.log('No player found');
@@ -79,9 +79,15 @@ class _Interpreter {
 
                     break;
                 case 'ATTACK':
-                    const [dmg] = token.values;
+                    const [attackTarget, dmg] = token.values;
                     const dmgAmount = parseInt(dmg);
-                    otherPlayer.damage(dmgAmount);
+                    const damageTarget = game.targets.find(
+                        (t) => t.uuid === attackTarget
+                    );
+                    if (!damageTarget) {
+                        throw new Error('Invalid target');
+                    }
+                    damageTarget.damage(dmgAmount);
                     break;
                 case 'DESTROY':
                     console.log(cardId);
@@ -97,10 +103,10 @@ class _Interpreter {
                     throw new Error('This is not a valid verb');
             }
 
-            await sleep(1000);
+            await sleep(this.speed);
             await Game.publishGame(game);
         }
     }
 }
 
-export const Interpreter = new _Interpreter();
+export const Interpreter = new _Interpreter(500);

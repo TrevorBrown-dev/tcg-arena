@@ -1,5 +1,5 @@
 fragment PlayerParts on Player {
-    id
+    uuid
     hand {
         ...HandParts
     }

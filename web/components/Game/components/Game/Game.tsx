@@ -1,3 +1,9 @@
+import {
+    targetContext,
+    TargetState,
+    TargetStateLayout,
+} from 'components/Game/utils/Targeting';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { MyHand } from './Hand/MyHand';
 import { OpponentHand } from './Hand/OpponentHand';
@@ -14,10 +20,12 @@ const StyledGame = styled.main`
 `;
 export const Game: React.FC = () => {
     return (
-        <StyledGame>
-            <OpponentHand />
-            <PlayFields />
-            <MyHand />
-        </StyledGame>
+        <TargetStateLayout>
+            <StyledGame>
+                <OpponentHand />
+                <PlayFields />
+                <MyHand />
+            </StyledGame>
+        </TargetStateLayout>
     );
 };

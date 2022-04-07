@@ -1,6 +1,7 @@
 import { Player, usePlayCardMutation } from '@graphql-gen';
 import { Card } from 'components/Card/Card';
 import { BlankCard } from 'components/Card/CardLayout';
+import { useTargetContext } from 'components/Game/utils/Targeting';
 import { useGameContext } from 'components/Game/utils/useGame/useGame';
 import styled from 'styled-components';
 import { StyledHand } from './StyledHand';
@@ -69,6 +70,7 @@ export const DeckDiscard: React.FC<{ player: Player; flipped: boolean }> = ({
 export const MyHand: React.FC = () => {
     const game = useGameContext();
     const [, playCard] = usePlayCardMutation();
+    const { targetState, setTargetState } = useTargetContext();
     return (
         <HandContainer>
             <StyledHand>
@@ -81,9 +83,10 @@ export const MyHand: React.FC = () => {
                                 onClick={() => {
                                     if (!game?.lobby.gameId) return;
                                     console.log(game.lobby.gameId);
-                                    playCard({
-                                        gameId: game.lobby.gameId,
-                                        uuid: card.uuid,
+                                    setTargetState({
+                                        enabled: true,
+                                        card: card.uuid,
+                                        target: null,
                                     });
                                 }}
                                 cardRecord={

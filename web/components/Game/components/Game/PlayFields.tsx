@@ -84,11 +84,17 @@ const Divider: React.FC = () => {
             <div className="box">
                 <div className="content">
                     <div className="top">
-                        <PlayerHealth health={game?.otherPlayer?.health!} />
+                        <PlayerHealth
+                            health={game?.otherPlayer?.health!}
+                            playerId={game?.otherPlayer?.uuid!}
+                        />
                     </div>
                     <hr />
                     <div className="bottom">
-                        <PlayerHealth health={game?.myPlayer.health!} />
+                        <PlayerHealth
+                            health={game?.myPlayer.health!}
+                            playerId={game?.myPlayer.uuid!}
+                        />
                     </div>
                 </div>
             </div>
@@ -100,7 +106,7 @@ const Divider: React.FC = () => {
 const PlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
     const game = useGameContext();
     const playField = game?.publicGame?.players?.find(
-        (player) => player.id === playerId
+        (player) => player.uuid === playerId
     )?.playField;
     return (
         <StyledPlayField>
@@ -118,9 +124,9 @@ export const PlayFields: React.FC = () => {
     const game = useGameContext();
     return (
         <StyledPlayFields>
-            <PlayField playerId={game?.otherPlayer?.id} />
+            <PlayField playerId={game?.otherPlayer?.uuid} />
             <Divider />
-            <PlayField playerId={game?.myPlayer?.id} />
+            <PlayField playerId={game?.myPlayer?.uuid} />
         </StyledPlayFields>
     );
 };

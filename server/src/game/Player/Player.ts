@@ -8,9 +8,10 @@ import { Hand } from './Hand';
 import { CardObj } from './Card';
 import { Interpreter } from '../../interpreter/Interpreter';
 import { Graveyard } from './Graveyard';
+import { Target } from '../utils/Target';
 
 @ObjectType()
-export class Player {
+export class Player implements Target {
     damage(dmgAmount: number) {
         this.health -= dmgAmount;
     }
@@ -20,7 +21,7 @@ export class Player {
     }
 
     @Field(() => String)
-    id: string = nanoid();
+    uuid: string = nanoid();
 
     @Field(() => Deck, { nullable: true })
     deck: Deck;
@@ -39,6 +40,10 @@ export class Player {
 
     @Field(() => Graveyard)
     graveyard = new Graveyard();
+
+    get name() {
+        return this.account.userName;
+    }
 
     drawCards(numCards: number = 1) {
         this.deck.popAndTransfer(numCards, this.hand);

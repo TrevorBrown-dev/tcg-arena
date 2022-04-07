@@ -1,4 +1,6 @@
+import { useEndTurnMutation } from '@graphql-gen';
 import { useGameContext } from 'components/Game/utils/useGame/useGame';
+import { Button } from 'components/library/Button';
 import styled from 'styled-components';
 import { Logs } from './Logs';
 
@@ -18,6 +20,9 @@ const StyledGameSidebar = styled.aside`
     }
     .player-info {
         text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
     }
 
     .other-player {
@@ -38,6 +43,7 @@ const StyledGameSidebar = styled.aside`
 
 export const GameSidebar: React.FC = () => {
     const game = useGameContext();
+    const [, endTurn] = useEndTurnMutation();
     return (
         <StyledGameSidebar>
             <div className="other-player">
@@ -49,6 +55,16 @@ export const GameSidebar: React.FC = () => {
             <div className="my-player">
                 <div className="player-info">
                     <h1>{game.myPlayer.account?.userName}</h1>
+                    <Button
+                        disabled={game.myPlayer.uuid !== game.publicGame?.turn}
+                        onClick={() => {
+                            if (game.myPlayer.uuid !== game.publicGame?.turn)
+                                return;
+                            endTurn({ gameId: game.lobby.gameId! });
+                        }}
+                    >
+                        End Turn
+                    </Button>
                 </div>
 
                 <Logs />

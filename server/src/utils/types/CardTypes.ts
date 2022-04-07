@@ -6,6 +6,14 @@ export interface CardInfo {
     code: string;
 }
 
+export interface CardMetadata {
+    validTargets?: string[];
+    resources?: {
+        name: string;
+        amount: number;
+    }[];
+}
+
 export interface Foilable {
     isFoil: boolean;
 }

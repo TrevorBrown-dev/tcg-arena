@@ -57,6 +57,7 @@ export type CardObj = {
   __typename?: 'CardObj';
   code: Scalars['String'];
   description: Scalars['String'];
+  health?: Maybe<Scalars['Float']>;
   id: Scalars['Float'];
   imageUrl?: Maybe<Scalars['String']>;
   isFoil: Scalars['Boolean'];
@@ -131,6 +132,7 @@ export type Game = {
   id: Scalars['String'];
   logs?: Maybe<GameLogs>;
   players: Array<Player>;
+  turn: Scalars['String'];
 };
 
 export type GameLogs = {
@@ -169,6 +171,7 @@ export type Mutation = {
   createOffer: EventOffer;
   declineOffer: EventOffer;
   deleteDeckTemplate: Scalars['Boolean'];
+  endTurn: Scalars['Boolean'];
   joinLobby: Lobby;
   leaveLobby: Lobby;
   login: AccountResponse;
@@ -239,6 +242,11 @@ export type MutationDeleteDeckTemplateArgs = {
 };
 
 
+export type MutationEndTurnArgs = {
+  gameId: Scalars['String'];
+};
+
+
 export type MutationJoinLobbyArgs = {
   accountId: Scalars['Float'];
   id: Scalars['String'];
@@ -258,8 +266,9 @@ export type MutationLoginArgs = {
 
 
 export type MutationPlayCardArgs = {
+  cardUuid: Scalars['String'];
   gameId: Scalars['String'];
-  uuid: Scalars['String'];
+  targetUuid?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -311,8 +320,8 @@ export type Player = {
   graveyard: Graveyard;
   hand?: Maybe<Hand>;
   health?: Maybe<Scalars['Float']>;
-  id: Scalars['String'];
   playField?: Maybe<PlayField>;
+  uuid: Scalars['String'];
 };
 
 export type PreGameLobby = {
@@ -490,11 +499,11 @@ export type HandPartsFragment = { __typename?: 'Hand', id: string, numCardsInHan
 
 export type PlayFieldPartsFragment = { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null };
 
-export type PlayerPartsFragment = { __typename?: 'Player', id: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null };
+export type PlayerPartsFragment = { __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null };
 
-export type PrivateGamePartsFragment = { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', id: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null }> };
+export type PrivateGamePartsFragment = { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null }> };
 
-export type PublicGamePartsFragment = { __typename?: 'Game', id: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', id: string, health?: number | null, graveyard: { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null }, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> };
+export type PublicGamePartsFragment = { __typename?: 'Game', id: string, turn: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', uuid: string, health?: number | null, graveyard: { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null }, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> };
 
 export type LoginMutationVariables = Exact<{
   password: Scalars['String'];
@@ -574,11 +583,19 @@ export type DeclineEventOfferMutation = { __typename?: 'Mutation', declineOffer:
 
 export type PlayCardMutationVariables = Exact<{
   gameId: Scalars['String'];
-  uuid: Scalars['String'];
+  cardUuid: Scalars['String'];
+  targetUuid?: InputMaybe<Scalars['String']>;
 }>;
 
 
 export type PlayCardMutation = { __typename?: 'Mutation', playCard: boolean };
+
+export type EndTurnMutationVariables = Exact<{
+  gameId: Scalars['String'];
+}>;
+
+
+export type EndTurnMutation = { __typename?: 'Mutation', endTurn: boolean };
 
 export type CreateLobbyMutationVariables = Exact<{
   creatorId: Scalars['Float'];
@@ -658,21 +675,21 @@ export type InitialPrivateGameQueryVariables = Exact<{
 }>;
 
 
-export type InitialPrivateGameQuery = { __typename?: 'Query', initialPrivateGame: { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', id: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null }> } };
+export type InitialPrivateGameQuery = { __typename?: 'Query', initialPrivateGame: { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null }> } };
 
 export type InitialPublicGameQueryVariables = Exact<{
   gameId: Scalars['String'];
 }>;
 
 
-export type InitialPublicGameQuery = { __typename?: 'Query', initialPublicGame: { __typename?: 'Game', id: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', id: string, health?: number | null, graveyard: { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null }, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> } };
+export type InitialPublicGameQuery = { __typename?: 'Query', initialPublicGame: { __typename?: 'Game', id: string, turn: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', uuid: string, health?: number | null, graveyard: { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null }, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> } };
 
 export type MyInitialPrivateGameQueryVariables = Exact<{
   gameId: Scalars['String'];
 }>;
 
 
-export type MyInitialPrivateGameQuery = { __typename?: 'Query', myInitialPrivateGame: { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', id: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null }> } };
+export type MyInitialPrivateGameQuery = { __typename?: 'Query', myInitialPrivateGame: { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null }> } };
 
 export type MyCardLibrarySubscriptionVariables = Exact<{ [key: string]: never; }>;
 
@@ -701,7 +718,7 @@ export type WatchMyPrivateGameSubscriptionVariables = Exact<{
 }>;
 
 
-export type WatchMyPrivateGameSubscription = { __typename?: 'Subscription', watchMyPrivateGame: { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', id: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null }> } };
+export type WatchMyPrivateGameSubscription = { __typename?: 'Subscription', watchMyPrivateGame: { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null }> } };
 
 export type WatchPrivateGameSubscriptionVariables = Exact<{
   gameId: Scalars['String'];
@@ -709,14 +726,14 @@ export type WatchPrivateGameSubscriptionVariables = Exact<{
 }>;
 
 
-export type WatchPrivateGameSubscription = { __typename?: 'Subscription', watchPrivateGame: { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', id: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null }> } };
+export type WatchPrivateGameSubscription = { __typename?: 'Subscription', watchPrivateGame: { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null }> } };
 
 export type WatchPublicGameSubscriptionVariables = Exact<{
   gameId: Scalars['String'];
 }>;
 
 
-export type WatchPublicGameSubscription = { __typename?: 'Subscription', watchPublicGame: { __typename?: 'Game', id: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', id: string, health?: number | null, graveyard: { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null }, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> } };
+export type WatchPublicGameSubscription = { __typename?: 'Subscription', watchPublicGame: { __typename?: 'Game', id: string, turn: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', uuid: string, health?: number | null, graveyard: { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null }, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> } };
 
 export type WatchLobbySubscriptionVariables = Exact<{
   watchLobbyId: Scalars['String'];
@@ -863,7 +880,7 @@ export const HandPartsFragmentDoc = gql`
     ${CardObjPartsFragmentDoc}`;
 export const PlayerPartsFragmentDoc = gql`
     fragment PlayerParts on Player {
-  id
+  uuid
   hand {
     ...HandParts
   }
@@ -896,11 +913,12 @@ export const PlayFieldPartsFragmentDoc = gql`
 export const PublicGamePartsFragmentDoc = gql`
     fragment PublicGameParts on Game {
   id
+  turn
   logs {
     logs
   }
   players {
-    id
+    uuid
     health
     graveyard {
       ...GraveyardParts
@@ -1048,13 +1066,22 @@ export function useDeclineEventOfferMutation() {
   return Urql.useMutation<DeclineEventOfferMutation, DeclineEventOfferMutationVariables>(DeclineEventOfferDocument);
 };
 export const PlayCardDocument = gql`
-    mutation PlayCard($gameId: String!, $uuid: String!) {
-  playCard(gameId: $gameId, uuid: $uuid)
+    mutation PlayCard($gameId: String!, $cardUuid: String!, $targetUuid: String) {
+  playCard(gameId: $gameId, cardUuid: $cardUuid, targetUuid: $targetUuid)
 }
     `;
 
 export function usePlayCardMutation() {
   return Urql.useMutation<PlayCardMutation, PlayCardMutationVariables>(PlayCardDocument);
+};
+export const EndTurnDocument = gql`
+    mutation EndTurn($gameId: String!) {
+  endTurn(gameId: $gameId)
+}
+    `;
+
+export function useEndTurnMutation() {
+  return Urql.useMutation<EndTurnMutation, EndTurnMutationVariables>(EndTurnDocument);
 };
 export const CreateLobbyDocument = gql`
     mutation CreateLobby($creatorId: Float!) {

@@ -1,10 +1,11 @@
 fragment PublicGameParts on Game {
     id
+    turn
     logs {
         logs
     }
     players {
-        id
+        uuid
         health
         graveyard {
             ...GraveyardParts

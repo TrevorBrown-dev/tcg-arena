@@ -34,11 +34,11 @@ export const useGame = () => {
     const publicGame = usePublicGame();
     const myPlayer = privateGame?.players[0];
     const myPublicPlayer = publicGame?.players.find(
-        (player) => player.id === myPlayer?.id
+        (player) => player.uuid === myPlayer?.uuid
     );
 
     const otherPlayer = publicGame?.players.find((player) => {
-        return player.id !== myPlayer?.id;
+        return player.uuid !== myPlayer?.uuid;
     });
     const state = {
         lobby,

@@ -22,9 +22,29 @@ class GameResolver {
     }
 
     @Mutation(() => Boolean)
+    async endTurn(
+        @Arg('gameId') gameId: string,
+        @Ctx() { accountId }: MyContext
+    ) {
+        if (!accountId) throw new Error('No authorization cookie found');
+        const game = Game.get(gameId);
+        if (!game) throw new Error(`Game not found with id: ${gameId}`);
+        const player = game.getPlayerByAccountId(accountId);
+        if (!player) throw new Error(`Player not found with id: ${accountId}`);
+        if (game.turn !== player.uuid) {
+            throw new Error(`It is not your turn!`);
+        }
+        game.endTurn();
+        game.logs.push(`${player.account.userName} ended their turn.`);
+        await Game.publishGame(game);
+        return true;
+    }
+
+    @Mutation(() => Boolean)
     async playCard(
         @Arg('gameId') gameId: string,
-        @Arg('uuid') uuid: string,
+        @Arg('cardUuid') cardUuid: string,
+        @Arg('targetUuid', { nullable: true }) targetUuid: string,
         @Ctx() { accountId }: MyContext
     ) {
         //Validation Step
@@ -35,18 +55,26 @@ class GameResolver {
         const player = game.getPlayerByAccountId(accountId);
         if (!player)
             throw new Error(`You are not a player in game with id: ${gameId}`);
-        const card = player.hand.findCard(uuid);
+        const card = player.hand.findCard(cardUuid);
         if (!card)
             throw new Error(
-                `Card not found with uuid: ${uuid} in player's hand`
+                `Card not found with uuid: ${cardUuid} in player's hand`
             );
-
-        //Run interpreter
+        if (game.turn !== player.uuid) {
+            throw new Error(`It is not your turn!`);
+        }
+        //Remove the card from the hand
         player.playCard(card);
+        //Log action
+
         game.logs.logs.push(`${player.account.userName} played ${card.name}.`);
         await Game.publishGame(game);
-        await game.executeAction(player.id, card.code, card.uuid);
-        //Remove the card from the hand
+        let newCode = card.code;
+        if (card.code.includes('$')) {
+            newCode = newCode.replace('$', targetUuid);
+        }
+        //Run interpreter
+        await game.executeAction(player.uuid, newCode, card.uuid);
         //Publish changes
         await Game.publishGame(game);
         return true;
