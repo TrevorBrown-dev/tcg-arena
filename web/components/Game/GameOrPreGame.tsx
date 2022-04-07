@@ -11,7 +11,7 @@ type Props = {
 export const GameOrPreGame: React.FC<Props> = ({ lobbyId }) => {
     const [lobbyResponse] = useWatchPreGameLobbySubscription({
         variables: {
-            id: lobbyId,
+            preGameLobbyId: lobbyId,
         },
     });
 

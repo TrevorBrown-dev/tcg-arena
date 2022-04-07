@@ -115,19 +115,21 @@ class PreGameLobbyResolver {
     @Subscription(() => PreGameLobby, {
         topics: ({ args }) => {
             setTimeout(() => {
-                const lobby = PreGameLobby.get(args.id);
+                const lobby = PreGameLobby.get(args.preGameLobbyId);
                 if (!lobby)
-                    console.log(`PreGameLobby not found with id: ${args.id}`);
-                pubsub.publish(`watchPreGameLobby_${args.id}`, {
+                    console.log(
+                        `PreGameLobby not found with id: ${args.preGameLobbyId}`
+                    );
+                pubsub.publish(`watchPreGameLobby_${args.preGameLobbyId}`, {
                     preGameLobby: lobby,
                 });
             }, 1);
-            return `watchPreGameLobby_${args.id}`;
+            return `watchPreGameLobby_${args.preGameLobbyId}`;
         },
     })
     async watchPreGameLobby(
         @Root('preGameLobby') preGameLobby: PreGameLobby,
-        @Arg('id') id: string
+        @Arg('preGameLobbyId') preGameLobbyId: string
     ) {
         return preGameLobby;
     }

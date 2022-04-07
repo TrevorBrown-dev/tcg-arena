@@ -1,5 +1,5 @@
-subscription WatchPreGameLobby($id: String!) {
-    watchPreGameLobby(id: $id) {
+subscription WatchPreGameLobby($preGameLobbyId: String!) {
+    watchPreGameLobby(preGameLobbyId: $preGameLobbyId) {
         ...PreGameLobbyParts
     }
 }

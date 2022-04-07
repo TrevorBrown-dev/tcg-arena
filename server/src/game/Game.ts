@@ -72,12 +72,9 @@ export class Game {
     }
 
     static async publishGame(game: Game) {
-        console.log('publishing public game');
         await pubsub.publish(`watchPublicGame_${game.id}`, {
             publicGame: game,
         });
-        console.log('publishing private game');
-
         await pubsub.publish(`watchPrivateGame_${game.id}`, {
             privateGame: game,
         });

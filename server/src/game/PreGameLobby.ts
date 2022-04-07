@@ -76,6 +76,22 @@ export class PreGameLobby {
     constructor(player1: Account, player2: Account) {
         this.players = [new PreGamePlayer(player1), new PreGamePlayer(player2)];
     }
+
+    static leave(lobbyId: string, accountId: number) {
+        const preGameLobby = PreGameLobby.get(lobbyId);
+        if (!preGameLobby) return;
+        preGameLobby.players = preGameLobby.players.filter(
+            (player) => player.account.id !== accountId
+        );
+        setTimeout(() => {
+            const preGameLobby = PreGameLobby.get(lobbyId);
+            if (!preGameLobby) return;
+            if (preGameLobby.players.length === 0) {
+                PreGameLobby.remove(preGameLobby.id);
+            }
+        }, 5000);
+    }
+
     static create(player1: Account, player2: Account) {
         const lobby = new PreGameLobby(player1, player2);
         PreGameLobby.preGameLobbies.set(lobby.id, lobby);

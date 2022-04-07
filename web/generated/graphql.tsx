@@ -441,7 +441,7 @@ export type SubscriptionWatchMyPrivateGameArgs = {
 
 
 export type SubscriptionWatchPreGameLobbyArgs = {
-  id: Scalars['String'];
+  preGameLobbyId: Scalars['String'];
 };
 
 
@@ -733,7 +733,7 @@ export type WatchChatSubscriptionVariables = Exact<{
 export type WatchChatSubscription = { __typename?: 'Subscription', watchChat: Array<{ __typename?: 'ChatMessage', id: number, message: string, account: { __typename?: 'Account', id: number, userName: string } }> };
 
 export type WatchPreGameLobbySubscriptionVariables = Exact<{
-  id: Scalars['String'];
+  preGameLobbyId: Scalars['String'];
 }>;
 
 
@@ -1317,8 +1317,8 @@ export function useWatchChatSubscription<TData = WatchChatSubscription>(options:
   return Urql.useSubscription<WatchChatSubscription, TData, WatchChatSubscriptionVariables>({ query: WatchChatDocument, ...options }, handler);
 };
 export const WatchPreGameLobbyDocument = gql`
-    subscription WatchPreGameLobby($id: String!) {
-  watchPreGameLobby(id: $id) {
+    subscription WatchPreGameLobby($preGameLobbyId: String!) {
+  watchPreGameLobby(preGameLobbyId: $preGameLobbyId) {
     ...PreGameLobbyParts
   }
 }

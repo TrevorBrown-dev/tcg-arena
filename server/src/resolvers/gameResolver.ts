@@ -43,6 +43,7 @@ class GameResolver {
 
         //Run interpreter
         player.playCard(card);
+        game.logs.logs.push(`${player.account.userName} played ${card.name}.`);
         await Game.publishGame(game);
         await game.executeAction(player.id, card.code, card.uuid);
         //Remove the card from the hand

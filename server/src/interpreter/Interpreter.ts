@@ -70,21 +70,12 @@ class _Interpreter {
                     let playerWhoDrew: string = '';
                     const amount = parseInt(_amount);
                     if (target === 'SELF') {
-                        playerWhoDrew = actingPlayer.account.userName;
                         actingPlayer.drawCards(amount);
                     } else if (target === 'OTHER') {
                         otherPlayer.drawCards(amount);
-                        playerWhoDrew = otherPlayer.account.userName;
                     } else {
                         throw new Error('Invalid target');
                     }
-                    game.logs.push(
-                        `${playerWhoDrew} drew ${amount} ${GameLogs.pluralize(
-                            amount,
-                            'card'
-                        )}`,
-                        game
-                    );
 
                     break;
                 case 'ATTACK':
@@ -101,7 +92,6 @@ class _Interpreter {
                         [cardId],
                         actingPlayer.graveyard
                     );
-                    game.logs.push(`${card?.name} was destroyed.`, game);
                     break;
                 default:
                     throw new Error('This is not a valid verb');
