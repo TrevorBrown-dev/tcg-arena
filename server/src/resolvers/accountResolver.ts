@@ -14,6 +14,7 @@ import { MyContext } from '../types';
 import { ILike } from 'typeorm';
 import jwt from 'jsonwebtoken';
 import { parseJWT } from '../utils/parseJWT';
+import { nanoid } from 'nanoid';
 @ObjectType()
 class FieldError {
     @Field()
@@ -56,6 +57,7 @@ class AccountResolver {
                 email,
                 password: hashedPassword,
                 userName,
+                friendCode: nanoid(),
             }).save();
 
             Account.createDefaultCardLibrary(account);

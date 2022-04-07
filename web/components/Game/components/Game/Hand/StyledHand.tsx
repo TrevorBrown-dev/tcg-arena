@@ -5,7 +5,9 @@ export const StyledHand = styled.div`
     flex: 2;
     min-width: 0;
     width: 100%;
+    overflow-y: hidden;
     .container {
+        overflow-y: hidden;
         margin: 0.4em 1em;
         display: flex;
         @media (min-width: 1200px) {

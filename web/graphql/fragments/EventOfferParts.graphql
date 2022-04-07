@@ -6,9 +6,11 @@ fragment EventOfferParts on EventOffer {
     issuer {
         id
         userName
+        friendCode
     }
     recipient {
         id
         userName
+        friendCode
     }
 }

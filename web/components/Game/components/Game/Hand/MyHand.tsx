@@ -6,6 +6,15 @@ import styled from 'styled-components';
 import { StyledHand } from './StyledHand';
 export const HandContainer = styled.div`
     display: flex;
+    .my-card {
+        transition: all 0.2s ease-in-out;
+        &:hover {
+            transform: scale(1.02);
+        }
+    }
+    .container {
+        padding: 0.15em;
+    }
 `;
 
 const StyledDeckDiscard = styled.div<{ flipped?: boolean }>`
@@ -16,9 +25,6 @@ const StyledDeckDiscard = styled.div<{ flipped?: boolean }>`
     transform: scale(0.8) ${({ flipped }) => (flipped ? 'rotate(180deg)' : '')};
     flex-direction: ${({ flipped }) => (flipped ? 'row-reverse' : 'row')};
     gap: 0.5em;
-    .deck,
-    .discard {
-    }
 `;
 
 export const DeckDiscard: React.FC<{ player: Player; flipped: boolean }> = ({
@@ -70,6 +76,7 @@ export const MyHand: React.FC = () => {
                     {game?.myPlayer?.hand?.cards &&
                         game.myPlayer.hand.cards.map((card, i) => (
                             <Card
+                                className="my-card"
                                 key={i}
                                 onClick={() => {
                                     if (!game?.lobby.gameId) return;

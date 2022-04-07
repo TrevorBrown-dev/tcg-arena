@@ -1,4 +1,5 @@
 import argon2 from 'argon2';
+import { nanoid } from 'nanoid';
 import { Field, ObjectType } from 'type-graphql';
 import {
     AfterInsert,
@@ -14,7 +15,6 @@ import {
 } from 'typeorm';
 import { CardLibrary } from './CardLibrary';
 import { Lobby } from './Lobby';
-
 @Entity()
 @ObjectType()
 export class Account extends BaseEntity {
@@ -32,6 +32,10 @@ export class Account extends BaseEntity {
     @Field(() => Number)
     @PrimaryGeneratedColumn()
     id: number;
+
+    @Field(() => String)
+    @Column({ unique: true })
+    friendCode: string;
 
     @Field()
     @Column({ unique: true })

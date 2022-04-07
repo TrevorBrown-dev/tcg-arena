@@ -30,7 +30,7 @@ class EventOfferResolver {
     @Mutation(() => EventOffer)
     async createOffer(
         @Ctx() { req: { req } }: MyContext,
-        @Arg('recipientId') recipientId: number,
+        @Arg('recipientFriendCode') recipientFriendCode: string,
         @Arg('type') type: EventOfferType
     ) {
         const authorization = req.headers.cookie;
@@ -43,10 +43,12 @@ class EventOfferResolver {
         }
         const issuerId = account.id;
         const issuer = await Account.findOne(issuerId);
-        const recipient = await Account.findOne(recipientId);
+        const recipient = await Account.findOne({
+            where: { friendCode: recipientFriendCode },
+        });
         if (!issuer || !recipient)
             throw new Error(
-                `Accounts not found with ids : ${issuerId}, ${recipientId}`
+                `Accounts not found with ids : ${issuerId}, ${recipientFriendCode}`
             );
         const offer = EventOffer.createEventOffer(issuer, recipient, type);
 

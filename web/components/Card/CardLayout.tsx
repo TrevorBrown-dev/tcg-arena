@@ -14,6 +14,8 @@ const SharedStyles = styled.div`
 `;
 
 export const CardLayout = styled(SharedStyles)<{ isFoil?: boolean }>`
+    cursor: pointer;
+    user-select: none;
     padding: 1em;
     padding-top: 0.5em;
     display: flex;
@@ -72,7 +74,7 @@ export const StyledBlankCard = styled(SharedStyles)<{ flipped?: boolean }>`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    ${({ flipped }) => (flipped ? 'transform: rotateY(180deg)' : '')};
+    ${({ flipped }) => (flipped ? 'transform: rotate(180deg)' : '')};
     padding: 1em 1.5em;
     svg {
         height: 3.5em;

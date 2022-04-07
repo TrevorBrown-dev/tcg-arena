@@ -19,6 +19,7 @@ export type Account = {
   __typename?: 'Account';
   cardLibrary?: Maybe<CardLibrary>;
   email: Scalars['String'];
+  friendCode: Scalars['String'];
   id: Scalars['Float'];
   userName: Scalars['String'];
 };
@@ -223,7 +224,7 @@ export type MutationCreateLobbyArgs = {
 
 
 export type MutationCreateOfferArgs = {
-  recipientId: Scalars['Float'];
+  recipientFriendCode: Scalars['String'];
   type: Scalars['String'];
 };
 
@@ -461,7 +462,7 @@ export type UpdateCardInput = {
   name?: InputMaybe<Scalars['String']>;
 };
 
-export type AccountPartsFragment = { __typename?: 'Account', id: number, email: string, userName: string };
+export type AccountPartsFragment = { __typename?: 'Account', id: number, email: string, userName: string, friendCode: string };
 
 export type CardLibraryPartsFragment = { __typename?: 'CardLibrary', id: number, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> };
 
@@ -473,7 +474,7 @@ export type ChatMessagePartsFragment = { __typename?: 'ChatMessage', id: number,
 
 export type DeckTemplatePartsFragment = { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null } }> };
 
-export type EventOfferPartsFragment = { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string }, recipient: { __typename?: 'Account', id: number, userName: string } };
+export type EventOfferPartsFragment = { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string, friendCode: string }, recipient: { __typename?: 'Account', id: number, userName: string, friendCode: string } };
 
 export type LobbyPartsFragment = { __typename?: 'Lobby', id: string, members?: Array<{ __typename?: 'Account', id: number, userName: string }> | null };
 
@@ -515,7 +516,7 @@ export type RegisterMutationVariables = Exact<{
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'AccountResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, account?: { __typename?: 'Account', id: number, email: string, userName: string } | null } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'AccountResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, account?: { __typename?: 'Account', id: number, email: string, userName: string, friendCode: string } | null } };
 
 export type DeleteDeckTemplateMutationVariables = Exact<{
   id: Scalars['Float'];
@@ -554,22 +555,22 @@ export type AcceptEventOfferMutationVariables = Exact<{
 }>;
 
 
-export type AcceptEventOfferMutation = { __typename?: 'Mutation', acceptOffer: { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string }, recipient: { __typename?: 'Account', id: number, userName: string } } };
+export type AcceptEventOfferMutation = { __typename?: 'Mutation', acceptOffer: { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string, friendCode: string }, recipient: { __typename?: 'Account', id: number, userName: string, friendCode: string } } };
 
 export type CreateEventMutationVariables = Exact<{
   type: Scalars['String'];
-  recipientId: Scalars['Float'];
+  recipientFriendCode: Scalars['String'];
 }>;
 
 
-export type CreateEventMutation = { __typename?: 'Mutation', createOffer: { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string }, recipient: { __typename?: 'Account', id: number, userName: string } } };
+export type CreateEventMutation = { __typename?: 'Mutation', createOffer: { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string, friendCode: string }, recipient: { __typename?: 'Account', id: number, userName: string, friendCode: string } } };
 
 export type DeclineEventOfferMutationVariables = Exact<{
   id: Scalars['String'];
 }>;
 
 
-export type DeclineEventOfferMutation = { __typename?: 'Mutation', declineOffer: { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string }, recipient: { __typename?: 'Account', id: number, userName: string } } };
+export type DeclineEventOfferMutation = { __typename?: 'Mutation', declineOffer: { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string, friendCode: string }, recipient: { __typename?: 'Account', id: number, userName: string, friendCode: string } } };
 
 export type PlayCardMutationVariables = Exact<{
   gameId: Scalars['String'];
@@ -630,12 +631,12 @@ export type AccountQueryVariables = Exact<{
 }>;
 
 
-export type AccountQuery = { __typename?: 'Query', account: { __typename?: 'Account', id: number, email: string, userName: string } };
+export type AccountQuery = { __typename?: 'Query', account: { __typename?: 'Account', id: number, email: string, userName: string, friendCode: string } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'Account', id: number, email: string, userName: string } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'Account', id: number, email: string, userName: string, friendCode: string } | null };
 
 export type CardsInLibraryQueryVariables = Exact<{
   cardLibraryId: Scalars['Float'];
@@ -649,7 +650,7 @@ export type EventOffersQueryVariables = Exact<{
 }>;
 
 
-export type EventOffersQuery = { __typename?: 'Query', eventOffers: Array<{ __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string }, recipient: { __typename?: 'Account', id: number, userName: string } }> };
+export type EventOffersQuery = { __typename?: 'Query', eventOffers: Array<{ __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string, friendCode: string }, recipient: { __typename?: 'Account', id: number, userName: string, friendCode: string } }> };
 
 export type InitialPrivateGameQueryVariables = Exact<{
   gameId: Scalars['String'];
@@ -693,7 +694,7 @@ export type WatchDeckTemplateSubscription = { __typename?: 'Subscription', deckT
 export type EventOfferInboxSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type EventOfferInboxSubscription = { __typename?: 'Subscription', eventOfferInbox: { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string }, recipient: { __typename?: 'Account', id: number, userName: string } } };
+export type EventOfferInboxSubscription = { __typename?: 'Subscription', eventOfferInbox: { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string, friendCode: string }, recipient: { __typename?: 'Account', id: number, userName: string, friendCode: string } } };
 
 export type WatchMyPrivateGameSubscriptionVariables = Exact<{
   gameId: Scalars['String'];
@@ -743,6 +744,7 @@ export const AccountPartsFragmentDoc = gql`
   id
   email
   userName
+  friendCode
 }
     `;
 export const CardPartsFragmentDoc = gql`
@@ -799,10 +801,12 @@ export const EventOfferPartsFragmentDoc = gql`
   issuer {
     id
     userName
+    friendCode
   }
   recipient {
     id
     userName
+    friendCode
   }
 }
     `;
@@ -1022,8 +1026,8 @@ export function useAcceptEventOfferMutation() {
   return Urql.useMutation<AcceptEventOfferMutation, AcceptEventOfferMutationVariables>(AcceptEventOfferDocument);
 };
 export const CreateEventDocument = gql`
-    mutation CreateEvent($type: String!, $recipientId: Float!) {
-  createOffer(type: $type, recipientId: $recipientId) {
+    mutation CreateEvent($type: String!, $recipientFriendCode: String!) {
+  createOffer(type: $type, recipientFriendCode: $recipientFriendCode) {
     ...EventOfferParts
   }
 }
