@@ -9,6 +9,7 @@ import {
 } from 'type-graphql';
 import { GameEntity } from '../entities/GameEntity';
 import { Game } from '../game/Game';
+import { Interpreter } from '../interpreter/Interpreter';
 import { MyContext, SubscriptionIterator } from '../types';
 import { getAccountIdFromCookie } from '../utils/auth/getAccountFromCookie';
 
@@ -41,10 +42,44 @@ class GameResolver {
     }
 
     @Mutation(() => Boolean)
+    async attack(
+        @Arg('gameId') gameId: string,
+        @Arg('cardUuid') cardUuid: string,
+        @Arg('targetUuid', () => [String]) targetUuid: string[],
+        @Ctx() { accountId }: MyContext
+    ) {
+        //Validation Step
+        if (!accountId) throw new Error('No authorization cookie found');
+
+        const game = Game.get(gameId);
+        if (!game) throw new Error(`Game not found with id: ${gameId}`);
+        const player = game.getPlayerByAccountId(accountId);
+        if (!player)
+            throw new Error(`You are not a player in game with id: ${gameId}`);
+        const card = player.playField.findCard(cardUuid);
+        if (!card)
+            throw new Error(
+                `Card not found with uuid: ${cardUuid} in player's hand`
+            );
+        if (game.turn !== player.uuid) {
+            throw new Error(`It is not your turn!`);
+        }
+        const targets = game.targets.filter((t) => targetUuid.includes(t.uuid));
+        if (!targets || targets.length !== targetUuid.length) {
+            throw new Error(`Targets not found with uuid: ${targetUuid}`);
+        }
+        card.executeAttack(targets);
+        game.logs.push(`${card.name} attacked ${targets.map((t) => t.name)}.`);
+        await Game.publishGame(game);
+        return true;
+    }
+
+    @Mutation(() => Boolean)
     async playCard(
         @Arg('gameId') gameId: string,
         @Arg('cardUuid') cardUuid: string,
-        @Arg('targetUuid', { nullable: true }) targetUuid: string,
+        @Arg('targetUuid', () => [String], { nullable: true })
+        targetUuid: string[] | null,
         @Ctx() { accountId }: MyContext
     ) {
         //Validation Step
@@ -69,12 +104,16 @@ class GameResolver {
 
         game.logs.logs.push(`${player.account.userName} played ${card.name}.`);
         await Game.publishGame(game);
-        let newCode = card.code;
-        if (card.code.includes('$')) {
-            newCode = newCode.replace('$', targetUuid);
+        const code = Interpreter.parseCode(card.code);
+        while (code.BODY.includes('$')) {
+            if (!targetUuid) throw new Error('No target specified');
+            const uuid = targetUuid?.shift();
+            if (!uuid) throw new Error('No target uuid provided');
+            code.BODY = code.BODY.replace('$', uuid);
+            console.log('NEW BODY: ', code.BODY);
         }
         //Run interpreter
-        await game.executeAction(player.uuid, newCode, card.uuid);
+        await game.executeAction(player.uuid, code, card.uuid);
         //Publish changes
         await Game.publishGame(game);
         return true;

@@ -20,12 +20,10 @@ const StyledGame = styled.main`
 `;
 export const Game: React.FC = () => {
     return (
-        <TargetStateLayout>
-            <StyledGame>
-                <OpponentHand />
-                <PlayFields />
-                <MyHand />
-            </StyledGame>
-        </TargetStateLayout>
+        <StyledGame>
+            <OpponentHand />
+            <PlayFields />
+            <MyHand />
+        </StyledGame>
     );
 };

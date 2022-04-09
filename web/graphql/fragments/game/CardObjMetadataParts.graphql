@@ -1,0 +1,10 @@
+fragment CardObjMetadataParts on CardObjMetadata {
+    VALID_TARGETS
+    TYPE
+    HEALTH
+    ATTACK
+    RESOURCES {
+        name
+        amount
+    }
+}

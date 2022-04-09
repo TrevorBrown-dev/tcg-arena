@@ -1,0 +1,3 @@
+mutation Attack($targetUuid: [String!]!, $cardUuid: String!, $gameId: String!) {
+    attack(targetUuid: $targetUuid, cardUuid: $cardUuid, gameId: $gameId)
+}

@@ -24,11 +24,12 @@ import { Lobby } from './entities/Lobby';
 import { testGame } from './game/tester';
 import ormconfig from './ormconfig';
 import { MyContext } from './types';
+import { customAuthChecker } from './utils/auth/customAuthChecker';
 import { compiler } from './utils/axios';
 import { cleanDb } from './utils/db/cleanDb';
 import { parseJWT } from './utils/parseJWT';
 import { handleDisconnects } from './utils/ws/handleDisconnects';
-type WithKindName = { name: { kind: string; value: string } };
+
 const options = {
     host: 'redis',
     port: 6379,
@@ -88,6 +89,7 @@ const main = async () => {
     const schema = await buildSchema({
         resolvers,
         pubSub: pubsub,
+        authChecker: customAuthChecker,
     });
 
     const wsServer = new WebSocketServer({

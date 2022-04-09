@@ -1,4 +1,4 @@
-import { Arg, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Authorized, Mutation, Query, Resolver } from 'type-graphql';
 import { Card } from '../entities/Card';
 import { CardInput, UpdateCardInput } from './inputs/CardInput';
 
@@ -19,6 +19,7 @@ class CardResolver {
     }
 
     //Creates a new card
+    // @Authorized()
     @Mutation(() => Card)
     async createCard(@Arg('data') data: CardInput): Promise<Card> {
         return await Card.create(data).save();

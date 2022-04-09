@@ -1,4 +1,6 @@
 import { useEndTurnMutation } from '@graphql-gen';
+import { SelectTarget } from 'components/Game/utils/SelectTarget';
+import { useTargetContext } from 'components/Game/utils/Targeting';
 import { useGameContext } from 'components/Game/utils/useGame/useGame';
 import { Button } from 'components/library/Button';
 import styled from 'styled-components';
@@ -44,6 +46,7 @@ const StyledGameSidebar = styled.aside`
 export const GameSidebar: React.FC = () => {
     const game = useGameContext();
     const [, endTurn] = useEndTurnMutation();
+    const { targetState, cancel } = useTargetContext();
     return (
         <StyledGameSidebar>
             <div className="other-player">
@@ -66,8 +69,10 @@ export const GameSidebar: React.FC = () => {
                         End Turn
                     </Button>
                 </div>
-
-                <Logs />
+                <div>
+                    <SelectTarget style={{ marginBottom: '1em' }} />
+                    <Logs />
+                </div>
             </div>
         </StyledGameSidebar>
     );

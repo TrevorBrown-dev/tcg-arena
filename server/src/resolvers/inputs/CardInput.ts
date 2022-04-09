@@ -3,6 +3,8 @@ import { Field, InputType } from 'type-graphql';
 @InputType()
 export class CardInput {
     @Field()
+    id: number;
+    @Field()
     name: string;
 
     @Field()

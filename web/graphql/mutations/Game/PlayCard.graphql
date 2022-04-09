@@ -1,3 +1,7 @@
-mutation PlayCard($gameId: String!, $cardUuid: String!, $targetUuid: String) {
+mutation PlayCard(
+    $gameId: String!
+    $cardUuid: String!
+    $targetUuid: [String!]
+) {
     playCard(gameId: $gameId, cardUuid: $cardUuid, targetUuid: $targetUuid)
 }

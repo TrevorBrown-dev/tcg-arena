@@ -14,7 +14,8 @@ export const HandContainer = styled.div`
         }
     }
     .container {
-        padding: 0.15em;
+        padding: 0.3em;
+        gap: 0.6em;
     }
 `;
 
@@ -79,15 +80,27 @@ export const MyHand: React.FC = () => {
                         game.myPlayer.hand.cards.map((card, i) => (
                             <Card
                                 className="my-card"
+                                activeCard={targetState.card === card.uuid}
                                 key={i}
                                 onClick={() => {
                                     if (!game?.lobby.gameId) return;
-                                    console.log(game.lobby.gameId);
-                                    setTargetState({
-                                        enabled: true,
-                                        card: card.uuid,
-                                        target: null,
-                                    });
+                                    console.log('METADATA', card.metadata);
+                                    if (
+                                        card.metadata?.VALID_TARGETS &&
+                                        card.metadata.VALID_TARGETS.length > 0
+                                    ) {
+                                        setTargetState({
+                                            enabled: true,
+                                            card: card.uuid,
+                                            type: 'PLAY',
+                                            target: null,
+                                        });
+                                    } else {
+                                        playCard({
+                                            cardUuid: card.uuid,
+                                            gameId: game.lobby.gameId!,
+                                        });
+                                    }
                                 }}
                                 cardRecord={
                                     { card, isFoil: card.isFoil } as any

@@ -1,12 +1,20 @@
 import { Field, ObjectType } from 'type-graphql';
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    BaseEntity,
+    Column,
+    Entity,
+    PrimaryColumn,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
+import { CardObjMetadata } from '../game/Player/Card';
+import { Interpreter } from '../interpreter/Interpreter';
 import { CardInfo } from '../utils/types/CardTypes';
 
 @ObjectType()
 @Entity()
 export class Card extends BaseEntity implements CardInfo {
     @Field(() => Number)
-    @PrimaryGeneratedColumn()
+    @PrimaryColumn({ unique: true })
     id!: number;
 
     @Field(() => String)
@@ -24,4 +32,10 @@ export class Card extends BaseEntity implements CardInfo {
     @Field(() => String)
     @Column()
     code!: string;
+
+    @Field(() => CardObjMetadata)
+    get metadata(): CardObjMetadata {
+        const parsedCode = Interpreter.parseCode(this.code).HEADER;
+        return parsedCode;
+    }
 }

@@ -4,13 +4,10 @@ export const PlayerHealth: React.FC<{
     health?: number;
     playerId?: string;
 }> = ({ health, playerId }) => {
-    const { targetState, setTargetState } = useTargetContext();
+    const { targetState, addTarget } = useTargetContext();
     const handleClick = () => {
         if (targetState.enabled) {
-            setTargetState({
-                ...targetState,
-                target: playerId!,
-            });
+            addTarget(playerId!);
         }
     };
 

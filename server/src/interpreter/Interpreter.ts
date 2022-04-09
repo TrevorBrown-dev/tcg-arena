@@ -1,21 +1,69 @@
+import { registerEnumType } from 'type-graphql';
 import { Game } from '../game/Game';
-import { GameLogs } from '../game/GameLogs';
 import { CardObj } from '../game/Player/Card';
+import { TARGETS } from '../game/utils/Target';
 import { sleep } from '../utils/sleep';
+import { ActionMap } from './actions';
+import { attack } from './actions/attack';
+import { destroy } from './actions/destroy';
+import { draw } from './actions/draw';
+import { InterpreterAction } from './actions/InterpreterAction';
+export enum VERBS {
+    DRAW = 'DRAW',
+    ATTACK = 'ATTACK',
+    DESTROY = 'DESTROY',
+}
 
-const Verbs = ['DRAW', 'ATTACK', 'DESTROY'];
-const Targets = ['SELF', 'SELF_FIELD', 'OTHER', 'OTHER_FIELD', 'ALL', '$'];
-type Token = {
-    type: string;
+export enum CARD_TYPES {
+    MINION = 'MINION',
+    SPELL = 'SPELL',
+}
+
+registerEnumType(CARD_TYPES, {
+    name: 'CARD_TYPES',
+});
+
+export type Token = {
+    type: VERBS | unknown;
     values: string[];
 };
+
+export interface Header {
+    VALID_TARGETS?: TARGETS[];
+    TYPE?: CARD_TYPES;
+    HEALTH?: number;
+    ATTACK?: number;
+    RESOURCES?: {
+        name: string;
+        amount: number;
+    }[];
+}
+
+export interface ParsedCode {
+    HEADER: Header;
+    BODY: string;
+}
+
+/**
+ * Card Code example:
+ *
+ * {
+ *    "HEADER": {
+ *          "VALID_TARGETS": ["SELF", "SELF_FIELD", "OTHER", "OTHER_FIELD", "ALL", "$"],
+ *          "RESOURCES": [{ "name": "Mana", "amount": 1 }, { "name": "Health", "amount": 1 }]
+ *   },
+ *  "BODY": ""
+ * }
+ *
+ *
+ */
 
 class _Interpreter {
     constructor(private speed: number) {}
 
-    tokenize(code: string): Token[] {
+    tokenize(code: ParsedCode): Token[] {
         console.log(code);
-        const statements = code.trim().split(';');
+        const statements = code.BODY.trim().split(';');
         const tokens = [];
 
         for (const statement of statements) {
@@ -25,9 +73,9 @@ class _Interpreter {
                 type: '',
                 values: [],
             };
-            for (const word of words) {
-                if (Verbs.includes(word)) {
-                    token.type = word.trim();
+            for (const word of words as VERBS[] | string[]) {
+                if (Object.values(VERBS).includes(word as VERBS)) {
+                    token.type = word as VERBS;
                 } else {
                     token.values.push(word.trim());
                 }
@@ -42,66 +90,45 @@ class _Interpreter {
         return tokens;
     }
 
+    parseCode(code: string): ParsedCode {
+        try {
+            const parsedCode = JSON.parse(code) as ParsedCode;
+            return parsedCode;
+        } catch {
+            return {
+                HEADER: {},
+                BODY: code,
+            };
+        }
+    }
+
     async interpret(
-        code: string,
+        code: ParsedCode,
         game: Game,
         playerId: string,
-        cardId?: string
+        cardId: string
     ) {
         const tokens = this.tokenize(code);
         const { actingPlayer, otherPlayer } =
             game.getActingAndOtherPlayer(playerId);
+
         let card: CardObj | undefined;
-        if (!actingPlayer) {
-            console.log('No player found');
-            throw new Error('No player found');
-        }
-        if (!otherPlayer) {
-            console.log('No other player found');
-            throw new Error('No other player found');
-        }
         if (cardId) {
             card = actingPlayer.playField.getCards([cardId])[0];
         }
         for (const token of tokens) {
-            switch (token.type) {
-                case 'DRAW':
-                    const [target, _amount] = token.values;
-                    let playerWhoDrew: string = '';
-                    const amount = parseInt(_amount);
-                    if (target === 'SELF') {
-                        actingPlayer.drawCards(amount);
-                    } else if (target === 'OTHER') {
-                        otherPlayer.drawCards(amount);
-                    } else {
-                        throw new Error('Invalid target');
-                    }
-
-                    break;
-                case 'ATTACK':
-                    const [attackTarget, dmg] = token.values;
-                    const dmgAmount = parseInt(dmg);
-                    const damageTarget = game.targets.find(
-                        (t) => t.uuid === attackTarget
-                    );
-                    if (!damageTarget) {
-                        throw new Error('Invalid target');
-                    }
-                    damageTarget.damage(dmgAmount);
-                    break;
-                case 'DESTROY':
-                    console.log(cardId);
-                    if (!cardId) {
-                        throw new Error('No card id found');
-                    }
-                    actingPlayer.playField.transferCards(
-                        [cardId],
-                        actingPlayer.graveyard
-                    );
-                    break;
-                default:
-                    throw new Error('This is not a valid verb');
+            const args: Parameters<InterpreterAction> = [
+                code,
+                token,
+                game,
+                playerId,
+                cardId,
+            ];
+            const action = ActionMap[token.type as VERBS];
+            if (!action) {
+                throw new Error(`Action ${token.type} not found`);
             }
+            action(...args);
 
             await sleep(this.speed);
             await Game.publishGame(game);

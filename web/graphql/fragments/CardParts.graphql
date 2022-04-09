@@ -3,4 +3,7 @@ fragment CardParts on Card {
     name
     description
     imageUrl
+    metadata {
+        ...CardObjMetadataParts
+    }
 }

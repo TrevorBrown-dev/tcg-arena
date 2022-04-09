@@ -1,5 +1,6 @@
 import { Card } from 'components/Card/Card';
 import { PlayerHealth } from 'components/Game/utils/PlayerHealth';
+import { useTargetContext } from 'components/Game/utils/Targeting';
 import { useGameContext } from 'components/Game/utils/useGame/useGame';
 import styled from 'styled-components';
 
@@ -105,6 +106,7 @@ const Divider: React.FC = () => {
 
 const PlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
     const game = useGameContext();
+    const { activate } = useTargetContext();
     const playField = game?.publicGame?.players?.find(
         (player) => player.uuid === playerId
     )?.playField;
@@ -113,7 +115,14 @@ const PlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
             <div className="spacer"></div>
             {playField?.cards?.map((card, i) => {
                 return (
-                    <Card key={i} cardRecord={{ card, isFoil: true } as any} />
+                    <Card
+                        onClick={() => {
+                            if (game.myPlayer.uuid !== playerId) return;
+                            activate('ATTACK', card.uuid);
+                        }}
+                        key={i}
+                        cardRecord={{ card, isFoil: true } as any}
+                    />
                 );
             })}
         </StyledPlayField>

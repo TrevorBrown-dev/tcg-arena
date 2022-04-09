@@ -13,7 +13,11 @@ const SharedStyles = styled.div`
     flex: 0 0 auto;
 `;
 
-export const CardLayout = styled(SharedStyles)<{ isFoil?: boolean }>`
+export const CardLayout = styled(SharedStyles)<{
+    isFoil?: boolean;
+    activeCard?: boolean;
+    targetable?: boolean;
+}>`
     cursor: pointer;
     user-select: none;
     padding: 1em;
@@ -21,10 +25,19 @@ export const CardLayout = styled(SharedStyles)<{ isFoil?: boolean }>`
     display: flex;
     border-color: ${(props) => (props.isFoil ? '#ffc107' : '#2196f3')};
     flex-direction: column;
+    justify-content: space-between;
     background-color: var(--color-light);
     gap: 0.2em;
+    &.my-card {
+        outline: 2px solid
+            ${(props) => (props.activeCard ? 'hotpink' : 'transparent')};
+        outline-offset: 2px;
+    }
+
     .header {
         display: flex;
+        justify-content: space-between;
+        align-items: center;
         font-size: 1.5em;
         font-weight: bold;
     }
@@ -62,8 +75,25 @@ export const CardLayout = styled(SharedStyles)<{ isFoil?: boolean }>`
         flex: 1;
         justify-content: flex-end;
         align-items: flex-end;
+        font-size: 0.8em;
         .amount-container {
             font-weight: 400;
+        }
+    }
+
+    .footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .attack,
+        .health {
+            display: flex;
+            align-items: center;
+            gap: 0.2em;
+            font-weight: bold;
+        }
+        .health {
+            gap: 0.5em;
         }
     }
 `;

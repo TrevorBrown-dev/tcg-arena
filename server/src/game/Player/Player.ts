@@ -45,6 +45,12 @@ export class Player implements Target {
         return this.account.userName;
     }
 
+    startTurn() {
+        this.playField.cards.forEach((card) => {
+            card.attacked = false;
+        });
+    }
+
     drawCards(numCards: number = 1) {
         this.deck.popAndTransfer(numCards, this.hand);
     }

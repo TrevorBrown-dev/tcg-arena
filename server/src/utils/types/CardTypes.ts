@@ -1,9 +1,12 @@
+import { CardObjMetadata } from '../../game/Player/Card';
+
 export interface CardInfo {
     id: number;
     name: string;
     description: string;
     imageUrl: string;
     code: string;
+    metadata: CardObjMetadata;
 }
 
 export interface CardMetadata {

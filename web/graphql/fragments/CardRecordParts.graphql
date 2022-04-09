@@ -1,8 +1,8 @@
 fragment CardRecordParts on CardRecord {
     id
+    amount
+    isFoil
     card {
         ...CardParts
     }
-    amount
-    isFoil
 }

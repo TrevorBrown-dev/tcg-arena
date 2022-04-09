@@ -11,6 +11,10 @@ export class PlayField extends WithCards {
     @Field(() => [CardObj], { nullable: true })
     cards: CardObj[] = [];
 
+    findCard(uuid: string) {
+        return this.cards.find((card) => card.uuid === uuid);
+    }
+
     playCard(card: CardObj) {
         this.addCards([card]);
     }

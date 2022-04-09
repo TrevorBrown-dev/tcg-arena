@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import styled from 'styled-components';
 import { Game } from './components/Game/Game';
 import { GameSidebar } from './components/Game/GameSidebar';
+import { TargetStateLayout } from './utils/Targeting';
 import { gameContext, useGame } from './utils/useGame/useGame';
 
 const GameLayout = styled.div`
@@ -24,10 +25,12 @@ export const GameLobby: React.FC = () => {
 
     return (
         <gameContext.Provider value={game}>
-            <GameLayout>
-                <GameSidebar />
-                <Game />
-            </GameLayout>
+            <TargetStateLayout>
+                <GameLayout>
+                    <GameSidebar />
+                    <Game />
+                </GameLayout>
+            </TargetStateLayout>
         </gameContext.Provider>
     );
 };

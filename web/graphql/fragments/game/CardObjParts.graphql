@@ -5,4 +5,7 @@ fragment CardObjParts on CardObj {
     description
     imageUrl
     isFoil
+    metadata {
+        ...CardObjMetadataParts
+    }
 }

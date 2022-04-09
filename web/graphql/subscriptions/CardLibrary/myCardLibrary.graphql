@@ -1,13 +1,5 @@
 subscription MyCardLibrary {
     myCardLibrary {
-        id
-        amount
-        isFoil
-        card {
-            id
-            name
-            description
-            imageUrl
-        }
+        ...CardRecordParts
     }
 }

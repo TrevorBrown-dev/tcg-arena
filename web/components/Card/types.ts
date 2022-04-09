@@ -1,3 +1,5 @@
+import { CardObjMetadata } from '@graphql-gen';
+
 export type CardRecordPart = {
     amount: number;
     isFoil: boolean;
@@ -6,6 +8,7 @@ export type CardRecordPart = {
         name: string;
         description: string;
         imageUrl?: string;
+        metadata: CardObjMetadata;
     };
 };
 

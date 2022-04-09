@@ -48,6 +48,9 @@ export class Account extends BaseEntity {
     @Column()
     userName: string;
 
+    @Column({ default: false })
+    isAdmin: boolean;
+
     @Field(() => CardLibrary, { nullable: true })
     @OneToOne(() => CardLibrary, (library) => library.account)
     @JoinColumn()
