@@ -7,16 +7,15 @@ export const attack: InterpreterAction = (
     playerId,
     cardId
 ) => {
-    const { actingPlayer, otherPlayer } =
-        game.getActingAndOtherPlayer(playerId);
     if (!cardId) {
         throw new Error('No card id found');
     }
     const [targetUuid, amount] = token.values;
 
     const target = game.targets.find((t) => t.uuid === targetUuid);
-
-    target?.damage(parseInt(amount));
-
-    actingPlayer.playField.transferCards([cardId], actingPlayer.graveyard);
+    if (!target) {
+        throw new Error('Target not found in attack action');
+    }
+    target.damage(parseInt(amount));
+    game.emitEvent('ATTACK');
 };

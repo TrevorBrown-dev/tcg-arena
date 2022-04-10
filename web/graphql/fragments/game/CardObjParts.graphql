@@ -5,6 +5,8 @@ fragment CardObjParts on CardObj {
     description
     imageUrl
     isFoil
+    attack
+    attacked
     metadata {
         ...CardObjMetadataParts
     }

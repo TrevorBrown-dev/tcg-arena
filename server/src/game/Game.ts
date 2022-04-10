@@ -13,6 +13,7 @@ type PlayerInput = {
     deckTemplate: DeckTemplate;
     account: Account;
 };
+
 @ObjectType()
 export class Game {
     static games = new Map<string, Game>();
@@ -28,8 +29,10 @@ export class Game {
         Game.games.delete(id);
     }
 
+    events = new Map<string, Function[]>();
+
     @Field(() => String)
-    id: string = nanoid();
+    id: string;
 
     @Field(() => [Player])
     players: Player[];
@@ -47,6 +50,21 @@ export class Game {
             ...(this.players[0].playField.cards as Target[]),
             ...(this.players[1].playField.cards as Target[]),
         ];
+    }
+
+    regesterEvent(event: string, callback: Function) {
+        if (!this.events.has(event)) {
+            this.events.set(event, []);
+        }
+        this.events.get(event)!.push(callback);
+    }
+
+    async emitEvent(event: string, ...args: any[]) {
+        if (this.events.has(event)) {
+            for (const callback of this.events.get(event)!) {
+                await callback(...args);
+            }
+        }
     }
 
     endTurn() {
@@ -85,8 +103,9 @@ export class Game {
         if (!player1 || !player2) {
             return;
         }
-        const p1 = new Player(player1.deckTemplate, player1.account);
-        const p2 = new Player(player2.deckTemplate, player2.account);
+        this.id = nanoid();
+        const p1 = new Player(player1.deckTemplate, player1.account, this.id);
+        const p2 = new Player(player2.deckTemplate, player2.account, this.id);
 
         this.players = [p1, p2];
 

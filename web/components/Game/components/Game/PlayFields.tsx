@@ -2,6 +2,7 @@ import { Card } from 'components/Card/Card';
 import { PlayerHealth } from 'components/Game/utils/PlayerHealth';
 import { useTargetContext } from 'components/Game/utils/Targeting';
 import { useGameContext } from 'components/Game/utils/useGame/useGame';
+import { useEffect } from 'react';
 import styled from 'styled-components';
 
 const StyledPlayFields = styled.div`
@@ -106,7 +107,8 @@ const Divider: React.FC = () => {
 
 const PlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
     const game = useGameContext();
-    const { activate } = useTargetContext();
+    const { activate, targetState } = useTargetContext();
+
     const playField = game?.publicGame?.players?.find(
         (player) => player.uuid === playerId
     )?.playField;
@@ -116,12 +118,44 @@ const PlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
             {playField?.cards?.map((card, i) => {
                 return (
                     <Card
+                        className="my-card"
+                        activeCard={targetState.card === card.uuid}
                         onClick={() => {
+                            if (card.attacked) return;
                             if (game.myPlayer.uuid !== playerId) return;
                             activate('ATTACK', card.uuid);
                         }}
                         key={i}
-                        cardRecord={{ card, isFoil: true } as any}
+                        cardRecord={{ card, isFoil: card.isFoil } as any}
+                    />
+                );
+            })}
+        </StyledPlayField>
+    );
+};
+
+const MyPlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
+    const game = useGameContext();
+    const { activate, targetState } = useTargetContext();
+
+    const playField = game?.publicGame?.players?.find(
+        (player) => player.uuid === playerId
+    )?.playField;
+    return (
+        <StyledPlayField>
+            <div className="spacer"></div>
+            {playField?.cards?.map((card, i) => {
+                return (
+                    <Card
+                        className="my-card"
+                        activeCard={targetState.card === card.uuid}
+                        onClick={() => {
+                            if (card.attacked) return;
+                            if (game.myPlayer.uuid !== playerId) return;
+                            activate('ATTACK', card.uuid);
+                        }}
+                        key={i}
+                        cardRecord={{ card, isFoil: card.isFoil } as any}
                     />
                 );
             })}
@@ -135,7 +169,7 @@ export const PlayFields: React.FC = () => {
         <StyledPlayFields>
             <PlayField playerId={game?.otherPlayer?.uuid} />
             <Divider />
-            <PlayField playerId={game?.myPlayer?.uuid} />
+            <MyPlayField playerId={game?.myPlayer?.uuid} />
         </StyledPlayFields>
     );
 };

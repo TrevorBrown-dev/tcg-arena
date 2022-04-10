@@ -4,14 +4,12 @@ import { CardObj } from '../game/Player/Card';
 import { TARGETS } from '../game/utils/Target';
 import { sleep } from '../utils/sleep';
 import { ActionMap } from './actions';
-import { attack } from './actions/attack';
-import { destroy } from './actions/destroy';
-import { draw } from './actions/draw';
 import { InterpreterAction } from './actions/InterpreterAction';
 export enum VERBS {
     DRAW = 'DRAW',
     ATTACK = 'ATTACK',
     DESTROY = 'DESTROY',
+    WHEN = 'WHEN',
 }
 
 export enum CARD_TYPES {
@@ -30,6 +28,7 @@ export type Token = {
 
 export interface Header {
     VALID_TARGETS?: TARGETS[];
+    NUM_TARGETS?: number;
     TYPE?: CARD_TYPES;
     HEALTH?: number;
     ATTACK?: number;
@@ -65,21 +64,15 @@ class _Interpreter {
         console.log(code);
         const statements = code.BODY.trim().split(';');
         const tokens = [];
-
         for (const statement of statements) {
             const words = statement.split(' ');
-
+            const verb = words.shift();
+            if (!verb || !Object.values(VERBS).includes(verb as VERBS))
+                continue;
             const token: Token = {
-                type: '',
-                values: [],
+                type: verb,
+                values: words,
             };
-            for (const word of words as VERBS[] | string[]) {
-                if (Object.values(VERBS).includes(word as VERBS)) {
-                    token.type = word as VERBS;
-                } else {
-                    token.values.push(word.trim());
-                }
-            }
             if (token.type) {
                 tokens.push(token);
             }
@@ -108,14 +101,12 @@ class _Interpreter {
         playerId: string,
         cardId: string
     ) {
-        const tokens = this.tokenize(code);
         const { actingPlayer, otherPlayer } =
             game.getActingAndOtherPlayer(playerId);
+        code.BODY = code.BODY.replace(/SELF/g, actingPlayer.uuid);
+        code.BODY = code.BODY.replace(/OTHER/g, otherPlayer.uuid);
 
-        let card: CardObj | undefined;
-        if (cardId) {
-            card = actingPlayer.playField.getCards([cardId])[0];
-        }
+        const tokens = this.tokenize(code);
         for (const token of tokens) {
             const args: Parameters<InterpreterAction> = [
                 code,

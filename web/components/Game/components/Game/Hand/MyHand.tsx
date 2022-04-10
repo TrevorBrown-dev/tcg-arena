@@ -1,4 +1,4 @@
-import { Player, usePlayCardMutation } from '@graphql-gen';
+import { CardObj, Player, usePlayCardMutation } from '@graphql-gen';
 import { Card } from 'components/Card/Card';
 import { BlankCard } from 'components/Card/CardLayout';
 import { useTargetContext } from 'components/Game/utils/Targeting';
@@ -72,41 +72,49 @@ export const MyHand: React.FC = () => {
     const game = useGameContext();
     const [, playCard] = usePlayCardMutation();
     const { targetState, setTargetState } = useTargetContext();
+
+    const handleClick = (card: CardObj) => {
+        if (!game?.lobby.gameId) return;
+        if (
+            card.metadata?.VALID_TARGETS &&
+            card.metadata.VALID_TARGETS.length > 0
+        ) {
+            setTargetState({
+                enabled: true,
+                card: card.uuid,
+                type: 'PLAY',
+                target: null,
+                numTargets: card.metadata.NUM_TARGETS || 1,
+            });
+        } else {
+            playCard({
+                cardUuid: card.uuid,
+                gameId: game.lobby.gameId!,
+            });
+        }
+    };
+
+    const cards = game?.myPlayer?.hand?.cards;
+    if (!cards)
+        return (
+            <HandContainer>
+                <StyledHand></StyledHand>
+            </HandContainer>
+        );
+
     return (
         <HandContainer>
             <StyledHand>
                 <div className="container">
-                    {game?.myPlayer?.hand?.cards &&
-                        game.myPlayer.hand.cards.map((card, i) => (
-                            <Card
-                                className="my-card"
-                                activeCard={targetState.card === card.uuid}
-                                key={i}
-                                onClick={() => {
-                                    if (!game?.lobby.gameId) return;
-                                    console.log('METADATA', card.metadata);
-                                    if (
-                                        card.metadata?.VALID_TARGETS &&
-                                        card.metadata.VALID_TARGETS.length > 0
-                                    ) {
-                                        setTargetState({
-                                            enabled: true,
-                                            card: card.uuid,
-                                            type: 'PLAY',
-                                            target: null,
-                                        });
-                                    } else {
-                                        playCard({
-                                            cardUuid: card.uuid,
-                                            gameId: game.lobby.gameId!,
-                                        });
-                                    }
-                                }}
-                                cardRecord={
-                                    { card, isFoil: card.isFoil } as any
-                                }
-                            />
-                        ))}
+                    {cards.map((card, i) => (
+                        <Card
+                            className="my-card"
+                            activeCard={targetState.card === card.uuid}
+                            key={i}
+                            onClick={() => handleClick(card as CardObj)}
+                            cardRecord={{ card, isFoil: card.isFoil } as any}
+                        />
+                    ))}
                 </div>
             </StyledHand>
             <DeckDiscard player={game.myPlayer as any} flipped={false} />

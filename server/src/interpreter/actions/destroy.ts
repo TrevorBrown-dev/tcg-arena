@@ -7,11 +7,18 @@ export const destroy: InterpreterAction = (
     playerId,
     cardId
 ) => {
-    const [attackTarget, dmg] = token.values;
-    const dmgAmount = parseInt(dmg);
-    const damageTarget = game.targets.find((t) => t.uuid === attackTarget);
-    if (!damageTarget) {
-        throw new Error('Invalid target');
+    //! Needs rework later to handle discards but maybe thats a different action entirely
+    const { actingPlayer, otherPlayer } =
+        game.getActingAndOtherPlayer(playerId);
+    const inActing = !!actingPlayer.playField.findCard(cardId);
+    const inOther = !!otherPlayer.playField.findCard(cardId);
+    if (!inActing && !inOther) {
+        throw new Error('Card not found in destroy action');
     }
-    damageTarget.damage(dmgAmount);
+    if (inActing) {
+        actingPlayer.playField.transferCards([cardId], actingPlayer.graveyard);
+    }
+    if (inOther) {
+        otherPlayer.playField.transferCards([cardId], otherPlayer.graveyard);
+    }
 };

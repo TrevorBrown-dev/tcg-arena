@@ -3,6 +3,7 @@ fragment CardObjMetadataParts on CardObjMetadata {
     TYPE
     HEALTH
     ATTACK
+    NUM_TARGETS
     RESOURCES {
         name
         amount

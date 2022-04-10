@@ -13,6 +13,7 @@ export type TargetState = {
     type: 'PLAY' | 'ATTACK' | null;
     card: string | null;
     target: string[] | null;
+    numTargets: number | null;
 };
 
 type TargetContext = {
@@ -30,6 +31,7 @@ export const targetContext = createContext<TargetContext>({
         type: null,
         card: null,
         target: null,
+        numTargets: null,
     },
     cancel: () => {},
     activate: (type: 'PLAY' | 'ATTACK', card: string) => {},
@@ -49,6 +51,7 @@ export const TargetStateLayout: React.FC = ({ children }) => {
         card: null,
         target: null,
         type: null,
+        numTargets: 0,
     });
 
     const cancel = useCallback(() => {
@@ -57,6 +60,7 @@ export const TargetStateLayout: React.FC = ({ children }) => {
             card: null,
             target: null,
             type: null,
+            numTargets: null,
         });
     }, [setTargetState]);
 
@@ -90,13 +94,14 @@ export const TargetStateLayout: React.FC = ({ children }) => {
                 type,
                 target: null,
                 card,
+                numTargets: null,
             });
         },
         [setTargetState, targetState]
     );
     useEffect(() => {
         if (!targetState.card || !targetState.target) return;
-        console.log('targetState', targetState);
+        if (targetState.numTargets !== targetState.target.length) return;
         if (targetState.type === 'PLAY') {
             playCard({
                 cardUuid: targetState.card,
@@ -116,6 +121,7 @@ export const TargetStateLayout: React.FC = ({ children }) => {
             card: null,
             target: null,
             type: null,
+            numTargets: null,
         });
     }, [targetState]);
 

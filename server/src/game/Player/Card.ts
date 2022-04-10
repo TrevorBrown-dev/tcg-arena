@@ -32,6 +32,9 @@ export class CardObjMetadata implements Header {
 
     @Field(() => [Resource], { nullable: true })
     RESOURCES?: Resource[];
+
+    @Field(() => Number, { nullable: true })
+    NUM_TARGETS?: number;
 }
 interface Minion extends Target {
     attack?: number;
