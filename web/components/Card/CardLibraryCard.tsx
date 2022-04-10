@@ -1,7 +1,6 @@
 import { useAddCardToDeckTemplateMutation } from '../../generated/graphql';
 import { useModeContext } from '../Home/Dashboard';
 import { Card } from './Card';
-import { CardLayout } from './CardLayout';
 import { WithCardRecord } from './types';
 
 //TODO pull this out to a type later

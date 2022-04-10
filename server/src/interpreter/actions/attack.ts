@@ -17,5 +17,5 @@ export const attack: InterpreterAction = (
         throw new Error('Target not found in attack action');
     }
     target.damage(parseInt(amount));
-    game.emitEvent('ATTACK');
+    game.emitEvent('ATTACK', cardId, playerId);
 };

@@ -13,7 +13,10 @@ type PlayerInput = {
     deckTemplate: DeckTemplate;
     account: Account;
 };
-
+export type EventCallback = (
+    cardPlayed: string | null,
+    playedBy: string
+) => void;
 @ObjectType()
 export class Game {
     static games = new Map<string, Game>();
@@ -52,14 +55,14 @@ export class Game {
         ];
     }
 
-    regesterEvent(event: string, callback: Function) {
+    regesterEvent(event: string, callback: EventCallback) {
         if (!this.events.has(event)) {
             this.events.set(event, []);
         }
         this.events.get(event)!.push(callback);
     }
 
-    async emitEvent(event: string, ...args: any[]) {
+    async emitEvent(event: string, ...args: Parameters<EventCallback>) {
         if (this.events.has(event)) {
             for (const callback of this.events.get(event)!) {
                 await callback(...args);
@@ -99,6 +102,10 @@ export class Game {
         await Interpreter.interpret(code, this, playerId, cardId);
     }
 
+    async executeRawCode(code: string, playerId: string) {
+        await this.executeAction(playerId, Interpreter.parseCode(code), '');
+    }
+
     constructor(player1: PlayerInput, player2: PlayerInput) {
         if (!player1 || !player2) {
             return;
@@ -113,10 +120,11 @@ export class Game {
         const first = Math.floor(Math.random() * 2);
         this.turn = this.players[first].uuid;
         this.logs.push(`${this.players[first].account.userName} goes first.`);
+        this.players[first].startTurn();
 
         //Draw cards
-        p1.drawCards(3);
-        p2.drawCards(3);
+        this.executeAction(p1.uuid, Interpreter.parseCode('DRAW SELF 3;'), '');
+        this.executeAction(p2.uuid, Interpreter.parseCode('DRAW SELF 3;'), '');
     }
 
     static create(player1: PlayerInput, player2: PlayerInput) {

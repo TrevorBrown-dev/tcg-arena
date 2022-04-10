@@ -1,4 +1,5 @@
-import { Card } from 'components/Card/Card';
+import { CardObj } from '@graphql-gen';
+import { Card, CardState } from 'components/Card/Card';
 import { PlayerHealth } from 'components/Game/utils/PlayerHealth';
 import { useTargetContext } from 'components/Game/utils/Targeting';
 import { useGameContext } from 'components/Game/utils/useGame/useGame';
@@ -112,6 +113,18 @@ const PlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
     const playField = game?.publicGame?.players?.find(
         (player) => player.uuid === playerId
     )?.playField;
+
+    const mapState = (card: CardObj): CardState => {
+        if (targetState.card === card.uuid) return CardState.Selected;
+
+        if (
+            targetState.validTargets &&
+            targetState.validTargets.includes('OTHER_FIELD')
+        )
+            return CardState.ValidTarget;
+
+        return CardState.Default;
+    };
     return (
         <StyledPlayField>
             <div className="spacer"></div>
@@ -119,11 +132,15 @@ const PlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
                 return (
                     <Card
                         className="my-card"
-                        activeCard={targetState.card === card.uuid}
+                        state={mapState(card as any)}
                         onClick={() => {
                             if (card.attacked) return;
                             if (game.myPlayer.uuid !== playerId) return;
-                            activate('ATTACK', card.uuid);
+                            activate(
+                                'ATTACK',
+                                card.uuid,
+                                card.metadata?.NUM_TARGETS || 1
+                            );
                         }}
                         key={i}
                         cardRecord={{ card, isFoil: card.isFoil } as any}
@@ -141,6 +158,19 @@ const MyPlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
     const playField = game?.publicGame?.players?.find(
         (player) => player.uuid === playerId
     )?.playField;
+
+    const mapState = (card: CardObj): CardState => {
+        if (targetState.card === card.uuid) return CardState.Selected;
+
+        if (
+            targetState.validTargets &&
+            targetState.validTargets.includes('SELF_FIELD')
+        )
+            return CardState.ValidTarget;
+
+        return CardState.Default;
+    };
+
     return (
         <StyledPlayField>
             <div className="spacer"></div>
@@ -148,11 +178,18 @@ const MyPlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
                 return (
                     <Card
                         className="my-card"
-                        activeCard={targetState.card === card.uuid}
+                        state={mapState(card as any)}
                         onClick={() => {
                             if (card.attacked) return;
                             if (game.myPlayer.uuid !== playerId) return;
-                            activate('ATTACK', card.uuid);
+                            if (game.publicGame?.turn !== game.myPlayer.uuid)
+                                return;
+                            activate(
+                                'ATTACK',
+                                card.uuid,
+                                card.metadata?.NUM_TARGETS || 1,
+                                ['OTHER_FIELD']
+                            );
                         }}
                         key={i}
                         cardRecord={{ card, isFoil: card.isFoil } as any}

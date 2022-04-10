@@ -8,7 +8,7 @@ export const OpponentHand: React.FC = () => {
     return (
         <HandContainer>
             <StyledHand>
-                <div className="container" style={{}}>
+                <div className="container">
                     {new Array(game?.otherPlayer?.hand?.numCardsInHand || 0)
                         .fill(0)
                         .map((_, i) => {

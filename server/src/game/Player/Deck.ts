@@ -12,6 +12,8 @@ export class Deck extends WithCards {
     @Field(() => String)
     id: string = nanoid();
 
+    owner: string;
+
     @Field(() => [CardObj], { nullable: true })
     cards: CardObj[] = [];
 
@@ -22,13 +24,14 @@ export class Deck extends WithCards {
 
     game: string;
 
-    constructor(gameId: string) {
+    constructor(gameId: string, owner: string) {
         super();
         this.game = gameId;
+        this.owner = owner;
     }
 
-    static create(template: DeckTemplate, gameId: string) {
-        const deck = new Deck(gameId);
+    static create(template: DeckTemplate, gameId: string, owner: string) {
+        const deck = new Deck(gameId, owner);
         deck.cards = DeckTemplate.loadCardsFromTemplate(template);
         deck.cards = shuffleArray(deck.cards);
         return deck;
@@ -36,11 +39,11 @@ export class Deck extends WithCards {
 
     shuffle() {
         this.cards = shuffleArray(this.cards);
-        Game.get(this.game)?.emitEvent('SHUFFLE');
+        Game.get(this.game)?.emitEvent('SHUFFLE', null, this.id);
     }
 
     replace(cards: CardObj[]) {
         this.addCards(cards);
-        Game.get(this.game)?.emitEvent('REPLACE');
+        Game.get(this.game)?.emitEvent('REPLACE', null, this.id);
     }
 }

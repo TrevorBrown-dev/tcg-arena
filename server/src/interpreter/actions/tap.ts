@@ -1,12 +1,6 @@
 import { InterpreterAction } from './InterpreterAction';
 
-export const draw: InterpreterAction = (
-    code,
-    token,
-    game,
-    playerId,
-    cardId
-) => {
+export const tap: InterpreterAction = (code, token, game, playerId, cardId) => {
     const [target, _amount] = token.values;
     const amount = parseInt(_amount);
     if (!target || !amount)
@@ -15,6 +9,6 @@ export const draw: InterpreterAction = (
     console.log(code, token.values);
     if (!playerToDraw) throw new Error('Player not found in draw action');
     playerToDraw.drawCards(amount);
-    game.emitEvent('DRAW', cardId, playerId);
-    game.emitEvent(`DRAW_${playerId}`, cardId, playerId);
+    game.emitEvent('TAP', cardId, playerId);
+    game.emitEvent(`TAP_${playerId}`, cardId, playerId);
 };

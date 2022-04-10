@@ -7,6 +7,7 @@ import { ActionMap } from './actions';
 import { InterpreterAction } from './actions/InterpreterAction';
 export enum VERBS {
     DRAW = 'DRAW',
+    TAP = 'TAP',
     ATTACK = 'ATTACK',
     DESTROY = 'DESTROY',
     WHEN = 'WHEN',
@@ -15,6 +16,7 @@ export enum VERBS {
 export enum CARD_TYPES {
     MINION = 'MINION',
     SPELL = 'SPELL',
+    TRAP = 'TRAP',
 }
 
 registerEnumType(CARD_TYPES, {
@@ -63,9 +65,10 @@ class _Interpreter {
     tokenize(code: ParsedCode): Token[] {
         console.log(code);
         const statements = code.BODY.trim().split(';');
+        console.log(statements);
         const tokens = [];
         for (const statement of statements) {
-            const words = statement.split(' ');
+            const words = statement.split(' ').filter((w) => w.length > 0);
             const verb = words.shift();
             if (!verb || !Object.values(VERBS).includes(verb as VERBS))
                 continue;
@@ -73,6 +76,7 @@ class _Interpreter {
                 type: verb,
                 values: words,
             };
+            console.log('WHEN TOKEN', token);
             if (token.type) {
                 tokens.push(token);
             }

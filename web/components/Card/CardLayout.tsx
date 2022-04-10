@@ -3,43 +3,54 @@ import { Pentacle } from 'components/svg/icons/Pentacle';
 import { Sword } from 'components/svg/icons/Sword';
 import { Wand } from 'components/svg/icons/Wand';
 import styled from 'styled-components';
+import { CardState } from './Card';
 
 const SharedStyles = styled.div`
     font-size: 0.8em;
-    width: 15em;
-    height: 20em;
-    border: 2px solid;
+    width: 15.5em;
+    height: 22em;
+    border: 0.35em solid;
     border-radius: 0.8rem;
     flex: 0 0 auto;
 `;
 
 export const CardLayout = styled(SharedStyles)<{
     isFoil?: boolean;
-    activeCard?: boolean;
-    targetable?: boolean;
+    state: CardState;
 }>`
     cursor: pointer;
     user-select: none;
-    padding: 1em;
-    padding-top: 0.5em;
+    padding: 0.5em;
     display: flex;
-    border-color: ${(props) => (props.isFoil ? '#ffc107' : '#2196f3')};
+    border-color: ${(props) => {
+        if (props.state === CardState.ValidTarget)
+            return 'var(--color-warning)';
+
+        return props.isFoil ? '#ffc107' : '#2196f3';
+    }};
     flex-direction: column;
     justify-content: space-between;
     background-color: var(--color-light);
     gap: 0.2em;
+
     &.my-card {
         outline: 2px solid
-            ${(props) => (props.activeCard ? 'hotpink' : 'transparent')};
+            ${(props) =>
+                props.state == CardState.Selected ? 'hotpink' : 'transparent'};
         outline-offset: 2px;
+    }
+    .top {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2em;
     }
 
     .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        font-size: 1.5em;
-        font-weight: bold;
+        font-size: 1.2em;
+        font-weight: 500;
     }
 
     .image {
@@ -83,7 +94,7 @@ export const CardLayout = styled(SharedStyles)<{
 
     .footer {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: center;
         .attack,
         .health {

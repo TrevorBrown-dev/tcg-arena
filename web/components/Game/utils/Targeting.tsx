@@ -14,6 +14,7 @@ export type TargetState = {
     card: string | null;
     target: string[] | null;
     numTargets: number | null;
+    validTargets?: string[] | null;
 };
 
 type TargetContext = {
@@ -22,7 +23,12 @@ type TargetContext = {
     addTarget: (target: string) => void;
     removeTarget: (target: string) => void;
     setTargetState: (targetState: TargetState) => void;
-    activate: (type: 'PLAY' | 'ATTACK', card: string) => void;
+    activate: (
+        type: 'PLAY' | 'ATTACK',
+        card: string,
+        numTargets: number,
+        validTargets?: string[]
+    ) => void;
 };
 
 export const targetContext = createContext<TargetContext>({
@@ -52,6 +58,7 @@ export const TargetStateLayout: React.FC = ({ children }) => {
         target: null,
         type: null,
         numTargets: 0,
+        validTargets: null,
     });
 
     const cancel = useCallback(() => {
@@ -61,11 +68,13 @@ export const TargetStateLayout: React.FC = ({ children }) => {
             target: null,
             type: null,
             numTargets: null,
+            validTargets: null,
         });
     }, [setTargetState]);
 
     const addTarget = useCallback(
         (target: string) => {
+            if (targetState.target?.includes(target)) return;
             setTargetState({
                 ...targetState,
                 target: targetState.target
@@ -88,18 +97,25 @@ export const TargetStateLayout: React.FC = ({ children }) => {
     );
 
     const activate = useCallback(
-        (type: 'PLAY' | 'ATTACK', card: string) => {
+        (
+            type: 'PLAY' | 'ATTACK',
+            card: string,
+            numTargets: number,
+            validTargets?: string[]
+        ) => {
             setTargetState({
                 enabled: true,
                 type,
                 target: null,
                 card,
-                numTargets: null,
+                numTargets: numTargets,
+                validTargets,
             });
         },
         [setTargetState, targetState]
     );
     useEffect(() => {
+        console.log('TARGETSTATE', targetState);
         if (!targetState.card || !targetState.target) return;
         if (targetState.numTargets !== targetState.target.length) return;
         if (targetState.type === 'PLAY') {
@@ -109,6 +125,7 @@ export const TargetStateLayout: React.FC = ({ children }) => {
                 targetUuid: targetState.target,
             });
         } else if (targetState.type === 'ATTACK') {
+            console.log('ATTACKING');
             attack({
                 cardUuid: targetState.card,
                 gameId: game.lobby.gameId!,
@@ -122,6 +139,7 @@ export const TargetStateLayout: React.FC = ({ children }) => {
             target: null,
             type: null,
             numTargets: null,
+            validTargets: null,
         });
     }, [targetState]);
 

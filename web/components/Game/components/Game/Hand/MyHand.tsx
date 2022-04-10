@@ -1,5 +1,5 @@
 import { CardObj, Player, usePlayCardMutation } from '@graphql-gen';
-import { Card } from 'components/Card/Card';
+import { Card, CardState } from 'components/Card/Card';
 import { BlankCard } from 'components/Card/CardLayout';
 import { useTargetContext } from 'components/Game/utils/Targeting';
 import { useGameContext } from 'components/Game/utils/useGame/useGame';
@@ -75,6 +75,7 @@ export const MyHand: React.FC = () => {
 
     const handleClick = (card: CardObj) => {
         if (!game?.lobby.gameId) return;
+        if (game.publicGame?.turn !== game.myPlayer.uuid) return;
         if (
             card.metadata?.VALID_TARGETS &&
             card.metadata.VALID_TARGETS.length > 0
@@ -85,6 +86,7 @@ export const MyHand: React.FC = () => {
                 type: 'PLAY',
                 target: null,
                 numTargets: card.metadata.NUM_TARGETS || 1,
+                validTargets: card.metadata.VALID_TARGETS,
             });
         } else {
             playCard({
@@ -92,6 +94,18 @@ export const MyHand: React.FC = () => {
                 gameId: game.lobby.gameId!,
             });
         }
+    };
+
+    const mapState = (card: CardObj): CardState => {
+        if (targetState.card === card.uuid) return CardState.Selected;
+
+        if (
+            targetState.validTargets &&
+            targetState.validTargets.includes('SELF_HAND')
+        )
+            return CardState.ValidTarget;
+
+        return CardState.Default;
     };
 
     const cards = game?.myPlayer?.hand?.cards;
@@ -109,7 +123,7 @@ export const MyHand: React.FC = () => {
                     {cards.map((card, i) => (
                         <Card
                             className="my-card"
-                            activeCard={targetState.card === card.uuid}
+                            state={mapState(card as any)}
                             key={i}
                             onClick={() => handleClick(card as CardObj)}
                             cardRecord={{ card, isFoil: card.isFoil } as any}

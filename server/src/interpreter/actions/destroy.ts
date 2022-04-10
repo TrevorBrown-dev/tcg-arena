@@ -12,6 +12,7 @@ export const destroy: InterpreterAction = (
         game.getActingAndOtherPlayer(playerId);
     const inActing = !!actingPlayer.playField.findCard(cardId);
     const inOther = !!otherPlayer.playField.findCard(cardId);
+    console.log('RUNNING DESTROY');
     if (!inActing && !inOther) {
         throw new Error('Card not found in destroy action');
     }
@@ -21,4 +22,5 @@ export const destroy: InterpreterAction = (
     if (inOther) {
         otherPlayer.playField.transferCards([cardId], otherPlayer.graveyard);
     }
+    game.emitEvent('DESTROY', cardId, playerId);
 };

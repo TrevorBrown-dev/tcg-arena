@@ -24,8 +24,7 @@ export class Player implements Target {
     game: string;
 
     @Field(() => String)
-    uuid: string = nanoid();
-
+    uuid: string;
     @Field(() => Deck, { nullable: true })
     deck: Deck;
 
@@ -52,15 +51,20 @@ export class Player implements Target {
         this.playField.cards.forEach((card) => {
             card.attacked = false;
         });
+        const game = Game.get(this.game);
+        game?.executeRawCode('DRAW SELF 1;', this.uuid);
+
+        game?.logs.push(`${this.name} starts their turn.`);
+        game?.logs.push(`${this.name} drew a card.`);
+        game?.emitEvent('START_TURN', null, this.uuid);
     }
 
     drawCards(numCards: number = 1) {
         this.deck.popAndTransfer(numCards, this.hand);
-        Game.get(this.game)?.emitEvent('DRAW');
     }
 
     drawCard() {
-        this.deck.popAndTransfer(1, this.hand);
+        this.drawCards(1);
     }
 
     playCard(card: CardObj) {
@@ -68,9 +72,10 @@ export class Player implements Target {
     }
 
     constructor(deckTemplate: DeckTemplate, account: Account, gameId: string) {
+        this.uuid = nanoid();
         this.account = account;
         this.game = gameId;
-        this.deck = Deck.create(deckTemplate, gameId);
+        this.deck = Deck.create(deckTemplate, gameId, this.uuid);
     }
     static create(
         deckTemplate: DeckTemplate,

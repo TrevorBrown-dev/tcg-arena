@@ -65,6 +65,7 @@ export class CardLibrary extends BaseEntity implements WithCardRecords {
 
         //! Make sure you remove the card from the library before you remove the card from the deck templates
         const success = await CardRecord.removeCount(library, card, isFoil);
+        if (!success) throw new Error(`Card not found in library`);
         await CardLibrary.removeCardFromDeckTemplates(library, card, isFoil);
         pubsub.publish(`updateCardLibrary_${library.account.id}`, {
             records: library.cards,

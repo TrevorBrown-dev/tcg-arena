@@ -10,16 +10,16 @@ export const when: InterpreterAction = (
     cardId
 ) => {
     const [verb, ...action] = token.values;
-    if (!verb || !Object.values(VERBS).includes(verb as VERBS))
-        throw new Error('No verb found in when action');
+    console.log('TOKEN IN WHEN FUNC', token);
     const card = game.targets.find((t) => t.uuid === cardId);
     const newAction: ParsedCode = {
         HEADER: {},
-        BODY: action.join(' '),
+        BODY: `${action.join(' ')};`,
     };
-    game.regesterEvent(verb, () => {
+    console.log('ACTION', action);
+    game.regesterEvent(verb, (cardPlayed, playedBy) => {
         game.executeAction(playerId, newAction, cardId);
-        game.emitEvent('WHEN');
+        game.emitEvent('WHEN', cardId, playerId);
         game.logs.push(`${card?.name} triggered an action`);
         Game.publishGame(game);
     });

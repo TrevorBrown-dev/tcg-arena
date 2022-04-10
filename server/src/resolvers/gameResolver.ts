@@ -35,8 +35,8 @@ class GameResolver {
         if (game.turn !== player.uuid) {
             throw new Error(`It is not your turn!`);
         }
-        game.endTurn();
         game.logs.push(`${player.account.userName} ended their turn.`);
+        game.endTurn();
         await Game.publishGame(game);
         return true;
     }
