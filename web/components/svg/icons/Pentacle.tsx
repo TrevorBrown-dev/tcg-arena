@@ -10,6 +10,7 @@ export const Pentacle = (props: SVGProps<SVGSVGElement>) => (
         xmlns="http://www.w3.org/2000/svg"
         {...props}
     >
+        <title>Pentacles</title>
         <circle
             cx={91}
             cy={91}

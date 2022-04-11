@@ -5,6 +5,7 @@ import { useGameContext } from 'components/Game/utils/useGame/useGame';
 import { Button } from 'components/library/Button';
 import styled from 'styled-components';
 import { Logs } from './Logs';
+import { Resources } from './Resources';
 
 const StyledGameSidebar = styled.aside`
     display: flex;
@@ -52,6 +53,7 @@ export const GameSidebar: React.FC = () => {
             <div className="other-player">
                 <div className="player-info">
                     <h1>{game.otherPlayer?.account.userName}</h1>
+                    <Resources player={game.otherPlayer as any} />
                 </div>
             </div>
             <hr />
@@ -68,6 +70,7 @@ export const GameSidebar: React.FC = () => {
                     >
                         End Turn
                     </Button>
+                    <Resources player={game.myPlayer as any} />
                 </div>
                 <div>
                     <SelectTarget style={{ marginBottom: '1em' }} />

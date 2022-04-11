@@ -8,9 +8,9 @@ import { when } from './when';
 export const ActionMap: {
     [key: string]: InterpreterAction;
 } = {
-    ['DRAW']: draw,
-    ['ATTACK']: attack,
-    ['DESTROY']: destroy,
-    ['WHEN']: when,
-    ['TAP']: tap,
+    ['DRAW']: draw, //A regular draw action
+    ['TAP']: tap, //Drawing without triggering a draw event
+    ['ATTACK']: attack, //A damage dealing action
+    ['DESTROY']: destroy, //Moves the card to the graveyard
+    ['WHEN']: when, //An action that triggers when a condition is met
 };

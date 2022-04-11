@@ -20,7 +20,9 @@ export const when: InterpreterAction = (
     game.regesterEvent(verb, (cardPlayed, playedBy) => {
         game.executeAction(playerId, newAction, cardId);
         game.emitEvent('WHEN', cardId, playerId);
+
         game.logs.push(`${card?.name} triggered an action`);
+
         Game.publishGame(game);
     });
 };

@@ -1,0 +1,6 @@
+fragment ResourcesParts on Resources {
+    swords
+    cups
+    wands
+    pentacles
+}

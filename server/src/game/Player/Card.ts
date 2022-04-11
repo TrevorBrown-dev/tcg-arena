@@ -1,20 +1,29 @@
 import { Field, ObjectType } from 'type-graphql';
 import { nanoid } from 'nanoid';
 import { CardInfo } from '../../utils/types/CardTypes';
-import { Target, TARGETS } from '../utils/Target';
+import { Target, TARGETS, TARGET_TYPE } from '../utils/Target';
 import {
     CARD_TYPES,
     Header,
     Interpreter,
     ParsedCode,
 } from '../../interpreter/Interpreter';
+import { Game } from '../Game';
+import { Resources } from './Player';
 
 @ObjectType()
-export class Resource {
-    @Field()
-    name: string;
-    @Field()
-    amount: number;
+class ResourceCosts {
+    @Field({ nullable: true })
+    swords?: number;
+
+    @Field({ nullable: true })
+    cups?: number;
+
+    @Field({ nullable: true })
+    wands?: number;
+
+    @Field({ nullable: true })
+    pentacles?: number;
 }
 @ObjectType()
 export class CardObjMetadata implements Header {
@@ -30,8 +39,8 @@ export class CardObjMetadata implements Header {
     @Field(() => Number, { nullable: true })
     ATTACK?: number;
 
-    @Field(() => [Resource], { nullable: true })
-    RESOURCES?: Resource[];
+    @Field(() => ResourceCosts, { nullable: true })
+    RESOURCES?: ResourceCosts;
 
     @Field(() => Number, { nullable: true })
     NUM_TARGETS?: number;
@@ -39,7 +48,7 @@ export class CardObjMetadata implements Header {
 interface Minion extends Target {
     attack?: number;
     attacked?: boolean;
-    executeAttack?: (target: Target[]) => void;
+    executeAttack?: (target: Target[], game: Game, playerId: string) => void;
     increaseAttack?: (amount: number) => void;
     decreaseAttack?: (amount: number) => void;
 }
@@ -75,27 +84,40 @@ export class CardObj implements CardInfo, Minion {
     @Field(() => Boolean)
     isFoil: boolean;
 
+    type = TARGET_TYPE.MINION;
+
     @Field(() => CardObjMetadata, { nullable: true })
     metadata: CardObjMetadata;
 
-    damage(dmgAmount: number) {
+    damage(dmgAmount: number, game: Game) {
         if (this.health) {
             this.health -= dmgAmount;
+            const player = game.players.find((p) =>
+                p.playField.findCard(this.uuid)
+            );
+            if (!player) throw new Error('Player not found in damage action');
+            if (this.health <= 0) {
+                game.executeRawCode(`DESTROY;`, player.uuid, this.uuid);
+            }
         }
     }
 
-    heal(healAmount: number) {
+    heal(healAmount: number, game: Game) {
         if (this.health && this.metadata.HEALTH) {
             this.health += healAmount;
             this.health = Math.min(this.health, this.metadata.HEALTH);
         }
     }
 
-    executeAttack(target: Target[]) {
+    executeAttack(target: Target[], game: Game, playerId: string) {
         if (this.attacked) throw new Error('You already attacked!');
-        target.forEach((t) => {
+        target.forEach(async (t) => {
             if (this.attack) {
-                t.damage(this.attack);
+                await game.executeRawCode(
+                    `ATTACK ${t.uuid} ${this.attack}`,
+                    playerId,
+                    this.uuid
+                );
             }
         });
         this.attacked = true;

@@ -95,7 +95,15 @@ export const CardLayout = styled(SharedStyles)<{
     .footer {
         display: flex;
         justify-content: flex-end;
-        align-items: center;
+        align-items: flex-end;
+
+        .resources {
+            flex: 1;
+            display: flex;
+            gap: 0.7em;
+            font-size: 0.8em;
+        }
+
         .attack,
         .health {
             display: flex;

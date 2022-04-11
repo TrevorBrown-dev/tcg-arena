@@ -1,5 +1,5 @@
 import { CardObj, Player, usePlayCardMutation } from '@graphql-gen';
-import { Card, CardState } from 'components/Card/Card';
+import { Card, CardState, GameCard } from 'components/Card/Card';
 import { BlankCard } from 'components/Card/CardLayout';
 import { useTargetContext } from 'components/Game/utils/Targeting';
 import { useGameContext } from 'components/Game/utils/useGame/useGame';
@@ -121,12 +121,12 @@ export const MyHand: React.FC = () => {
             <StyledHand>
                 <div className="container">
                     {cards.map((card, i) => (
-                        <Card
+                        <GameCard
                             className="my-card"
                             state={mapState(card as any)}
                             key={i}
                             onClick={() => handleClick(card as CardObj)}
-                            cardRecord={{ card, isFoil: card.isFoil } as any}
+                            card={card as CardObj}
                         />
                     ))}
                 </div>

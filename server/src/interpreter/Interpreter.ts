@@ -11,6 +11,7 @@ export enum VERBS {
     ATTACK = 'ATTACK',
     DESTROY = 'DESTROY',
     WHEN = 'WHEN',
+    HEAL = 'HEAL',
 }
 
 export enum CARD_TYPES {
@@ -35,9 +36,11 @@ export interface Header {
     HEALTH?: number;
     ATTACK?: number;
     RESOURCES?: {
-        name: string;
-        amount: number;
-    }[];
+        swords?: number;
+        cups?: number;
+        wands?: number;
+        pentacles?: number;
+    };
 }
 
 export interface ParsedCode {

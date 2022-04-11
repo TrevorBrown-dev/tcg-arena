@@ -5,7 +5,9 @@ fragment CardObjMetadataParts on CardObjMetadata {
     ATTACK
     NUM_TARGETS
     RESOURCES {
-        name
-        amount
+        swords
+        cups
+        wands
+        pentacles
     }
 }

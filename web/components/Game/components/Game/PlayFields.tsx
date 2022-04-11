@@ -1,5 +1,5 @@
 import { CardObj } from '@graphql-gen';
-import { Card, CardState } from 'components/Card/Card';
+import { Card, CardState, GameCard } from 'components/Card/Card';
 import { PlayerHealth } from 'components/Game/utils/PlayerHealth';
 import { useTargetContext } from 'components/Game/utils/Targeting';
 import { useGameContext } from 'components/Game/utils/useGame/useGame';
@@ -108,7 +108,7 @@ const Divider: React.FC = () => {
 
 const PlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
     const game = useGameContext();
-    const { activate, targetState } = useTargetContext();
+    const { addTarget, targetState } = useTargetContext();
 
     const playField = game?.publicGame?.players?.find(
         (player) => player.uuid === playerId
@@ -130,20 +130,14 @@ const PlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
             <div className="spacer"></div>
             {playField?.cards?.map((card, i) => {
                 return (
-                    <Card
+                    <GameCard
                         className="my-card"
                         state={mapState(card as any)}
                         onClick={() => {
-                            if (card.attacked) return;
-                            if (game.myPlayer.uuid !== playerId) return;
-                            activate(
-                                'ATTACK',
-                                card.uuid,
-                                card.metadata?.NUM_TARGETS || 1
-                            );
+                            addTarget(card.uuid);
                         }}
                         key={i}
-                        cardRecord={{ card, isFoil: card.isFoil } as any}
+                        card={card as CardObj}
                     />
                 );
             })}
@@ -176,7 +170,7 @@ const MyPlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
             <div className="spacer"></div>
             {playField?.cards?.map((card, i) => {
                 return (
-                    <Card
+                    <GameCard
                         className="my-card"
                         state={mapState(card as any)}
                         onClick={() => {
@@ -192,7 +186,7 @@ const MyPlayField: React.FC<{ playerId?: string }> = ({ playerId }) => {
                             );
                         }}
                         key={i}
-                        cardRecord={{ card, isFoil: card.isFoil } as any}
+                        card={card as CardObj}
                     />
                 );
             })}

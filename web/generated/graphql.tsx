@@ -32,7 +32,8 @@ export type AccountResponse = {
 
 export enum Card_Types {
   Minion = 'MINION',
-  Spell = 'SPELL'
+  Spell = 'SPELL',
+  Trap = 'TRAP'
 }
 
 export type Card = {
@@ -80,7 +81,7 @@ export type CardObjMetadata = {
   ATTACK?: Maybe<Scalars['Float']>;
   HEALTH?: Maybe<Scalars['Float']>;
   NUM_TARGETS?: Maybe<Scalars['Float']>;
-  RESOURCES?: Maybe<Array<Resource>>;
+  RESOURCES?: Maybe<ResourceCosts>;
   TYPE?: Maybe<Card_Types>;
   VALID_TARGETS?: Maybe<Array<Targets>>;
 };
@@ -153,6 +154,7 @@ export type Game = {
   logs?: Maybe<GameLogs>;
   players: Array<Player>;
   turn: Scalars['String'];
+  winner?: Maybe<Scalars['String']>;
 };
 
 export type GameLogs = {
@@ -193,6 +195,7 @@ export type Mutation = {
   declineOffer: EventOffer;
   deleteDeckTemplate: Scalars['Boolean'];
   endTurn: Scalars['Boolean'];
+  increaseResource: Scalars['Boolean'];
   joinLobby: Lobby;
   leaveLobby: Lobby;
   login: AccountResponse;
@@ -275,6 +278,12 @@ export type MutationEndTurnArgs = {
 };
 
 
+export type MutationIncreaseResourceArgs = {
+  gameId: Scalars['String'];
+  resource: Scalars['String'];
+};
+
+
 export type MutationJoinLobbyArgs = {
   accountId: Scalars['Float'];
   id: Scalars['String'];
@@ -349,6 +358,8 @@ export type Player = {
   hand?: Maybe<Hand>;
   health?: Maybe<Scalars['Float']>;
   playField?: Maybe<PlayField>;
+  resources: Resources;
+  resourcesLeftToSelect: Scalars['Float'];
   uuid: Scalars['String'];
 };
 
@@ -442,10 +453,20 @@ export type RegisterInput = {
   userName: Scalars['String'];
 };
 
-export type Resource = {
-  __typename?: 'Resource';
-  amount: Scalars['Float'];
-  name: Scalars['String'];
+export type ResourceCosts = {
+  __typename?: 'ResourceCosts';
+  cups?: Maybe<Scalars['Float']>;
+  pentacles?: Maybe<Scalars['Float']>;
+  swords?: Maybe<Scalars['Float']>;
+  wands?: Maybe<Scalars['Float']>;
+};
+
+export type Resources = {
+  __typename?: 'Resources';
+  cups: Scalars['Float'];
+  pentacles: Scalars['Float'];
+  swords: Scalars['Float'];
+  wands: Scalars['Float'];
 };
 
 export type Subscription = {
@@ -516,15 +537,15 @@ export type UpdateCardInput = {
 
 export type AccountPartsFragment = { __typename?: 'Account', id: number, email: string, userName: string, friendCode: string };
 
-export type CardLibraryPartsFragment = { __typename?: 'CardLibrary', id: number, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } } }> };
+export type CardLibraryPartsFragment = { __typename?: 'CardLibrary', id: number, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } } }> };
 
-export type CardPartsFragment = { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } };
+export type CardPartsFragment = { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } };
 
-export type CardRecordPartsFragment = { __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } } };
+export type CardRecordPartsFragment = { __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } } };
 
 export type ChatMessagePartsFragment = { __typename?: 'ChatMessage', id: number, message: string, account: { __typename?: 'Account', id: number, userName: string } };
 
-export type DeckTemplatePartsFragment = { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } } }> };
+export type DeckTemplatePartsFragment = { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } } }> };
 
 export type EventOfferPartsFragment = { __typename?: 'EventOffer', id: string, type: EventOfferType, status: EventOfferStatus, lobbyId?: string | null, issuer: { __typename?: 'Account', id: number, userName: string, friendCode: string }, recipient: { __typename?: 'Account', id: number, userName: string, friendCode: string } };
 
@@ -532,23 +553,25 @@ export type LobbyPartsFragment = { __typename?: 'Lobby', id: string, members?: A
 
 export type PreGameLobbyPartsFragment = { __typename?: 'PreGameLobby', id: string, ready: boolean, gameId?: string | null, players: Array<{ __typename?: 'PreGamePlayer', id: string, ready: boolean, account: { __typename?: 'Account', id: number, userName: string } }> };
 
-export type CardObjMetadataPartsFragment = { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null };
+export type CardObjMetadataPartsFragment = { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null };
 
-export type CardObjPartsFragment = { __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } | null };
+export type CardObjPartsFragment = { __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, health?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } | null };
 
-export type DeckPartsFragment = { __typename?: 'Deck', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } | null }> | null };
+export type DeckPartsFragment = { __typename?: 'Deck', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, health?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } | null }> | null };
 
-export type GraveyardPartsFragment = { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } | null }> | null };
+export type GraveyardPartsFragment = { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, health?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } | null }> | null };
 
-export type HandPartsFragment = { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } | null }> | null };
+export type HandPartsFragment = { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, health?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } | null }> | null };
 
-export type PlayFieldPartsFragment = { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } | null }> | null };
+export type PlayFieldPartsFragment = { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, health?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } | null }> | null };
 
-export type PlayerPartsFragment = { __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } | null }> | null } | null };
+export type PlayerPartsFragment = { __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, health?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } | null }> | null } | null };
 
-export type PrivateGamePartsFragment = { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } | null }> | null } | null }> };
+export type PrivateGamePartsFragment = { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, health?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } | null }> | null } | null }> };
 
-export type PublicGamePartsFragment = { __typename?: 'Game', id: string, turn: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', uuid: string, health?: number | null, graveyard: { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } | null }> | null }, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } | null }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> };
+export type PublicGamePartsFragment = { __typename?: 'Game', id: string, turn: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', uuid: string, health?: number | null, resourcesLeftToSelect: number, resources: { __typename?: 'Resources', swords: number, cups: number, wands: number, pentacles: number }, graveyard: { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, health?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } | null }> | null }, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, health?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } | null }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> };
+
+export type ResourcesPartsFragment = { __typename?: 'Resources', swords: number, cups: number, wands: number, pentacles: number };
 
 export type LoginMutationVariables = Exact<{
   password: Scalars['String'];
@@ -586,14 +609,14 @@ export type RemoveCardFromDeckTemplateMutationVariables = Exact<{
 }>;
 
 
-export type RemoveCardFromDeckTemplateMutation = { __typename?: 'Mutation', removeCardFromDeckTemplate: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } } }> } };
+export type RemoveCardFromDeckTemplateMutation = { __typename?: 'Mutation', removeCardFromDeckTemplate: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } } }> } };
 
 export type CreateDeckTemplateMutationVariables = Exact<{
   name: Scalars['String'];
 }>;
 
 
-export type CreateDeckTemplateMutation = { __typename?: 'Mutation', createDeckTemplate: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } } }> } };
+export type CreateDeckTemplateMutation = { __typename?: 'Mutation', createDeckTemplate: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } } }> } };
 
 export type AddCardToDeckTemplateMutationVariables = Exact<{
   cardId: Scalars['Float'];
@@ -602,7 +625,7 @@ export type AddCardToDeckTemplateMutationVariables = Exact<{
 }>;
 
 
-export type AddCardToDeckTemplateMutation = { __typename?: 'Mutation', addCardToDeckTemplate: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } } }> } };
+export type AddCardToDeckTemplateMutation = { __typename?: 'Mutation', addCardToDeckTemplate: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } } }> } };
 
 export type AcceptEventOfferMutationVariables = Exact<{
   id: Scalars['String'];
@@ -650,6 +673,14 @@ export type EndTurnMutationVariables = Exact<{
 
 
 export type EndTurnMutation = { __typename?: 'Mutation', endTurn: boolean };
+
+export type IncreaseResourceMutationVariables = Exact<{
+  gameId: Scalars['String'];
+  resource: Scalars['String'];
+}>;
+
+
+export type IncreaseResourceMutation = { __typename?: 'Mutation', increaseResource: boolean };
 
 export type CreateLobbyMutationVariables = Exact<{
   creatorId: Scalars['Float'];
@@ -729,38 +760,38 @@ export type InitialPrivateGameQueryVariables = Exact<{
 }>;
 
 
-export type InitialPrivateGameQuery = { __typename?: 'Query', initialPrivateGame: { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } | null }> | null } | null }> } };
+export type InitialPrivateGameQuery = { __typename?: 'Query', initialPrivateGame: { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, health?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } | null }> | null } | null }> } };
 
 export type InitialPublicGameQueryVariables = Exact<{
   gameId: Scalars['String'];
 }>;
 
 
-export type InitialPublicGameQuery = { __typename?: 'Query', initialPublicGame: { __typename?: 'Game', id: string, turn: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', uuid: string, health?: number | null, graveyard: { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } | null }> | null }, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } | null }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> } };
+export type InitialPublicGameQuery = { __typename?: 'Query', initialPublicGame: { __typename?: 'Game', id: string, turn: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', uuid: string, health?: number | null, resourcesLeftToSelect: number, resources: { __typename?: 'Resources', swords: number, cups: number, wands: number, pentacles: number }, graveyard: { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, health?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } | null }> | null }, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, health?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } | null }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> } };
 
 export type MyInitialPrivateGameQueryVariables = Exact<{
   gameId: Scalars['String'];
 }>;
 
 
-export type MyInitialPrivateGameQuery = { __typename?: 'Query', myInitialPrivateGame: { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } | null }> | null } | null }> } };
+export type MyInitialPrivateGameQuery = { __typename?: 'Query', myInitialPrivateGame: { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, health?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } | null }> | null } | null }> } };
 
 export type MyCardLibrarySubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MyCardLibrarySubscription = { __typename?: 'Subscription', myCardLibrary: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } } }> };
+export type MyCardLibrarySubscription = { __typename?: 'Subscription', myCardLibrary: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } } }> };
 
 export type MyDeckTemplatesSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MyDeckTemplatesSubscription = { __typename?: 'Subscription', myDeckTemplates: Array<{ __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } } }> }> };
+export type MyDeckTemplatesSubscription = { __typename?: 'Subscription', myDeckTemplates: Array<{ __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } } }> }> };
 
 export type WatchDeckTemplateSubscriptionVariables = Exact<{
   deckTemplateId: Scalars['Float'];
 }>;
 
 
-export type WatchDeckTemplateSubscription = { __typename?: 'Subscription', deckTemplateUpdated: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } } }> } };
+export type WatchDeckTemplateSubscription = { __typename?: 'Subscription', deckTemplateUpdated: { __typename?: 'DeckTemplate', id: number, name: string, cards: Array<{ __typename?: 'CardRecord', id: number, amount: number, isFoil: boolean, card: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } } }> } };
 
 export type EventOfferInboxSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
@@ -772,7 +803,7 @@ export type WatchMyPrivateGameSubscriptionVariables = Exact<{
 }>;
 
 
-export type WatchMyPrivateGameSubscription = { __typename?: 'Subscription', watchMyPrivateGame: { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } | null }> | null } | null }> } };
+export type WatchMyPrivateGameSubscription = { __typename?: 'Subscription', watchMyPrivateGame: { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, health?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } | null }> | null } | null }> } };
 
 export type WatchPrivateGameSubscriptionVariables = Exact<{
   gameId: Scalars['String'];
@@ -780,14 +811,14 @@ export type WatchPrivateGameSubscriptionVariables = Exact<{
 }>;
 
 
-export type WatchPrivateGameSubscription = { __typename?: 'Subscription', watchPrivateGame: { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } | null }> | null } | null }> } };
+export type WatchPrivateGameSubscription = { __typename?: 'Subscription', watchPrivateGame: { __typename?: 'Game', id: string, players: Array<{ __typename?: 'Player', uuid: string, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, health?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } | null }> | null } | null }> } };
 
 export type WatchPublicGameSubscriptionVariables = Exact<{
   gameId: Scalars['String'];
 }>;
 
 
-export type WatchPublicGameSubscription = { __typename?: 'Subscription', watchPublicGame: { __typename?: 'Game', id: string, turn: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', uuid: string, health?: number | null, graveyard: { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } | null }> | null }, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: Array<{ __typename?: 'Resource', name: string, amount: number }> | null } | null }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> } };
+export type WatchPublicGameSubscription = { __typename?: 'Subscription', watchPublicGame: { __typename?: 'Game', id: string, turn: string, logs?: { __typename?: 'GameLogs', logs: Array<string> } | null, players: Array<{ __typename?: 'Player', uuid: string, health?: number | null, resourcesLeftToSelect: number, resources: { __typename?: 'Resources', swords: number, cups: number, wands: number, pentacles: number }, graveyard: { __typename?: 'Graveyard', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, health?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } | null }> | null }, account: { __typename?: 'Account', id: number, userName: string }, playField?: { __typename?: 'PlayField', id: string, cards?: Array<{ __typename?: 'CardObj', id: number, uuid: string, name: string, description: string, imageUrl?: string | null, isFoil: boolean, attack?: number | null, health?: number | null, attacked?: boolean | null, metadata?: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } | null }> | null } | null, deck?: { __typename?: 'Deck', id: string, numCardsInDeck: number } | null, hand?: { __typename?: 'Hand', id: string, numCardsInHand: number } | null }> } };
 
 export type WatchLobbySubscriptionVariables = Exact<{
   watchLobbyId: Scalars['String'];
@@ -826,8 +857,10 @@ export const CardObjMetadataPartsFragmentDoc = gql`
   ATTACK
   NUM_TARGETS
   RESOURCES {
-    name
-    amount
+    swords
+    cups
+    wands
+    pentacles
   }
 }
     `;
@@ -930,6 +963,7 @@ export const CardObjPartsFragmentDoc = gql`
   imageUrl
   isFoil
   attack
+  health
   attacked
   metadata {
     ...CardObjMetadataParts
@@ -969,6 +1003,14 @@ export const PrivateGamePartsFragmentDoc = gql`
   }
 }
     ${PlayerPartsFragmentDoc}`;
+export const ResourcesPartsFragmentDoc = gql`
+    fragment ResourcesParts on Resources {
+  swords
+  cups
+  wands
+  pentacles
+}
+    `;
 export const GraveyardPartsFragmentDoc = gql`
     fragment GraveyardParts on Graveyard {
   id
@@ -995,6 +1037,10 @@ export const PublicGamePartsFragmentDoc = gql`
   players {
     uuid
     health
+    resourcesLeftToSelect
+    resources {
+      ...ResourcesParts
+    }
     graveyard {
       ...GraveyardParts
     }
@@ -1015,7 +1061,8 @@ export const PublicGamePartsFragmentDoc = gql`
     }
   }
 }
-    ${GraveyardPartsFragmentDoc}
+    ${ResourcesPartsFragmentDoc}
+${GraveyardPartsFragmentDoc}
 ${PlayFieldPartsFragmentDoc}`;
 export const LoginDocument = gql`
     mutation Login($password: String!, $email: String!) {
@@ -1166,6 +1213,15 @@ export const EndTurnDocument = gql`
 
 export function useEndTurnMutation() {
   return Urql.useMutation<EndTurnMutation, EndTurnMutationVariables>(EndTurnDocument);
+};
+export const IncreaseResourceDocument = gql`
+    mutation IncreaseResource($gameId: String!, $resource: String!) {
+  increaseResource(gameId: $gameId, resource: $resource)
+}
+    `;
+
+export function useIncreaseResourceMutation() {
+  return Urql.useMutation<IncreaseResourceMutation, IncreaseResourceMutationVariables>(IncreaseResourceDocument);
 };
 export const CreateLobbyDocument = gql`
     mutation CreateLobby($creatorId: Float!) {

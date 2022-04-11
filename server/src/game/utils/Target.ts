@@ -1,4 +1,5 @@
 import { registerEnumType } from 'type-graphql';
+import { Game } from '../Game';
 
 export enum TARGETS {
     SELF = 'SELF',
@@ -8,6 +9,11 @@ export enum TARGETS {
     ALL = 'ALL',
 }
 
+export enum TARGET_TYPE {
+    PLAYER = 'PLAYER',
+    MINION = 'MINION',
+}
+
 registerEnumType(TARGETS, {
     name: 'TARGETS',
     description: 'The possible targets for a card',
@@ -15,7 +21,8 @@ registerEnumType(TARGETS, {
 export interface Target {
     uuid: string;
     name: string;
+    type: TARGET_TYPE;
     health?: number;
-    damage(dmgAmount: number): void;
-    heal(healAmount: number): void;
+    damage(dmgAmount: number, game: Game): void;
+    heal(healAmount: number, game: Game): void;
 }

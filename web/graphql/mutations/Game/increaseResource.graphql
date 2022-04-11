@@ -1,0 +1,3 @@
+mutation IncreaseResource($gameId: String!, $resource: String!) {
+    increaseResource(gameId: $gameId, resource: $resource)
+}

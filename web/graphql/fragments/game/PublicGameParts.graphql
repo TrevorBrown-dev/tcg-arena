@@ -7,6 +7,10 @@ fragment PublicGameParts on Game {
     players {
         uuid
         health
+        resourcesLeftToSelect
+        resources {
+            ...ResourcesParts
+        }
         graveyard {
             ...GraveyardParts
         }

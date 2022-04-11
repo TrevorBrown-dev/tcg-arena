@@ -10,6 +10,7 @@ export const Wand = (props: SVGProps<SVGSVGElement>) => (
         xmlns="http://www.w3.org/2000/svg"
         {...props}
     >
+        <title>Wands</title>
         <path
             d="M14.5 57L3 69.4946L18.3762 91.8265C32.6599 165.029 36.6129 206.385 28.6268 280C42.2937 295.469 49.4705 292.894 61.9416 280C53.4372 206.558 55.5856 164.914 73.2907 91.8265L93.0598 69.4946L81 58.5"
             stroke="currentColor"

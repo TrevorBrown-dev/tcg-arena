@@ -1,4 +1,9 @@
 import { Loading } from 'components/Loading';
+import { SelectResource } from 'components/SelectResource';
+import { Cup } from 'components/svg/icons/Cup';
+import { Pentacle } from 'components/svg/icons/Pentacle';
+import { Sword } from 'components/svg/icons/Sword';
+import { Wand } from 'components/svg/icons/Wand';
 import { useEffect } from 'react';
 import styled from 'styled-components';
 import { Game } from './components/Game/Game';
@@ -23,8 +28,14 @@ export const GameLobby: React.FC = () => {
         return <Loading />;
     }
 
+    const selectResourceVisible =
+        !!game.myPlayer.resourcesLeftToSelect &&
+        game.myPlayer.resourcesLeftToSelect > 0 &&
+        game.publicGame.turn === game.myPlayer.uuid;
+
     return (
         <gameContext.Provider value={game}>
+            {selectResourceVisible && <SelectResource />}
             <TargetStateLayout>
                 <GameLayout>
                     <GameSidebar />

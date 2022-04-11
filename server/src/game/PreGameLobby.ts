@@ -116,7 +116,8 @@ export class PreGameLobby {
             {
                 account: preGameLobby.player2.account,
                 deckTemplate: preGameLobby?.player2?.deckTemplate,
-            }
+            },
+            preGameLobby.id
         );
         preGameLobby.gameId = game.id;
         return game;

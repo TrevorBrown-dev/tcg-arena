@@ -9,6 +9,7 @@ import {
 } from 'type-graphql';
 import { GameEntity } from '../entities/GameEntity';
 import { Game } from '../game/Game';
+import { Resources } from '../game/Player/Player';
 import { Interpreter } from '../interpreter/Interpreter';
 import { MyContext, SubscriptionIterator } from '../types';
 import { getAccountIdFromCookie } from '../utils/auth/getAccountFromCookie';
@@ -42,6 +43,23 @@ class GameResolver {
     }
 
     @Mutation(() => Boolean)
+    async increaseResource(
+        @Arg('gameId') gameId: string,
+        @Arg('resource') resource: string,
+        @Ctx() { accountId }: MyContext
+    ) {
+        if (!accountId) throw new Error('No authorization cookie found');
+        const game = Game.get(gameId);
+        if (!game) throw new Error(`Game not found with id: ${gameId}`);
+        const player = game.getPlayerByAccountId(accountId);
+        if (!player)
+            throw new Error(`You are not a player in game with id: ${gameId}`);
+        player.selectResource(resource.toLowerCase() as keyof Resources, 1);
+        await Game.publishGame(game);
+        return true;
+    }
+
+    @Mutation(() => Boolean)
     async attack(
         @Arg('gameId') gameId: string,
         @Arg('cardUuid') cardUuid: string,
@@ -68,7 +86,8 @@ class GameResolver {
         if (!targets || targets.length !== targetUuid.length) {
             throw new Error(`Targets not found with uuid: ${targetUuid}`);
         }
-        card.executeAttack(targets);
+
+        card.executeAttack(targets, game, player.uuid);
         game.logs.push(`${card.name} attacked ${targets.map((t) => t.name)}.`);
         await Game.publishGame(game);
         return true;
@@ -98,6 +117,13 @@ class GameResolver {
         if (game.turn !== player.uuid) {
             throw new Error(`It is not your turn!`);
         }
+
+        if (!player.hasResources(card.metadata.RESOURCES!))
+            throw new Error(
+                `You don't have enough resources to play this card`
+            );
+        player.spendResources(card.metadata.RESOURCES!);
+
         //Remove the card from the hand
         player.playCard(card);
         //Log action

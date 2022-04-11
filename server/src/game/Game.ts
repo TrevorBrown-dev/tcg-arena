@@ -7,6 +7,7 @@ import { pubsub } from '..';
 import { GameLogs } from './GameLogs';
 import { Interpreter, ParsedCode } from '../interpreter/Interpreter';
 import { Target } from './utils/Target';
+import { PreGameLobby } from './PreGameLobby';
 
 //create a class decorator that will inject a property called id
 type PlayerInput = {
@@ -46,6 +47,11 @@ export class Game {
     @Field(() => String)
     turn: string;
 
+    @Field(() => String, { nullable: true })
+    winner: string;
+
+    lobbyId: string;
+
     get targets() {
         return [
             this.players[0] as Target,
@@ -70,10 +76,24 @@ export class Game {
         }
     }
 
+    endGame() {
+        const winningPlayer = this.players.find((p) => p.health <= 0);
+        this.winner = winningPlayer!.uuid;
+
+        if (!winningPlayer) throw new Error('No winner found');
+
+        this.logs.push(`${winningPlayer.account.userName} wins!`);
+        Game.publishGame(this);
+        setTimeout(() => {
+            PreGameLobby.remove(this.lobbyId);
+            Game.games.delete(this.id);
+        }, 5000);
+    }
+
     endTurn() {
         const { otherPlayer } = this.getActingAndOtherPlayer(this.turn);
         this.turn = otherPlayer!.uuid!;
-        otherPlayer.startTurn();
+        otherPlayer.startTurn(this);
     }
 
     getPlayerByAccountId(accountId: number) {
@@ -102,15 +122,20 @@ export class Game {
         await Interpreter.interpret(code, this, playerId, cardId);
     }
 
-    async executeRawCode(code: string, playerId: string) {
-        await this.executeAction(playerId, Interpreter.parseCode(code), '');
+    async executeRawCode(code: string, playerId: string, cardId?: string) {
+        await this.executeAction(
+            playerId,
+            Interpreter.parseCode(code),
+            cardId || ''
+        );
     }
 
-    constructor(player1: PlayerInput, player2: PlayerInput) {
+    constructor(player1: PlayerInput, player2: PlayerInput, lobbyId: string) {
         if (!player1 || !player2) {
             return;
         }
         this.id = nanoid();
+        this.lobbyId = lobbyId;
         const p1 = new Player(player1.deckTemplate, player1.account, this.id);
         const p2 = new Player(player2.deckTemplate, player2.account, this.id);
 
@@ -120,15 +145,15 @@ export class Game {
         const first = Math.floor(Math.random() * 2);
         this.turn = this.players[first].uuid;
         this.logs.push(`${this.players[first].account.userName} goes first.`);
-        this.players[first].startTurn();
+        this.players[first].startTurn(this);
 
         //Draw cards
         this.executeAction(p1.uuid, Interpreter.parseCode('DRAW SELF 3;'), '');
         this.executeAction(p2.uuid, Interpreter.parseCode('DRAW SELF 3;'), '');
     }
 
-    static create(player1: PlayerInput, player2: PlayerInput) {
-        const game = new Game(player1, player2);
+    static create(player1: PlayerInput, player2: PlayerInput, lobbyId: string) {
+        const game = new Game(player1, player2, lobbyId);
         Game.games.set(game.id, game);
         return game;
     }
