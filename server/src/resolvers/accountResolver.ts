@@ -162,6 +162,13 @@ class AccountResolver {
 
         return account;
     }
+
+    @Query(() => Account, { nullable: true })
+    async meAdmin(@Ctx() ctx: MyContext): Promise<Account> {
+        const admin = await this.me(ctx);
+        if (!admin.isAdmin) throw new Error('Not Authorized');
+        return admin;
+    }
 }
 
 //    @Subscription(() => Test, {

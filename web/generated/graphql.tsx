@@ -397,6 +397,7 @@ export type Query = {
   initialPublicGame: Game;
   lobbies: Array<Lobby>;
   me?: Maybe<Account>;
+  meAdmin?: Maybe<Account>;
   myInitialPrivateGame: Game;
   preGameLobbies: Array<PreGameLobby>;
 };
@@ -595,6 +596,14 @@ export type RegisterMutationVariables = Exact<{
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'AccountResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, account?: { __typename?: 'Account', id: number, email: string, userName: string, friendCode: string } | null } };
 
+export type UpdateCardMutationVariables = Exact<{
+  data: UpdateCardInput;
+  updateCardId: Scalars['Float'];
+}>;
+
+
+export type UpdateCardMutation = { __typename?: 'Mutation', updateCard: { __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } } };
+
 export type DeleteDeckTemplateMutationVariables = Exact<{
   id: Scalars['Float'];
 }>;
@@ -739,6 +748,16 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'Account', id: number, email: string, userName: string, friendCode: string } | null };
+
+export type MeAdminQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeAdminQuery = { __typename?: 'Query', meAdmin?: { __typename?: 'Account', id: number, email: string, userName: string, friendCode: string } | null };
+
+export type CardsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CardsQuery = { __typename?: 'Query', cards: Array<{ __typename?: 'Card', id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } }> };
 
 export type CardsInLibraryQueryVariables = Exact<{
   cardLibraryId: Scalars['Float'];
@@ -1108,6 +1127,17 @@ export const RegisterDocument = gql`
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
 };
+export const UpdateCardDocument = gql`
+    mutation UpdateCard($data: UpdateCardInput!, $updateCardId: Float!) {
+  updateCard(data: $data, id: $updateCardId) {
+    ...CardParts
+  }
+}
+    ${CardPartsFragmentDoc}`;
+
+export function useUpdateCardMutation() {
+  return Urql.useMutation<UpdateCardMutation, UpdateCardMutationVariables>(UpdateCardDocument);
+};
 export const DeleteDeckTemplateDocument = gql`
     mutation DeleteDeckTemplate($id: Float!) {
   deleteDeckTemplate(id: $id)
@@ -1310,6 +1340,28 @@ export const MeDocument = gql`
 
 export function useMeQuery(options?: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'>) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
+};
+export const MeAdminDocument = gql`
+    query MeAdmin {
+  meAdmin {
+    ...AccountParts
+  }
+}
+    ${AccountPartsFragmentDoc}`;
+
+export function useMeAdminQuery(options?: Omit<Urql.UseQueryArgs<MeAdminQueryVariables>, 'query'>) {
+  return Urql.useQuery<MeAdminQuery>({ query: MeAdminDocument, ...options });
+};
+export const CardsDocument = gql`
+    query Cards {
+  cards {
+    ...CardParts
+  }
+}
+    ${CardPartsFragmentDoc}`;
+
+export function useCardsQuery(options?: Omit<Urql.UseQueryArgs<CardsQueryVariables>, 'query'>) {
+  return Urql.useQuery<CardsQuery>({ query: CardsDocument, ...options });
 };
 export const CardsInLibraryDocument = gql`
     query CardsInLibrary($cardLibraryId: Float!) {

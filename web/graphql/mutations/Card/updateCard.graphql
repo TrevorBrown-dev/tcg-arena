@@ -1,0 +1,5 @@
+mutation UpdateCard($data: UpdateCardInput!, $updateCardId: Float!) {
+    updateCard(data: $data, id: $updateCardId) {
+        ...CardParts
+    }
+}
