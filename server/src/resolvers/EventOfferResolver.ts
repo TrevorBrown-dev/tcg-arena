@@ -37,6 +37,7 @@ class EventOfferResolver {
         if (!authorization) throw new Error('No authorization cookie found');
         const account = parseJWT(authorization);
         if (!account || !account?.id) {
+            console.log('errorrr');
             throw new Error(
                 `No account found with cookie ${authorization} and payload response`
             );
@@ -46,10 +47,13 @@ class EventOfferResolver {
         const recipient = await Account.findOne({
             where: { friendCode: recipientFriendCode },
         });
-        if (!issuer || !recipient)
+        if (!issuer || !recipient) {
+            console.log('no issue');
             throw new Error(
                 `Accounts not found with ids : ${issuerId}, ${recipientFriendCode}`
             );
+        }
+
         const offer = EventOffer.createEventOffer(issuer, recipient, type);
 
         return offer;
