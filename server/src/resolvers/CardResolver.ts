@@ -18,6 +18,12 @@ class CardResolver {
         return await Card.find();
     }
 
+    @Authorized()
+    @Query(() => [Card])
+    async adminCards() {
+        return await Card.find();
+    }
+
     //Creates a new card
     // @Authorized()
     @Mutation(() => Card)
@@ -25,6 +31,7 @@ class CardResolver {
         return await Card.create(data).save();
     }
 
+    @Authorized()
     @Mutation(() => Card)
     async updateCard(
         @Arg('id') id: number,

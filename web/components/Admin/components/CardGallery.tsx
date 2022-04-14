@@ -1,7 +1,8 @@
-import { useCardsQuery } from '@graphql-gen';
+import { useAdminCardsQuery, useCardsQuery } from '@graphql-gen';
 import { Card } from 'components/Card/Card';
 import { CardLibraryCard } from 'components/Card/CardLibraryCard';
 import styled from 'styled-components';
+import { useCardContext } from './SelectedCardContext';
 
 const StyledCardGallery = styled.div`
     background-color: var(--color-light);
@@ -13,14 +14,17 @@ const StyledCardGallery = styled.div`
     max-height: 40vh;
 `;
 export const CardGallery: React.FC = () => {
-    const [cardsResponse] = useCardsQuery();
+    const [cardsResponse] = useAdminCardsQuery();
 
-    const cards = cardsResponse.data?.cards;
+    const cards = cardsResponse.data?.adminCards;
+    const { setCard } = useCardContext();
+
     return (
         <StyledCardGallery>
             {cards?.map((card, i) => {
                 return (
                     <Card
+                        onClick={() => setCard(card)}
                         cardRecord={{
                             card: card as any,
                             isFoil: false,

@@ -1,0 +1,6 @@
+query AdminCards {
+    adminCards {
+        code
+        ...CardParts
+    }
+}

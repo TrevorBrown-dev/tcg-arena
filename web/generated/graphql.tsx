@@ -384,6 +384,7 @@ export type PreGamePlayer = {
 export type Query = {
   __typename?: 'Query';
   account: Account;
+  adminCards: Array<Card>;
   card: Card;
   cardLibraries: Array<CardLibrary>;
   cards: Array<Card>;
@@ -753,6 +754,11 @@ export type MeAdminQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MeAdminQuery = { __typename?: 'Query', meAdmin?: { __typename?: 'Account', id: number, email: string, userName: string, friendCode: string } | null };
+
+export type AdminCardsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AdminCardsQuery = { __typename?: 'Query', adminCards: Array<{ __typename?: 'Card', code: string, id: number, name: string, description: string, imageUrl?: string | null, metadata: { __typename?: 'CardObjMetadata', VALID_TARGETS?: Array<Targets> | null, TYPE?: Card_Types | null, HEALTH?: number | null, ATTACK?: number | null, NUM_TARGETS?: number | null, RESOURCES?: { __typename?: 'ResourceCosts', swords?: number | null, cups?: number | null, wands?: number | null, pentacles?: number | null } | null } }> };
 
 export type CardsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1351,6 +1357,18 @@ export const MeAdminDocument = gql`
 
 export function useMeAdminQuery(options?: Omit<Urql.UseQueryArgs<MeAdminQueryVariables>, 'query'>) {
   return Urql.useQuery<MeAdminQuery>({ query: MeAdminDocument, ...options });
+};
+export const AdminCardsDocument = gql`
+    query AdminCards {
+  adminCards {
+    code
+    ...CardParts
+  }
+}
+    ${CardPartsFragmentDoc}`;
+
+export function useAdminCardsQuery(options?: Omit<Urql.UseQueryArgs<AdminCardsQueryVariables>, 'query'>) {
+  return Urql.useQuery<AdminCardsQuery>({ query: AdminCardsDocument, ...options });
 };
 export const CardsDocument = gql`
     query Cards {
